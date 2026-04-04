@@ -1,0 +1,1 @@
+# Agent Universe\n\nDecentralized agentic universe where autonomous agents perceive, reason, act, and settle value through a shared append-only log, optimized file system, routing, state-management, quantum-enhanced MCP, multimodal communication (voice, WhatsApp, Gmail, TikTok), and self-improving feedback loops.
