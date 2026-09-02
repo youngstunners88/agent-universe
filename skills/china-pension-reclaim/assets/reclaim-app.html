@@ -1,0 +1,730 @@
+<title>Unclaimed in China</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap">
+<style>
+:root{
+  --paper:#F2F4F5;
+  --card:#FFFFFF;
+  --sunk:#E8ECEE;
+  --ink:#16202B;
+  --ink-2:#4A5966;
+  --ink-3:#78889A;
+  --rule:#D3DADE;
+  --rule-2:#E4E9EC;
+  --seal:#C1272D;
+  --seal-soft:#FBEDED;
+  --jade:#3F7561;
+  --jade-soft:#EAF2EE;
+  --amber:#9A6410;
+  --amber-soft:#FBF1E0;
+  --focus:#16202B;
+  --shadow:0 1px 2px rgba(22,32,43,.06),0 8px 24px -12px rgba(22,32,43,.18);
+  --serif:"Newsreader",ui-serif,Georgia,"Songti SC",serif;
+  --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+  --cjk:"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans CJK SC","Source Han Sans SC",sans-serif;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --paper:#121A20;
+    --card:#18222A;
+    --sunk:#0E161B;
+    --ink:#E3E9EC;
+    --ink-2:#A3B1BC;
+    --ink-3:#7A8994;
+    --rule:#2B3841;
+    --rule-2:#232F37;
+    --seal:#EE6A63;
+    --seal-soft:#2A1A1B;
+    --jade:#79BB9B;
+    --jade-soft:#14231D;
+    --amber:#D9A65C;
+    --amber-soft:#251D10;
+    --focus:#E3E9EC;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 28px -14px rgba(0,0,0,.7);
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#121A20;
+  --card:#18222A;
+  --sunk:#0E161B;
+  --ink:#E3E9EC;
+  --ink-2:#A3B1BC;
+  --ink-3:#7A8994;
+  --rule:#2B3841;
+  --rule-2:#232F37;
+  --seal:#EE6A63;
+  --seal-soft:#2A1A1B;
+  --jade:#79BB9B;
+  --jade-soft:#14231D;
+  --amber:#D9A65C;
+  --amber-soft:#251D10;
+  --focus:#E3E9EC;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 28px -14px rgba(0,0,0,.7);
+}
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased}
+.zh{font-family:var(--cjk)}
+.wrap{max-width:940px;margin:0 auto;padding:0 22px 96px}
+:where(a):focus-visible,:where(button):focus-visible,:where(input,select,textarea):focus-visible{outline:2px solid var(--focus);outline-offset:2px;border-radius:3px}
+
+/* ---------- file cover ---------- */
+.cover{padding:44px 0 26px;border-bottom:2px solid var(--ink);position:relative}
+.docmark{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+.docmark .zh{letter-spacing:.06em;text-transform:none}
+h1{font-family:var(--serif);font-weight:500;font-size:clamp(38px,6.4vw,60px);line-height:1.02;letter-spacing:-.02em;margin:16px 0 0;text-wrap:balance;max-width:15ch}
+.deck{font-size:17px;color:var(--ink-2);max-width:60ch;margin:14px 0 0}
+.deck b{color:var(--ink);font-weight:600}
+.seal{position:absolute;top:52px;right:0;width:112px;height:112px;border:2.5px solid var(--seal);border-radius:50%;display:grid;place-content:center;text-align:center;transform:rotate(-11deg);color:var(--seal);opacity:.92;pointer-events:none}
+.seal::after{content:"";position:absolute;inset:6px;border:1px solid var(--seal);border-radius:50%}
+.seal .big{font-family:var(--cjk);font-size:27px;font-weight:700;line-height:1.1;letter-spacing:.06em}
+.seal .sm{font-family:var(--mono);font-size:8.5px;letter-spacing:.13em;margin-top:3px}
+@media(max-width:720px){.seal{position:static;margin:22px 0 0;transform:rotate(-6deg)}}
+
+/* ---------- form grid (bilingual field pairs) ---------- */
+.fieldgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(168px,1fr));gap:0;border:1px solid var(--rule);border-radius:2px;overflow:hidden;margin:26px 0 0;background:var(--card)}
+.fg{padding:11px 13px;border-right:1px solid var(--rule-2);border-bottom:1px solid var(--rule-2)}
+.fg:last-child{border-right:none}
+.fg .lab{font-family:var(--cjk);font-size:11.5px;color:var(--ink-3);letter-spacing:.04em}
+.fg .lab i{display:block;font-family:var(--mono);font-style:normal;font-size:9.5px;letter-spacing:.11em;text-transform:uppercase;margin-top:1px}
+.fg .val{font-family:var(--mono);font-size:14px;font-weight:500;margin-top:5px;color:var(--ink);word-break:break-word}
+
+/* ---------- section rhythm ---------- */
+section{margin-top:56px}
+.eyebrow{font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--seal);display:flex;align-items:baseline;gap:10px}
+.eyebrow .zh{font-family:var(--cjk);letter-spacing:.08em;text-transform:none;font-size:12px;color:var(--ink-3)}
+h2{font-family:var(--serif);font-weight:500;font-size:clamp(25px,3.6vw,33px);line-height:1.14;letter-spacing:-.015em;margin:11px 0 0;text-wrap:balance;max-width:24ch}
+h3{font-family:var(--sans);font-weight:600;font-size:16px;margin:0;letter-spacing:-.005em}
+p{margin:13px 0 0;max-width:66ch}
+.lede{font-size:16.5px;color:var(--ink-2)}
+small.note{display:block;margin-top:9px;font-size:12.5px;color:var(--ink-3);max-width:64ch;line-height:1.55}
+
+/* ---------- verdict ---------- */
+.verdicts{display:grid;grid-template-columns:repeat(auto-fit,minmax(212px,1fr));gap:1px;background:var(--rule);border:1px solid var(--rule);border-radius:3px;overflow:hidden;margin-top:22px}
+.v{background:var(--card);padding:18px 17px 19px}
+.v .q{font-family:var(--mono);font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;color:var(--ink-3)}
+.v .a{font-family:var(--serif);font-size:26px;font-weight:500;line-height:1.12;margin-top:9px;letter-spacing:-.015em}
+.v .a.yes{color:var(--jade)}
+.v .a.no{color:var(--seal)}
+.v .why{font-size:13px;color:var(--ink-2);margin-top:8px;line-height:1.5}
+
+/* ---------- calculator ---------- */
+.calc{display:grid;grid-template-columns:1.05fr .95fr;gap:22px;margin-top:24px;align-items:start}
+@media(max-width:800px){.calc{grid-template-columns:1fr}}
+.panel{background:var(--card);border:1px solid var(--rule);border-radius:3px;box-shadow:var(--shadow)}
+.panel-h{padding:13px 17px;border-bottom:1px solid var(--rule-2);display:flex;justify-content:space-between;align-items:center;gap:12px}
+.panel-h .t{font-family:var(--cjk);font-size:13px;font-weight:600}
+.panel-h .t i{display:block;font-family:var(--mono);font-style:normal;font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);font-weight:400;margin-top:2px}
+.panel-b{padding:17px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:520px){.row{grid-template-columns:1fr}}
+label{display:block;margin-top:13px}
+label:first-child,.row label{margin-top:0}
+.row+.row,.row+label,label+.row{margin-top:13px}
+.lbl{font-size:11.5px;font-weight:600;letter-spacing:.03em;color:var(--ink-2);display:block;margin-bottom:5px}
+.lbl span{font-family:var(--cjk);font-weight:400;color:var(--ink-3)}
+input,select{width:100%;font-family:var(--mono);font-size:13.5px;padding:8px 10px;border:1px solid var(--rule);border-radius:2px;background:var(--paper);color:var(--ink)}
+select{font-family:var(--sans);font-size:13.5px}
+input[type=checkbox]{width:auto}
+.chk{display:flex;gap:9px;align-items:flex-start;margin-top:13px;font-size:13px;color:var(--ink-2);cursor:pointer}
+.chk input{margin-top:3px;accent-color:var(--seal)}
+
+/* ---------- result ---------- */
+.result{background:var(--card);border:1px solid var(--rule);border-radius:3px;box-shadow:var(--shadow);overflow:hidden}
+.res-top{padding:19px 18px 17px;border-bottom:1px dashed var(--rule)}
+.res-lab{font-family:var(--mono);font-size:10px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink-3)}
+.res-lab .zh{font-family:var(--cjk);letter-spacing:.05em;text-transform:none;font-size:11.5px}
+.amount{font-family:var(--mono);font-weight:600;font-size:clamp(33px,5.4vw,44px);letter-spacing:-.025em;color:var(--seal);margin-top:8px;line-height:1;font-variant-numeric:tabular-nums}
+.amount .cur{font-size:.5em;font-weight:500;letter-spacing:0;margin-right:.16em;color:var(--ink-2)}
+.amount .zar{display:block;font-size:.33em;color:var(--ink-3);font-weight:400;letter-spacing:0;margin-top:9px}
+.breakdown{padding:6px 18px 15px}
+.br{display:flex;justify-content:space-between;gap:14px;padding:9px 0;border-bottom:1px solid var(--rule-2);font-size:13px;align-items:baseline}
+.br:last-child{border-bottom:none}
+.br .k{color:var(--ink-2)}
+.br .k b{color:var(--ink);font-weight:600;display:block;font-size:13.5px}
+.br .k span{font-family:var(--cjk);font-size:11.5px;color:var(--ink-3)}
+.br .n{font-family:var(--mono);font-size:13.5px;font-variant-numeric:tabular-nums;white-space:nowrap;font-weight:500}
+.br .n.gone{color:var(--ink-3);text-decoration:line-through}
+.flag{margin:0;padding:12px 18px;font-size:12.5px;line-height:1.5;border-top:1px solid var(--rule-2)}
+.flag.warn{background:var(--amber-soft);color:var(--amber)}
+.flag.good{background:var(--jade-soft);color:var(--jade)}
+.flag.bad{background:var(--seal-soft);color:var(--seal)}
+.flag b{font-weight:600}
+
+/* ---------- steps ---------- */
+.steps{margin-top:26px;display:flex;flex-direction:column;gap:1px;background:var(--rule);border:1px solid var(--rule);border-radius:3px;overflow:hidden}
+.step{background:var(--card);padding:19px 19px 20px;display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:start}
+.step.done{background:var(--jade-soft)}
+.num{width:31px;height:31px;border-radius:50%;border:1.5px solid var(--seal);color:var(--seal);display:grid;place-content:center;font-family:var(--mono);font-size:13px;font-weight:600;flex:none}
+.step.done .num{background:var(--jade);border-color:var(--jade);color:var(--card)}
+.step-h{display:flex;justify-content:space-between;gap:14px;align-items:flex-start;flex-wrap:wrap}
+.meta{display:flex;gap:7px;flex-wrap:wrap;flex:none}
+.tag{font-family:var(--mono);font-size:9.5px;letter-spacing:.09em;text-transform:uppercase;padding:3px 7px;border-radius:2px;border:1px solid var(--rule);color:var(--ink-3);white-space:nowrap}
+.tag.t-time{border-color:var(--amber);color:var(--amber)}
+.tag.t-free{border-color:var(--jade);color:var(--jade)}
+.tag.t-cost{border-color:var(--seal);color:var(--seal)}
+.step p{margin-top:9px;font-size:14px;max-width:62ch}
+.step ul{margin:10px 0 0;padding-left:18px;font-size:13.5px;color:var(--ink-2)}
+.step li{margin-top:6px}
+.step li b{color:var(--ink);font-weight:600}
+.tick{display:flex;align-items:center;gap:8px;margin-top:14px;font-size:12px;font-family:var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);cursor:pointer;user-select:none}
+.tick input{accent-color:var(--jade)}
+
+/* ---------- script / doc blocks ---------- */
+.doc{background:var(--sunk);border:1px solid var(--rule);border-radius:3px;margin-top:14px;overflow:hidden}
+.doc-h{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:9px 13px;border-bottom:1px solid var(--rule);background:var(--card)}
+.doc-h .dt{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3)}
+.doc-h .dt b{font-family:var(--cjk);letter-spacing:.05em;text-transform:none;font-size:12.5px;color:var(--ink);font-weight:600;display:block;margin-bottom:1px}
+.copy{font-family:var(--mono);font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;padding:5px 10px;border:1px solid var(--rule);background:var(--paper);color:var(--ink-2);border-radius:2px;cursor:pointer;white-space:nowrap}
+.copy:hover{border-color:var(--ink-3);color:var(--ink)}
+.copy.ok{border-color:var(--jade);color:var(--jade)}
+pre.body{margin:0;padding:15px 14px;font-family:var(--mono);font-size:12.5px;line-height:1.72;white-space:pre-wrap;word-break:break-word;color:var(--ink);overflow-x:auto}
+pre.body .cn{font-family:var(--cjk);font-size:13.5px}
+.say{padding:13px 14px;border-bottom:1px solid var(--rule-2);display:grid;grid-template-columns:auto 1fr;gap:14px;align-items:start}
+.say:last-child{border-bottom:none}
+.say .n{font-family:var(--mono);font-size:11px;color:var(--seal);padding-top:2px;font-weight:600}
+.say .en{font-size:13px;color:var(--ink-2);font-style:italic}
+.say .cn{font-family:var(--cjk);font-size:15px;margin-top:5px;line-height:1.55}
+
+/* ---------- tables ---------- */
+.scroll{overflow-x:auto;margin-top:18px;border:1px solid var(--rule);border-radius:3px;background:var(--card)}
+table{border-collapse:collapse;width:100%;font-size:13.5px;min-width:520px}
+th{text-align:left;font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);font-weight:500;padding:11px 13px;border-bottom:1px solid var(--rule);white-space:nowrap}
+td{padding:11px 13px;border-bottom:1px solid var(--rule-2);vertical-align:top}
+tr:last-child td{border-bottom:none}
+td.num{font-family:var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+td b{font-weight:600}
+td .zh{font-size:12px;color:var(--ink-3);display:block}
+
+/* ---------- clock strip ---------- */
+.clock{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1px;background:var(--rule);border:1px solid var(--rule);border-radius:3px;margin-top:16px;overflow:hidden}
+.cl{background:var(--card);padding:13px 15px}
+.cl .z{font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3)}
+.cl .t{font-family:var(--mono);font-size:19px;font-weight:600;margin-top:5px;font-variant-numeric:tabular-nums}
+.cl .d{font-size:12px;color:var(--ink-2);margin-top:3px}
+.cl.hot .t{color:var(--seal)}
+
+/* ---------- risks ---------- */
+.risks{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px;margin-top:20px}
+.risk{border-left:2px solid var(--seal);padding:2px 0 2px 15px}
+.risk h3{font-size:14.5px}
+.risk p{margin-top:6px;font-size:13.5px;color:var(--ink-2)}
+.risk.ok{border-left-color:var(--jade)}
+
+footer{margin-top:64px;padding-top:22px;border-top:1px solid var(--rule);font-size:12.5px;color:var(--ink-3);line-height:1.65}
+footer a{color:var(--ink-2)}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+@media print{.copy,.tick{display:none}body{background:#fff}}
+</style>
+
+<div class="wrap">
+
+<header class="cover">
+  <div class="docmark">
+    <span>Claim kit</span><span class="zh">境外人员社保个人账户清算</span><span>Rev. 2026-09</span>
+  </div>
+  <h1>Unclaimed in China</h1>
+  <p class="deck">If you worked in China on a work permit and left without closing your social-insurance account, <b>the 8% taken off every payslip is still sitting there in your name</b>. It does not expire, it earns interest, and you can take it as a lump sum from anywhere in the world. Most people never find out.</p>
+  <div class="seal" aria-hidden="true"><span class="big zh">待办</span><span class="sm">PENDING</span></div>
+  <div class="fieldgrid" id="cover-fields"></div>
+</header>
+
+<section id="verdict">
+  <div class="eyebrow">The short answer <span class="zh">结论</span></div>
+  <h2>Yes — but the first job is proving the account exists at all.</h2>
+  <p class="lede">The case below is a South African ESL teacher who worked in Shanghai until 2022, whose employer has since been dissolved, and who has no termination letter. Every one of those facts is survivable. Change the inputs and the whole kit re-writes itself for your situation.</p>
+  <div class="verdicts">
+    <div class="v"><div class="q">Can he claim from abroad?</div><div class="a yes">Yes</div><div class="why">No bilateral treaty is needed to withdraw. Leaving China permanently is itself the qualifying event.</div></div>
+    <div class="v"><div class="q">Must he fly to Shanghai?</div><div class="a no">No</div><div class="why">Shanghai is a counter-only service, but it accepts an agent acting on a signed power of attorney. The agent needs a PRC ID card.</div></div>
+    <div class="v"><div class="q">What does the government charge?</div><div class="a yes">Nothing</div><div class="why"><span class="zh">不收费</span> — the filing is free. Your cost is notarising and apostilling the paperwork.</div></div>
+    <div class="v"><div class="q">Is it too late?</div><div class="a no">No</div><div class="why">The individual account has no claim deadline. Balances from 2022 are still there, still accruing.</div></div>
+  </div>
+</section>
+
+<section id="calc">
+  <div class="eyebrow">Step 00 · What is in there <span class="zh">个人账户储存额估算</span></div>
+  <h2>Estimate the balance before you spend a cent on paperwork</h2>
+  <p>Chinese pension has two buckets. Your <b>8%</b> goes to a personal account with your name on it — that is refundable. The employer's <b>16%</b> goes to the city pooling fund and is gone the moment you stop being a Chinese pensioner-in-waiting. Knowing the number tells you whether the notary fees are worth it.</p>
+
+  <div class="calc">
+    <div class="panel">
+      <div class="panel-h"><div class="t zh">参保情况<i>Your enrolment</i></div><button class="copy" id="reset">Reset to sample</button></div>
+      <div class="panel-b">
+        <div class="row">
+          <label><span class="lbl">Name on passport <span class="zh">姓名</span></span><input id="f-name" type="text" value="Example Applicant"></label>
+          <label><span class="lbl">Passport no. <span class="zh">护照号</span></span><input id="f-pp" type="text" value="A01234567"></label>
+        </div>
+        <div class="row">
+          <label><span class="lbl">Nationality <span class="zh">国籍</span></span>
+            <select id="f-nat">
+              <option value="ZA" selected>South Africa</option>
+              <option value="GB">United Kingdom</option>
+              <option value="US">United States</option>
+              <option value="AU">Australia</option>
+              <option value="IE">Ireland</option>
+              <option value="NZ">New Zealand</option>
+              <option value="CA" data-treaty="1">Canada (treaty)</option>
+              <option value="DE" data-treaty="1">Germany (treaty)</option>
+              <option value="KR" data-treaty="1">South Korea (treaty)</option>
+              <option value="JP" data-treaty="1">Japan (treaty)</option>
+              <option value="NL" data-treaty="1">Netherlands (treaty)</option>
+              <option value="ES" data-treaty="1">Spain (treaty)</option>
+              <option value="CH" data-treaty="1">Switzerland (treaty)</option>
+              <option value="DK" data-treaty="1">Denmark (treaty)</option>
+              <option value="FI" data-treaty="1">Finland (treaty)</option>
+              <option value="LU" data-treaty="1">Luxembourg (treaty)</option>
+              <option value="RS" data-treaty="1">Serbia (treaty)</option>
+              <option value="KG" data-treaty="1">Kyrgyzstan (treaty)</option>
+              <option value="XX">Other / not listed</option>
+            </select>
+          </label>
+          <label><span class="lbl">City of employment <span class="zh">参保城市</span></span>
+            <select id="f-city"><option value="SH" selected>Shanghai</option><option value="OTHER">Beijing / Shenzhen / other</option></select>
+          </label>
+        </div>
+        <div class="row">
+          <label><span class="lbl">Job started <span class="zh">入职</span></span><input id="f-start" type="month" value="2019-09"></label>
+          <label><span class="lbl">Job ended <span class="zh">离职</span></span><input id="f-end" type="month" value="2022-06"></label>
+        </div>
+        <div class="row">
+          <label><span class="lbl">Gross monthly pay, RMB <span class="zh">月薪</span></span><input id="f-pay" type="number" min="0" step="500" value="20000"></label>
+          <label><span class="lbl">ZAR per RMB <span class="zh">汇率</span></span><input id="f-fx" type="number" min="0" step="0.05" value="2.55"></label>
+        </div>
+        <label class="chk"><input type="checkbox" id="f-early"><span>I was already enrolled in Shanghai social insurance <b>before</b> August 2021 (voluntary scheme). Leave unticked if unsure — before 16 Aug 2021 Shanghai let employers opt foreigners out, and most opted out.</span></label>
+      </div>
+    </div>
+
+    <div class="result">
+      <div class="res-top">
+        <div class="res-lab"><span class="zh">可支取金额（估算）</span> · Recoverable, estimated</div>
+        <div class="amount" id="amt"><span class="cur">¥</span><span id="amt-n">0</span><span class="zar" id="amt-zar"></span></div>
+      </div>
+      <div class="breakdown" id="bd"></div>
+      <div id="flags"></div>
+    </div>
+  </div>
+  <small class="note">Estimate only. It applies Shanghai's official contribution floor and ceiling for each month you were enrolled (¥5,975–31,014 to Jun 2022; ¥6,520–34,188 to Jun 2023; ¥7,310–36,549 to Jun 2024; ¥7,384–36,921 to Jun 2025, carried forward after that), then 8% for pension and 2% for the medical account. Employers under-declaring the base is common, so treat this as a ceiling until the 12333 operator reads you the real figure.</small>
+</section>
+
+<section id="call">
+  <div class="eyebrow">Step 01 · The phone call <span class="zh">先打电话确认</span></div>
+  <h2>One call settles whether you have a claim</h2>
+  <p>Do this before paying any agent. The operator can look you up on your passport number alone and tell you, on the spot, whether an account exists and what is in it. <b>Shanghai's 12345 line will transfer you to an English desk if you speak English</b> — say so immediately and wait through the Chinese prompt.</p>
+
+  <div class="clock" id="clock"></div>
+
+  <div class="doc">
+    <div class="doc-h"><div class="dt"><b class="zh">来电脚本</b>What to say, line by line</div><button class="copy" data-copy="script">Copy Chinese</button></div>
+    <div class="say"><div class="n">1</div><div><div class="en">Open in English. This alone triggers the transfer.</div><div class="cn">你好，我需要英文服务，请帮我转接。</div></div></div>
+    <div class="say"><div class="n">2</div><div><div class="en">Say what you want, in case no English desk is free.</div><div class="cn">我想查询一位外籍人员的社保参保记录和养老保险个人账户余额。</div></div></div>
+    <div class="say"><div class="n">3</div><div><div class="en">Give the identifiers. Passport number is the account key.</div><div class="cn">护照号是 <span id="sc-pp">A01234567</span>，姓名 <span id="sc-nm">Example Applicant</span>，<span id="sc-yr">2019 年至 2022 年</span>在上海工作。</div></div></div>
+    <div class="say"><div class="n">4</div><div><div class="en">The decisive question — was I ever enrolled?</div><div class="cn">请问他有没有参加过职工基本养老保险？个人账户里有多少钱？</div></div></div>
+    <div class="say"><div class="n">5</div><div><div class="en">State the two complications up front. They are routine.</div><div class="cn">他现在人在国外，原单位已经注销了，没有解除劳动合同证明。</div></div></div>
+    <div class="say"><div class="n">6</div><div><div class="en">Ask the three things you actually need from the call.</div><div class="cn">想终止社会保险关系、一次性支取个人账户，请问需要哪些材料？可以委托他人代办吗？应该到哪个区的社保分中心办理？</div></div></div>
+  </div>
+
+  <div class="scroll">
+    <table>
+      <thead><tr><th>Line</th><th>Who answers</th><th>Hours (Shanghai)</th><th>Use it for</th></tr></thead>
+      <tbody>
+        <tr><td class="num"><b>12333</b><span class="zh">人力资源社会保障热线</span></td><td>Social-insurance specialists</td><td class="num">Mon–Fri, 09:00–17:00</td><td>Account balances, exact document lists, which district branch holds your file. Chinese-only in practice.</td></tr>
+        <tr><td class="num"><b>12345</b><span class="zh">市民服务热线</span></td><td>City hotline, routes to specialists</td><td class="num">Daily, 08:00–20:00</td><td><b>Start here.</b> Press 0 for a human, ask for English, get transferred. Slower but you will be understood.</td></tr>
+        <tr><td class="num"><b>+86 21 12333</b></td><td>Same line from outside China</td><td class="num">As above</td><td>Dial with the country code. Use a VoIP service — hold times run 5–20 minutes and this is the cheap part.</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <small class="note">Ask the operator for the <span class="zh">社保分中心</span> (district branch) that holds the file and its street address — you need that for the power of attorney, and it is the one fact you cannot look up from outside China.</small>
+</section>
+
+<section id="route">
+  <div class="eyebrow">Step 02 → 05 · The route <span class="zh">办理流程</span></div>
+  <h2>Four moves, run in this order because each unlocks the next</h2>
+  <div class="steps" id="steps"></div>
+</section>
+
+<section id="docs">
+  <div class="eyebrow">Document pack <span class="zh">申请材料</span></div>
+  <h2>Two documents do the heavy lifting</h2>
+  <p>Both fill themselves from the form above. The power of attorney is what removes the need to fly; the statement of circumstances is what replaces the termination letter your dissolved employer can no longer give you.</p>
+
+  <div class="doc">
+    <div class="doc-h"><div class="dt"><b class="zh">授权委托书</b>Power of attorney · notarise + apostille</div><button class="copy" data-copy="poa">Copy</button></div>
+    <pre class="body" id="poa"></pre>
+  </div>
+
+  <div class="doc">
+    <div class="doc-h"><div class="dt"><b class="zh">情况说明</b>Statement of circumstances · employer dissolved</div><button class="copy" data-copy="stmt">Copy</button></div>
+    <pre class="body" id="stmt"></pre>
+  </div>
+  <small class="note">Sign the power of attorney in front of a notary public — do not pre-sign. In South Africa the chain is: notary public → apostille from DIRCO's Legalisation Section in Pretoria (the Chinese Embassy stopped legalising documents on 7 November 2023, when the Apostille Convention entered into force between China and South Africa) → certified Chinese translation, which is cheapest done in China by the agency your agent uses, because the counter wants a translator's chop on it.</small>
+</section>
+
+<section id="cost">
+  <div class="eyebrow">Money and time <span class="zh">时限与费用</span></div>
+  <h2>What it costs to unlock, and how long each part takes</h2>
+  <div class="scroll">
+    <table>
+      <thead><tr><th>Item</th><th>Typical cost</th><th>Elapsed time</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td><b>Government filing fee</b><span class="zh">社保经办费用</span></td><td class="num">¥0</td><td class="num">—</td><td>Free by regulation, at every counter, in every city.</td></tr>
+        <tr><td><b>Notary public</b> (South Africa)</td><td class="num">R600 – R1,500</td><td class="num">1 day</td><td>Any notary. Bring your passport and the unsigned power of attorney.</td></tr>
+        <tr><td><b>DIRCO apostille</b></td><td class="num">R0 – R1,200</td><td class="num">1–4 weeks</td><td>State fee is nominal; couriers and expediters are what cost. Walk-in in Pretoria is fastest.</td></tr>
+        <tr><td><b>Certified Chinese translation</b></td><td class="num">¥200 – ¥600</td><td class="num">2–3 days</td><td>Must carry the translation agency's chop. Do it in China.</td></tr>
+        <tr><td><b>Agent in China</b></td><td class="num">¥0 – ¥6,000</td><td class="num">—</td><td>Free if a friend or ex-colleague with a PRC ID card will do it. Agencies charge ¥2,000–6,000 or a percentage.</td></tr>
+        <tr><td><b>Counter processing</b><span class="zh">办理时限</span></td><td class="num">¥0</td><td class="num">20 working days</td><td>The statutory limit for the Shanghai branch to review, action and report back.</td></tr>
+        <tr><td><b>Payment out</b></td><td class="num">Bank fees</td><td class="num">1–4 weeks</td><td>Paid in RMB to a Chinese bank account in <em>your</em> name. See the risk below.</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p><b>Realistic end-to-end: three to five months</b>, and roughly R1,500–3,500 out of pocket if a friend acts as agent. Almost all of the elapsed time is the apostille and the courier — the Chinese side is the fast part.</p>
+</section>
+
+<section id="risks">
+  <div class="eyebrow">Read before you start <span class="zh">风险提示</span></div>
+  <h2>The four things that actually derail these claims</h2>
+  <div class="risks">
+    <div class="risk"><h3>Your Chinese bank account is closed</h3><p>This is the most common failure. The payout goes to a Chinese account in your own name — not your agent's. If yours was closed, reopening it usually requires you in person, which defeats the whole plan. <b>Ask the operator on the first call</b> whether the branch will remit overseas or accept a designated account; policy varies by branch and has been loosening.</p></div>
+    <div class="risk"><h3>You may never have been enrolled</h3><p>Shanghai only made social insurance compulsory for foreigners on 16 August 2021. Before that, employers could opt you out, and training centres routinely did. If you taught at a tutoring centre killed by the July 2021 crackdown, your enrolment window may be a handful of months — or zero. The call decides it.</p></div>
+    <div class="risk"><h3>Withdrawing is one-way</h3><p>Taking the lump sum terminates the relationship and zeroes your contribution history. If you might work in China again, the alternative is to leave the account dormant — it keeps earning interest and resumes accumulating when you return. Only 15 years of contributions ever unlocks an actual monthly pension.</p></div>
+    <div class="risk ok"><h3>The dissolved employer is not fatal</h3><p>When a company deregisters, it closes its social-insurance registration and your status drops to terminated automatically — which is the proof the counter wants. Your exit stamps and expired work permit corroborate it. Bring the statement of circumstances and let the branch check the registry.</p></div>
+  </div>
+</section>
+
+<footer>
+  <p><b>What this is.</b> A working kit, not legal advice. Rules are set nationally by the Interim Measures for the Participation in Social Insurance of Foreigners Employed in China (MOHRSS Order No. 16, 2011) but administered branch by branch, and counter practice moves faster than published guidance. Verify the document list on the call before you spend money on notarisation.</p>
+  <p style="margin-top:10px">Sources: Shanghai Municipal Human Resources and Social Security Bureau service guide <span class="zh">「外籍、台港澳居民养老保险个人账户终止」</span> · Shanghai One-Stop service portal item catalogue · Notice on the Cessation of Legalisation Service, Chinese Embassy in South Africa, 26 October 2023. Your entries stay in this browser.</p>
+</footer>
+
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var $ = function(id){ return document.getElementById(id); };
+  var KEY = "unclaimed-cn-v1";
+
+  // Shanghai contribution floor/ceiling by period (YYYY-MM inclusive)
+  var BASES = [
+    { from:"2019-04", to:"2020-06", lo:4927,  hi:24633 },
+    { from:"2020-07", to:"2021-06", lo:4927,  hi:24633 },
+    { from:"2021-07", to:"2022-06", lo:5975,  hi:31014 },
+    { from:"2022-07", to:"2023-06", lo:6520,  hi:34188 },
+    { from:"2023-07", to:"2024-06", lo:7310,  hi:36549 },
+    { from:"2024-07", to:"2099-12", lo:7384,  hi:36921 }
+  ];
+  var TREATY = { CA:1,DE:1,KR:1,JP:1,NL:1,ES:1,CH:1,DK:1,FI:1,LU:1,RS:1,KG:1 };
+  var SH_MANDATORY = "2021-08";
+
+  var F = { name:"f-name", pp:"f-pp", nat:"f-nat", city:"f-city", start:"f-start", end:"f-end", pay:"f-pay", fx:"f-fx" };
+
+  function mi(s){ if(!s) return null; var p = s.split("-"); return (+p[0])*12 + (+p[1]) - 1; }
+  function ms(n){ var y = Math.floor(n/12), m = n%12 + 1; return y + "-" + (m<10?"0":"") + m; }
+  function band(n){
+    for (var i=0;i<BASES.length;i++){
+      if (n >= mi(BASES[i].from) && n <= mi(BASES[i].to)) return BASES[i];
+    }
+    return n < mi(BASES[0].from) ? BASES[0] : BASES[BASES.length-1];
+  }
+  function money(n){ return Math.round(n).toLocaleString("en-US"); }
+
+  function read(){
+    return {
+      name: $(F.name).value.trim() || "—",
+      pp:   $(F.pp).value.trim() || "—",
+      nat:  $(F.nat).value,
+      natText: $(F.nat).options[$(F.nat).selectedIndex].text.replace(" (treaty)",""),
+      city: $(F.city).value,
+      start:$(F.start).value,
+      end:  $(F.end).value,
+      pay:  +$(F.pay).value || 0,
+      fx:   +$(F.fx).value || 0,
+      early:$("f-early").checked
+    };
+  }
+
+  function compute(d){
+    var s = mi(d.start), e = mi(d.end);
+    var floorM = (d.city === "SH" && !d.early) ? mi(SH_MANDATORY) : s;
+    var from = Math.max(s, floorM);
+    var r = { months:0, pension:0, medical:0, pooled:0, from:null, to:null, capped:false, floored:false, gap:0 };
+    if (s === null || e === null || e < s) return r;
+    r.gap = Math.max(0, from - s);
+    if (e < from) return r;
+    r.from = ms(from); r.to = ms(e);
+    for (var n = from; n <= e; n++){
+      var b = band(n);
+      var base = d.pay;
+      if (base > b.hi){ base = b.hi; r.capped = true; }
+      if (base < b.lo){ base = b.lo; r.floored = true; }
+      r.months++;
+      r.pension += base * 0.08;
+      r.medical += base * 0.02;
+      r.pooled  += base * 0.16;
+    }
+    return r;
+  }
+
+  function render(){
+    var d = read(), r = compute(d);
+    var total = r.pension + r.medical;
+
+    $("amt-n").textContent = money(total);
+    $("amt-zar").textContent = d.fx > 0 ? "≈ R" + money(total * d.fx) + " at " + d.fx.toFixed(2) + " ZAR/RMB" : "";
+
+    var bd = [
+      ["Pension personal account", "养老保险个人账户", "¥" + money(r.pension), ""],
+      ["Medical personal account", "医保个人账户", "¥" + money(r.medical), ""],
+      ["Employer's 16%, pooled fund", "统筹账户 — not recoverable", "¥" + money(r.pooled), "gone"],
+      ["Months enrolled", r.from ? r.from + " → " + r.to : "no qualifying months", r.months ? r.months + " mo" : "0", ""]
+    ];
+    $("bd").innerHTML = bd.map(function(x){
+      return '<div class="br"><div class="k"><b>' + x[0] + '</b><span class="zh">' + x[1] + '</span></div><div class="n ' + x[3] + '">' + x[2] + '</div></div>';
+    }).join("");
+
+    var f = [];
+    if (!r.months){
+      f.push(['bad','<b>No qualifying months on these dates.</b> ' + (d.city === "SH" ? 'Shanghai only made enrolment compulsory for foreigners on 16 Aug 2021 — if you left before then and were never voluntarily enrolled, there is likely nothing to claim. Tick the box above if you know you were enrolled earlier.' : 'Check the dates.')]);
+    } else if (r.gap > 0){
+      f.push(['warn','<b>' + r.gap + ' months before Aug 2021 excluded.</b> Shanghai let employers opt foreigners out until 16 Aug 2021, so only the months after that are counted here. If your payslips show a social-insurance deduction earlier than that, tick the box and the figure will rise sharply.']);
+    }
+    if (r.capped) f.push(['warn','Your pay is above the contribution ceiling in at least one period, so contributions were calculated on the capped base, not your full salary.']);
+    if (r.floored && r.months) f.push(['warn','Your pay is below the contribution floor in at least one period — contributions were calculated on the minimum base.']);
+    if (TREATY[d.nat]) f.push(['good','<b>' + d.natText + ' has a social-security treaty with China.</b> You may have been lawfully exempt from pension contributions, in which case there is no personal account to claim. If your employer enrolled you anyway, the balance is still yours.']);
+    else if (r.months) f.push(['good','<b>' + d.natText + ' has no social-security treaty with China</b>, so no exemption applied — enrolment was compulsory and a personal account should exist.']);
+    if (r.months) f.push(['good','Balance accrues interest, credited annually. Add a few percent per year since ' + r.to + ' to the figure above. <b>There is no deadline to claim it.</b>']);
+    $("flags").innerHTML = f.map(function(x){ return '<p class="flag ' + x[0] + '">' + x[1] + '</p>'; }).join("");
+
+    // cover fields
+    var status = r.months ? "待办 / Pending" : "待核实 / Unverified";
+    var cf = [
+      ["申请人","APPLICANT", d.name],
+      ["国籍","NATIONALITY", d.natText],
+      ["参保城市","CITY", d.city === "SH" ? "Shanghai 上海" : "Other"],
+      ["参保期间","PERIOD", r.from ? r.from + " → " + r.to : "—"],
+      ["案件状态","STATUS", status]
+    ];
+    $("cover-fields").innerHTML = cf.map(function(x){
+      return '<div class="fg"><div class="lab zh">' + x[0] + '<i>' + x[1] + '</i></div><div class="val">' + esc(x[2]) + '</div></div>';
+    }).join("");
+
+    // call script identifiers
+    $("sc-pp").textContent = d.pp;
+    $("sc-nm").textContent = d.name;
+    var y1 = d.start ? d.start.split("-")[0] : "", y2 = d.end ? d.end.split("-")[0] : "";
+    $("sc-yr").textContent = y1 + " 年至 " + y2 + " 年";
+
+    buildDocs(d, r);
+    save();
+  }
+
+  function esc(s){ return String(s).replace(/[&<>]/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;"}[c]; }); }
+
+  function buildDocs(d, r){
+    var period = r.from ? r.from + " – " + r.to : (d.start + " – " + d.end);
+    var poa =
+"授 权 委 托 书\n" +
+"POWER OF ATTORNEY\n" +
+"────────────────────────────────────────\n\n" +
+"委托人 PRINCIPAL\n" +
+"  姓名 Name ............ " + d.name + "\n" +
+"  国籍 Nationality ..... " + d.natText + "\n" +
+"  护照号 Passport No. .. " + d.pp + "\n" +
+"  参保城市 City ....... " + (d.city === "SH" ? "上海市 Shanghai" : "____________") + "\n" +
+"  参保期间 Period ..... " + period + "\n\n" +
+"受托人 ATTORNEY-IN-FACT\n" +
+"  姓名 Name ............ ________________________\n" +
+"  身份证号 PRC ID No. .. ________________________\n" +
+"  联系电话 Phone ...... ________________________\n\n" +
+"兹委托事项 SCOPE OF AUTHORITY\n" +
+"兹委托上述受托人作为本人的合法代理人，代为办理下列事项：\n" +
+"I hereby appoint the above as my lawful agent to act on my behalf in:\n\n" +
+"  1. 查询本人职工基本养老保险、职工基本医疗保险的参保记录及个人账户储存额；\n" +
+"     Querying my pension and medical insurance records and personal account balances;\n\n" +
+"  2. 申请终止本人的社会保险关系，并一次性支取养老保险个人账户储存额\n" +
+"     及医疗保险个人账户余额；\n" +
+"     Applying to terminate my social insurance relationship and to draw the balances\n" +
+"     of my pension and medical personal accounts as a lump sum;\n\n" +
+"  3. 填写、签收上述事项相关的表格、文书及凭证。\n" +
+"     Completing, submitting and receiving all related forms and documents.\n\n" +
+"委托期限 TERM — 自签署之日起十二（12）个月 / twelve months from signature.\n" +
+"受托人在上述授权范围内所为的行为，本人予以承认并承担相应法律责任。\n" +
+"I ratify and accept legal responsibility for all acts done within this authority.\n\n" +
+"委托人签名 Signature ______________________  日期 Date ______________\n\n" +
+"────────────────────────────────────────\n" +
+"SIGN ONLY IN THE PRESENCE OF A NOTARY PUBLIC.\n" +
+"Then: notary → DIRCO apostille → certified Chinese translation.";
+
+    var stmt =
+"情 况 说 明\n" +
+"STATEMENT OF CIRCUMSTANCES\n" +
+"────────────────────────────────────────\n\n" +
+"致：上海市社会保险事业管理中心 ______ 分中心\n" +
+"To: Shanghai Social Insurance Affairs Centre, ______ District Branch\n\n" +
+"本人 " + d.name + "，" + d.natText + "国籍，护照号 " + d.pp + "，\n" +
+"于 " + period + " 期间在上海市就业并参加职工社会保险。现声明如下：\n\n" +
+"  1. 本人已于 " + (d.end || "________") + " 与原用人单位终止劳动关系，并已离境，\n" +
+"     至今未再在中国境内就业。\n" +
+"     My employment ended on the date above; I left China and have not worked in\n" +
+"     the PRC since.\n\n" +
+"  2. 原用人单位已停止经营并注销，本人无法取得《解除（终止）劳动\n" +
+"     关系证明》。\n" +
+"     My former employer has ceased operations and been deregistered; a termination\n" +
+"     certificate cannot be obtained from it.\n\n" +
+"  3. 现申请终止社会保险关系，一次性支取个人账户储存额。敬请贵中心\n" +
+"     依据单位注销登记、本人工作许可失效记录及出入境记录予以核实。\n" +
+"     I apply to terminate the relationship and draw the balance as a lump sum, and\n" +
+"     ask the Centre to verify the above against the company deregistration record,\n" +
+"     my expired work permit and my exit records.\n\n" +
+"附件 ENCLOSED\n" +
+"  □ 护照首页及签证页复印件  Passport bio page + visa/permit pages\n" +
+"  □ 出入境记录或登机牌    Exit record or boarding pass\n" +
+"  □ 工作许可证复印件        Work permit copy\n" +
+"  □ 社保卡复印件              Social security card copy\n" +
+"  □ 工资单 / 银行流水        Payslips or bank statements showing deductions\n" +
+"  □ 经公证认证的授权委托书  Notarised + apostilled power of attorney\n" +
+"  □ 中文翻译件（翻译机构盖章） Chinese translations bearing agency chop\n\n" +
+"签名 Signature ______________________  日期 Date ______________";
+
+    $("poa").textContent = poa;
+    $("stmt").textContent = stmt;
+  }
+
+  // ---------- steps ----------
+  var STEPS = [
+    { n:"02", zh:"确认参保记录", t:"Confirm the account and get the branch name",
+      tags:[["t-free","Free"],["t-time","1 call"]],
+      p:"Everything downstream depends on two facts only the counter holds: whether you were ever enrolled, and which district branch keeps your file. Use the script above.",
+      li:["<b>Get the balance</b> — ask for the 个人账户储存额 figure, not a rounded estimate.","<b>Get the branch</b> — name, district and street address, for the power of attorney.","<b>Get their document list</b> — read it back and write it down. It beats every guide, including this one.","<b>Ask about payment</b> — will they remit overseas, or do you need a live Chinese bank account?"] },
+    { n:"03", zh:"找代办人", t:"Find someone in China with a PRC ID card",
+      tags:[["t-cost","¥0–6,000"],["t-time","Days"]],
+      p:"Shanghai processes this at the counter only — no app, no portal, no post. The agent must produce their own PRC resident ID card alongside your power of attorney, so a foreign friend still in Shanghai cannot do it.",
+      li:["<b>Best case</b> — a former colleague, a Chinese friend, a partner's family. Costs nothing.","<b>Otherwise</b> — a licensed HR or visa agency in Shanghai; ¥2,000–6,000, and they will know the branch's habits.","<b>Avoid</b> — anyone asking for the payout to land in their account. It cannot, and the request is the tell."] },
+    { n:"04", zh:"公证、认证、翻译", t:"Notarise, apostille, translate",
+      tags:[["t-cost","R600–2,700"],["t-time","1–4 weeks"]],
+      p:"This is the slow, expensive leg, and the only one that needs you physically present — in your own country, not China.",
+      li:["<b>Notary</b> — sign the power of attorney in front of them, never before.","<b>Apostille</b> — DIRCO Legalisation, Pretoria. Since 7 Nov 2023 the Chinese Embassy no longer legalises; an apostille replaces it.","<b>Translate</b> — in China, by an agency that applies its chop. Cheaper and more acceptable than a translation done abroad.","<b>Courier</b> — send originals to your agent. Scans are not accepted at the counter."] },
+    { n:"05", zh:"递交并等待", t:"Agent files at the branch; 20 working days to a decision",
+      tags:[["t-free","¥0 fee"],["t-time","20 working days"]],
+      p:"Counter hours are narrow — weekdays 09:00–11:30 and 13:30–16:30. Your agent submits the pack, the branch reviews, and the balance is paid into your Chinese account in RMB.",
+      li:["<b>Statutory limit is 20 working days</b> for review and result. Chase through 12345 if it slips.","<b>Do the medical account too</b> — it is a separate liquidation at the medical insurance office, and your agent is already there.","<b>Ask about the housing fund</b> — 住房公积金 is a different institution again. Voluntary for foreigners in Shanghai, but if your employer paid it, it is often the larger sum.","<b>Keep every receipt</b> — the termination confirmation is your proof the relationship is closed."] }
+  ];
+
+  function buildSteps(){
+    $("steps").innerHTML = STEPS.map(function(s, i){
+      return '<div class="step" data-i="' + i + '">' +
+        '<div class="num">' + s.n + '</div><div>' +
+        '<div class="step-h"><h3>' + s.t + '</h3><div class="meta">' +
+          s.tags.map(function(t){ return '<span class="tag ' + t[0] + '">' + t[1] + '</span>'; }).join("") +
+          '<span class="tag zh">' + s.zh + '</span></div></div>' +
+        '<p>' + s.p + '</p><ul>' + s.li.map(function(l){ return "<li>" + l + "</li>"; }).join("") + '</ul>' +
+        '<label class="tick"><input type="checkbox" data-step="' + i + '"> Done</label>' +
+        '</div></div>';
+    }).join("");
+    $("steps").addEventListener("change", function(e){
+      var cb = e.target;
+      if (!cb.hasAttribute("data-step")) return;
+      cb.closest(".step").classList.toggle("done", cb.checked);
+      updateSeal(); save();
+    });
+  }
+
+  function updateSeal(){
+    var boxes = document.querySelectorAll("[data-step]");
+    var done = 0;
+    boxes.forEach(function(b){ if (b.checked) done++; });
+    var seal = document.querySelector(".seal");
+    if (done === boxes.length && boxes.length){
+      seal.querySelector(".big").textContent = "已办";
+      seal.querySelector(".sm").textContent = "FILED";
+      seal.style.borderColor = "var(--jade)"; seal.style.color = "var(--jade)";
+    } else {
+      seal.querySelector(".big").textContent = "待办";
+      seal.querySelector(".sm").textContent = "PENDING";
+      seal.style.borderColor = ""; seal.style.color = "";
+    }
+  }
+
+  // ---------- clock ----------
+  function buildClock(){
+    var now = new Date();
+    var sh = new Date(now.getTime() + (8*60 + now.getTimezoneOffset()) * 60000);
+    var h = sh.getHours();
+    var open12345 = h >= 8 && h < 20;
+    var open12333 = sh.getDay() >= 1 && sh.getDay() <= 5 && h >= 9 && h < 17;
+    var pad = function(n){ return (n<10?"0":"") + n; };
+    var cells = [
+      ["Shanghai now", pad(sh.getHours()) + ":" + pad(sh.getMinutes()), "UTC+8, all of China", false],
+      ["Your local time", pad(now.getHours()) + ":" + pad(now.getMinutes()), "This browser's clock", false],
+      ["12345 city line", open12345 ? "OPEN" : "CLOSED", "08:00–20:00 Shanghai time, daily", open12345],
+      ["12333 specialists", open12333 ? "OPEN" : "CLOSED", "Weekdays 09:00–17:00 Shanghai time", open12333]
+    ];
+    $("clock").innerHTML = cells.map(function(c){
+      return '<div class="cl' + (c[3] ? " hot" : "") + '"><div class="z">' + c[0] + '</div><div class="t">' + c[1] + '</div><div class="d">' + c[2] + '</div></div>';
+    }).join("");
+  }
+
+  // ---------- copy ----------
+  document.addEventListener("click", function(e){
+    var b = e.target.closest(".copy");
+    if (!b) return;
+    if (b.id === "reset"){ localStorage.removeItem(KEY); location.reload(); return; }
+    var what = b.getAttribute("data-copy"), text = "";
+    if (what === "script"){
+      text = Array.prototype.map.call(document.querySelectorAll("#call .say .cn"), function(el){ return el.textContent.trim(); }).join("\n");
+    } else {
+      text = $(what).textContent;
+    }
+    var done = function(){
+      var old = b.textContent; b.textContent = "Copied"; b.classList.add("ok");
+      setTimeout(function(){ b.textContent = old; b.classList.remove("ok"); }, 1600);
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(done, function(){ fallback(text, done); });
+    } else fallback(text, done);
+  });
+  function fallback(text, done){
+    var ta = document.createElement("textarea");
+    ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0";
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand("copy"); done(); } catch(err){}
+    document.body.removeChild(ta);
+  }
+
+  // ---------- persistence ----------
+  function save(){
+    try {
+      var o = { v:{}, s:[] };
+      Object.keys(F).forEach(function(k){ o.v[k] = $(F[k]).value; });
+      o.v.early = $("f-early").checked;
+      document.querySelectorAll("[data-step]").forEach(function(b){ o.s.push(b.checked); });
+      localStorage.setItem(KEY, JSON.stringify(o));
+    } catch(err){}
+  }
+  function load(){
+    try {
+      var raw = localStorage.getItem(KEY);
+      if (!raw) return;
+      var o = JSON.parse(raw);
+      if (o && o.v){
+        Object.keys(F).forEach(function(k){ if (o.v[k] !== undefined) $(F[k]).value = o.v[k]; });
+        if (o.v.early !== undefined) $("f-early").checked = o.v.early;
+      }
+      if (o && o.s){
+        document.querySelectorAll("[data-step]").forEach(function(b, i){
+          if (o.s[i]){ b.checked = true; b.closest(".step").classList.add("done"); }
+        });
+      }
+    } catch(err){}
+  }
+
+  buildSteps();
+  load();
+  buildClock();
+  render();
+  updateSeal();
+  ["input","change"].forEach(function(ev){
+    document.querySelector("#calc .panel-b").addEventListener(ev, render);
+  });
+})();
+</script>
