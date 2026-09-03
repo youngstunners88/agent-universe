@@ -125,6 +125,30 @@ Generate both, pre-filled, using `assets/reclaim-app.html` or by writing them di
   has dissolved. It asks the branch to verify against the company deregistration record, the
   expired work permit and the exit records — all of which the state already holds.
 
+### Where the claimant lives changes nothing about the claim
+
+The qualifying event is having left China and ended the employment — not residence in any
+particular country. What their location *does* change is the authentication chain, the cost of
+the phone call, and how realistic a trip to the counter is.
+
+| Signing in | Notary | Apostille authority |
+|---|---|---|
+| South Africa | Any notary public | High Court Registrar, or DIRCO Pretoria |
+| South Korea | A Korean notary (공증인) | **Ministry of Justice** — the competent authority for notarial acts, not Foreign Affairs |
+| UK | Notary or solicitor | FCDO Legalisation Office |
+| US | Notary public | Secretary of State **of the state where notarised** |
+| Australia | Notary public | DFAT |
+
+A claimant somewhere in East Asia is in a much stronger position than one in Europe or Africa:
+same time zone as the hotlines, a cheap short flight to the counter, and — critically — going in
+person removes the agent, the power of attorney, and the notarisation chain entirely, and lets
+them reopen a frozen bank account. When the payout account is the blocker, always price a trip
+against the paperwork before assuming remote filing is cheaper.
+
+Watch for a false lead: several countries have social-security treaties with China, but those
+cover a country's *own nationals*. A South African living in Seoul gets nothing from the
+China–Korea agreement.
+
 ### Apostille, not legalisation
 
 China joined the Hague Apostille Convention on **7 November 2023**. Chinese embassies stopped
@@ -143,6 +167,9 @@ country's competent authority (South Africa: **DIRCO Legalisation Section, Preto
 - **The housing fund is a separate institution.** 住房公积金 is not social insurance and is
   claimed elsewhere. Voluntary for foreigners in Shanghai, but where an employer paid it, it is
   frequently the larger sum. Always ask.
+- **A flat salary is usually wrong.** Contributions are calculated on what the person earned at
+  the time, so a career with annual raises needs a year-by-year figure, not an average. Using
+  the final salary throughout overstates the balance.
 - **Under-declared contribution bases** are common, so any estimate is a ceiling until the
   operator reads out the real figure. Note that while the *account balance* has no claim
   deadline, a complaint about under-declaration or non-enrolment generally expires two years

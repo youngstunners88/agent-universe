@@ -79,6 +79,20 @@ small.note{display:block;margin-top:9px;font-size:12.5px;color:var(--ink-3);max-
 .v .a.yes{color:var(--jade)} .v .a.no{color:var(--seal)} .v .a.mid{color:var(--amber)}
 .v .why{font-size:13px;color:var(--ink-2);margin-top:8px;line-height:1.5}
 
+.salgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(104px,1fr));gap:9px;margin-top:12px}
+.sal label{display:block}
+.sal .y{font-family:var(--mono);font-size:10px;letter-spacing:.1em;color:var(--ink-3);margin-bottom:4px;display:block}
+.sal input{padding:7px 8px;font-size:13px}
+.sal.out input{opacity:.45}
+.chain{background:var(--card);border:1px solid var(--rule);border-radius:3px;margin-top:16px;overflow:hidden}
+.chain-h{padding:11px 15px;border-bottom:1px solid var(--rule-2);font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3)}
+.chain ol{margin:0;padding:14px 15px 15px 34px;font-size:13.5px}
+.chain li{margin-top:9px} .chain li:first-child{margin-top:0}
+.chain li b{font-weight:600}
+.chain li .sub{display:block;font-family:var(--mono);font-size:11.5px;color:var(--ink-3);margin-top:3px;line-height:1.5}
+.callout{border-left:2px solid var(--jade);background:var(--jade-soft);padding:14px 16px;margin-top:16px;border-radius:0 3px 3px 0}
+.callout h3{font-size:14.5px;color:var(--jade)}
+.callout p{margin-top:7px;font-size:13.5px;color:var(--ink-2);max-width:66ch}
 .ansgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:1px;background:var(--rule);border:1px solid var(--rule);border-radius:3px;overflow:hidden;margin-top:22px}
 .ans{background:var(--card);padding:17px 17px 18px}
 .ans .k{font-family:var(--mono);font-size:10px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink-3)}
@@ -282,11 +296,21 @@ footer p{max-width:none}
             <label><span class="lbl">Employment ended <span class="zh">离职</span></span><input id="f-end" type="month" value="2023-02"></label>
           </div>
           <div class="row" style="margin-top:12px">
-            <label><span class="lbl">Gross monthly pay, RMB <span class="zh">月薪</span></span><input id="f-pay" type="number" min="0" step="500" value="16000"></label>
+            <label><span class="lbl">Starting monthly pay, RMB <span class="zh">起薪</span></span><input id="f-pay" type="number" min="0" step="500" value="12000"></label>
+            <label><span class="lbl">Raise per year, RMB <span class="zh">年涨幅</span></span><input id="f-raise" type="number" min="0" step="500" value="1000"></label>
+          </div>
+          <div class="row" style="margin-top:12px">
             <label><span class="lbl">ZAR per RMB <span class="zh">汇率</span></span><input id="f-fx" type="number" min="0" step="0.05" value="2.55"></label>
+            <label><span class="lbl">&nbsp;</span><button class="copy" id="applyraise" style="width:100%;padding:8px">Apply raise to all years</button></label>
           </div>
           <label class="chk"><input type="checkbox" id="f-kept"><span>My employer <b>kept paying contributions after I left China</b>. Leave unticked unless you have seen the record — social insurance attaches to employment inside China on a valid permit, so months worked remotely from abroad normally stop contributing on the day you leave.</span></label>
           <label class="chk"><input type="checkbox" id="f-early"><span>I was enrolled in Shanghai social insurance <b>before</b> August 2021. Those earlier months count at the old voluntary scheme's <b>fixed low base</b>, not your salary — so they add less than you would expect.</span></label>
+        </fieldset>
+
+        <fieldset>
+          <legend>Pay year by year <span class="zh">各年月薪</span></legend>
+          <p style="font-size:12.5px;color:var(--ink-2);margin:0 0 4px">Contributions are calculated on what you earned <em>at the time</em>, so a rising salary matters. Edit any year directly, or set a starting figure and a raise above and apply it. Years outside your contributing window are dimmed — they are kept in case the window turns out to be longer than assumed.</p>
+          <div class="salgrid sal" id="salgrid"></div>
         </fieldset>
 
         <fieldset>
@@ -308,6 +332,21 @@ footer p{max-width:none}
             </select>
           </label>
           <small class="note">Banks restrict foreigners' accounts when the residence permit on file expires, so "it existed in 2022" is not the same as "it works". Test it before you spend anything on a notary.</small>
+        </fieldset>
+
+        <fieldset>
+          <legend>Where you are now <span class="zh">现居地</span></legend>
+          <label><span class="lbl">Country you will sign the documents in</span>
+            <select id="f-where">
+              <option value="ZA" selected>South Africa</option>
+              <option value="KR">South Korea</option>
+              <option value="GB">United Kingdom</option>
+              <option value="US">United States</option>
+              <option value="AU">Australia</option>
+              <option value="XX">Somewhere else</option>
+            </select>
+          </label>
+          <small class="note">This decides your notary and apostille chain, not whether you can claim — the claim itself is unaffected by where you live. It also decides how easy the phone call is, and how cheaply you could go in person if the payout account turns out to be the blocker.</small>
         </fieldset>
 
         <fieldset>
@@ -414,6 +453,12 @@ footer p{max-width:none}
     <p class="gate" id="gate-stmt" hidden></p>
     <pre class="body" id="stmt"></pre>
   </div>
+  <div class="chain">
+    <div class="chain-h" id="chain-h">Authentication chain</div>
+    <ol id="chain"></ol>
+  </div>
+  <div id="chain-note"></div>
+
   <small class="note">Sign nothing before you are in front of the notary — including the application form. In South Africa the chain is: notary public → apostille (<b>the Registrar of any High Court division, or DIRCO in Pretoria</b> — the Registrar is usually faster and DIRCO runs appointment backlogs) → certified Chinese translation, cheapest done in China by the agency your agent uses, because the counter wants a translator's chop on it.</small>
 </section>
 
@@ -432,6 +477,57 @@ footer p{max-width:none}
       </tbody>
     </table>
   </div>
+</section>
+
+
+<section id="contacts">
+  <div class="eyebrow">Who to contact <span class="zh">办事机构一览</span></div>
+  <h2>The offices, the hotlines, and how to find an agent without being fleeced</h2>
+  <p>Everything below is a public office. There is no private company in this list, and you should be suspicious of any guide that puts one there — the state charges nothing, and the only paid help you need is a person with a PRC ID card who can stand at a counter.</p>
+
+  <h3 style="margin-top:26px">Hotlines and portals</h3>
+  <div class="scroll">
+    <table>
+      <thead><tr><th>Contact</th><th>What it handles</th><th>Hours / notes</th></tr></thead>
+      <tbody>
+        <tr class="hi"><td><b>12345</b><span class="zh">上海市民服务热线</span><br><span class="zh">+86 21 12345</span></td><td>City hotline. Press 0 for a human, ask for English, get transferred.</td><td class="num">Daily 08:00–20:00</td></tr>
+        <tr><td><b>12333</b><span class="zh">人社服务热线</span><br><span class="zh">+86 21 12333</span></td><td>Social insurance specialists. Document lists, which branch holds your file.</td><td class="num">Weekdays 09:00–17:00</td></tr>
+        <tr><td><b>12329</b><span class="zh">住房公积金热线</span><br><span class="zh">+86 21 12329</span></td><td>Housing fund — the separate claim where the employer's share is also yours.</td><td class="num">Weekdays 09:00–17:00</td></tr>
+        <tr><td><b>si.12333.gov.cn</b><span class="zh">国家社会保险公共服务平台</span></td><td>National portal. Register with 证件类型 → 外国护照 and read your own 参保缴费明细.</td><td>Usually needs a Chinese mobile for the SMS code</td></tr>
+        <tr><td><b>zwdt.sh.gov.cn</b><span class="zh">一网通办</span></td><td>Shanghai's service portal. The application form for account termination is downloaded here.</td><td>Chinese only in practice</td></tr>
+        <tr><td><b>电子社保卡</b></td><td>Mini-programme inside WeChat or Alipay. Same records, easier registration than the portal.</td><td>Search 电子社保卡 in either app</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3 style="margin-top:30px">Shanghai district branches <span class="zh" style="font-weight:400;color:var(--ink-3);font-size:13px">社保分中心</span></h3>
+  <p>Your file sits at <em>one</em> of these — whichever district your employer was registered in. Ask on the call which one; it is the single fact you cannot look up from outside China. Counter hours everywhere are weekdays 09:00–11:30 and 13:30–16:30.</p>
+  <div class="scroll">
+    <table>
+      <thead><tr><th>District</th><th>Address</th></tr></thead>
+      <tbody>
+        <tr><td><b>黄浦</b> Huangpu</td><td class="zh">陆家浜路265号</td></tr>
+        <tr><td><b>徐汇</b> Xuhui</td><td class="zh">徐虹北路80号</td></tr>
+        <tr><td><b>长宁</b> Changning</td><td class="zh">天山路38号</td></tr>
+        <tr><td><b>静安</b> Jing'an</td><td class="zh">沪太路1026号 · 人才大厦：梅园路77号</td></tr>
+        <tr><td><b>普陀</b> Putuo</td><td class="zh">武宁路1032号</td></tr>
+        <tr><td><b>虹口</b> Hongkou</td><td class="zh">曲阳路179号</td></tr>
+        <tr><td><b>杨浦</b> Yangpu</td><td class="zh">江浦路736号</td></tr>
+        <tr><td><b>闵行</b> Minhang</td><td class="zh">莘松路385号</td></tr>
+        <tr><td><b>浦东</b> Pudong</td><td class="zh">环科路999弄2号楼 · 惠南：拱极路3623号</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <small class="note">Addresses drift and branches relocate. Confirm on the call before anyone travels — and note that a <span class="zh">社区事务受理服务中心</span> (neighbourhood service centre) can accept some filings too, which may be closer for your agent.</small>
+
+  <h3 style="margin-top:30px">Finding an agent</h3>
+  <p>You need one thing: a person holding a PRC resident ID card who will spend two mornings at a counter. That is the entire job specification.</p>
+  <ul style="font-size:14px;color:var(--ink-2);padding-left:19px;margin-top:12px">
+    <li style="margin-top:7px"><b>Ask first, pay second.</b> A former colleague, a Chinese friend, a partner's family, an ex-student. This costs nothing and is how most of these actually get done.</li>
+    <li style="margin-top:7px"><b>If you must pay:</b> a licensed HR, payroll or visa agency in Shanghai. Ask for their <span class="zh">营业执照</span> (business licence) and check the company exists on <b>gsxt.gov.cn</b>, the national enterprise credit system. Expect ¥2,000–6,000.</li>
+    <li style="margin-top:7px"><b>Also worth asking:</b> your country's chamber of commerce in Shanghai, and the expat community groups that outlast any individual agency.</li>
+    <li style="margin-top:7px"><b>Red flags, any one of which ends the conversation:</b> a percentage of the payout rather than a flat fee; a request that the money be paid into their account (the counter will not do it); a promise of a guaranteed amount before anyone has seen your record; pressure to notarise before you have confirmed the document list.</li>
+  </ul>
 </section>
 
 <section id="cost">
@@ -496,8 +592,33 @@ footer p{max-width:none}
   var SH_MANDATORY = "2021-08";
   var INTEREST = 0.03;
 
+  var CHAINS = {
+    ZA: { name:"South Africa", party:true, notary:"Any notary public",
+      auth:"Registrar of a High Court division, or DIRCO Legalisation Section, Pretoria",
+      sub:"The High Court Registrar is usually faster; DIRCO runs appointment backlogs.",
+      time:"3 days – 4 weeks", cost:"R900 – R2,700 all in" },
+    KR: { name:"South Korea", party:true, notary:"A Korean notary (공증인) — your nationality does not matter, only that you sign in front of them",
+      auth:"Ministry of Justice — the competent authority for notarial acts",
+      sub:"Twin Tree Tower A, 15F, 6 Yulgok-ro, Jongno-gu, Seoul 03142 · +82 2 6399 7133. (Korea's Ministry of Foreign Affairs handles administrative documents; a notarised power of attorney is a notarial act, so it is Justice, not Foreign Affairs.)",
+      time:"2 – 5 days", cost:"₩50,000 – ₩200,000" },
+    GB: { name:"United Kingdom", party:true, notary:"A notary public or solicitor",
+      auth:"FCDO Legalisation Office", sub:"Standard service is a few working days by post.",
+      time:"3 – 10 days", cost:"£30 – £150" },
+    US: { name:"United States", party:true, notary:"Any notary public",
+      auth:"Secretary of State of the state where it was notarised",
+      sub:"It must be the same state as the notary — a mismatch is the usual rejection.",
+      time:"1 – 3 weeks", cost:"$20 – $150" },
+    AU: { name:"Australia", party:true, notary:"A notary public",
+      auth:"DFAT", sub:"In person in capital cities, or by post.",
+      time:"1 – 2 weeks", cost:"A$100 – A$200" },
+    XX: { name:"your country", party:null, notary:"A notary public",
+      auth:"Your country's designated Apostille competent authority",
+      sub:"Look it up on hcch.net under the Apostille Section. If your country is NOT a party to the Convention, the apostille route does not exist for you — you need consular legalisation at the Chinese embassy instead, which is slower and needs your foreign ministry first.",
+      time:"varies", cost:"varies" }
+  };
+
   var F = { name:"f-name", pp:"f-pp", ppold:"f-ppold", nat:"f-nat", city:"f-city",
-            start:"f-start", exit:"f-exit", end:"f-end", pay:"f-pay", fx:"f-fx",
+            start:"f-start", exit:"f-exit", end:"f-end", pay:"f-pay", raise_:"f-raise", fx:"f-fx", where:"f-where",
             hfe:"f-hfe", hfr:"f-hfr", bank:"f-bank",
             agn:"f-agn", agid:"f-agid", agph:"f-agph", branch:"f-branch" };
 
@@ -519,8 +640,19 @@ footer p{max-width:none}
     o.natText = $("f-nat").options[$("f-nat").selectedIndex].text.replace(" (treaty)","");
     o.pay = +o.pay || 0; o.fx = +o.fx || 0;
     o.hfe = +o.hfe || 0; o.hfr = +o.hfr || 0;
+    o.pay = +o.pay || 0; o.raise_ = +o.raise_ || 0;
     o.early = $("f-early").checked; o.kept = $("f-kept").checked; o.hf = $("f-hf").checked;
+    o.sal = {};
+    document.querySelectorAll("[data-year]").forEach(function(inp){
+      o.sal[inp.getAttribute("data-year")] = +inp.value || 0;
+    });
     return o;
+  }
+
+  function salaryFor(d, n){
+    var y = Math.floor(n / 12);
+    var v = d.sal && d.sal[y];
+    return (v && v > 0) ? v : d.pay;
   }
 
   function compute(d){
@@ -540,7 +672,7 @@ footer p{max-width:none}
       if (d.city === "SH" && d.early && n < mi(SH_MANDATORY)){
         base = b.lo; low = true; r.lowMonths++; if (b.approx) r.approx = true;
       } else {
-        base = d.pay;
+        base = salaryFor(d, n);
         if (base > b.hi){ base = b.hi; r.capped = true; }
         if (base < b.lo){ base = b.lo; }
       }
@@ -555,6 +687,60 @@ footer p{max-width:none}
     r.interest = (r.pension + r.medical) * INTEREST * years;
     r.years = years;
     return r;
+  }
+
+  function buildSalaries(preserve){
+    var d0 = { start:$("f-start").value, end:$("f-end").value };
+    var y1 = d0.start ? +d0.start.split("-")[0] : 2018;
+    var y2 = d0.end ? +d0.end.split("-")[0] : y1;
+    if (y2 < y1) y2 = y1;
+    if (y2 - y1 > 40) y2 = y1 + 40;
+    var old = {};
+    document.querySelectorAll("[data-year]").forEach(function(i){ old[i.getAttribute("data-year")] = i.value; });
+    var pay = +$("f-pay").value || 0, inc = +$("f-raise").value || 0;
+    var html = "";
+    for (var y = y1; y <= y2; y++){
+      var v = (preserve && old[y]) ? old[y] : (pay + inc * (y - y1));
+      html += '<label><span class="y">' + y + '</span>' +
+              '<input type="number" min="0" step="500" data-year="' + y + '" value="' + v + '"></label>';
+    }
+    $("salgrid").innerHTML = html;
+  }
+
+  function markSalaryWindow(r){
+    if (!r.from) return;
+    var a = +r.from.split("-")[0], b = +r.to.split("-")[0];
+    document.querySelectorAll("[data-year]").forEach(function(i){
+      var y = +i.getAttribute("data-year");
+      i.parentNode.style.opacity = (y >= a && y <= b) ? "1" : "0.4";
+    });
+  }
+
+  function renderChain(d){
+    var c = CHAINS[d.where] || CHAINS.XX;
+    $("chain-h").textContent = "Authentication chain — signing in " + c.name;
+    $("chain").innerHTML =
+      '<li><b>Notarise the full bundle.</b> ' + c.notary +
+        '<span class="sub">All four documents in one sitting: power of attorney, certified copies of your passport bio page and last exit-stamp page, the statement of circumstances, and the Centre\'s application form. Sign nothing beforehand.</span></li>' +
+      '<li><b>Apostille the set.</b> ' + c.auth +
+        '<span class="sub">' + c.sub + ' Typical: ' + c.time + ', ' + c.cost + '.</span></li>' +
+      '<li><b>Translate into Chinese, in China.</b> An agency that applies its chop' +
+        '<span class="sub">Cheaper and more readily accepted than a translation done abroad. Your agent arranges it once the originals arrive.</span></li>' +
+      '<li><b>Courier the originals to your agent.</b> Including the physical 社保卡 if you still have it' +
+        '<span class="sub">Scans are not accepted at the counter.</span></li>';
+
+    var note = "";
+    if (d.where === "KR"){
+      note = '<div class="callout"><h3>Being in Korea is an advantage here, not an obstacle</h3>' +
+        '<p>Three reasons. <b>The time zone:</b> Korea is UTC+9 against China\'s UTC+8, so the 12345 hotline\'s 08:00–20:00 window is 09:00–21:00 where you are — you can call on any ordinary evening instead of at dawn. ' +
+        '<b>The apostille:</b> Korea has been an Apostille Convention party since 2007 and China since 7 November 2023, so a Korean notary plus a Ministry of Justice apostille is accepted directly in Shanghai — no Chinese embassy step, and typically days rather than the weeks a DIRCO run takes. ' +
+        '<b>And the flight:</b> Seoul to Shanghai is about two hours and cheap. If the payout account turns out to be the blocker — the most common way these claims die — going in person for three days becomes a realistic option rather than a fantasy, and in person you can reopen a bank account and file everything yourself without an agent or a power of attorney at all.</p>' +
+        '<p><b>One thing that does not help:</b> Korea has a social-security treaty with China, but treaties cover a country\'s own nationals. It does nothing for a South African passport holder, and it does not affect your right to withdraw.</p></div>';
+    } else if (d.where === "XX"){
+      note = '<div class="callout" style="border-left-color:var(--amber);background:var(--amber-soft)"><h3>Check your country is an Apostille party first</h3>' +
+        '<p>The whole chain above assumes it is. If it is not, you need the older consular route — your foreign ministry, then the Chinese embassy — which is slower and more expensive. The Hague Conference site (hcch.net) lists every party and names the exact office.</p></div>';
+    }
+    $("chain-note").innerHTML = note;
   }
 
   function variants(d){
@@ -682,6 +868,8 @@ footer p{max-width:none}
       return '<div class="fg"><div class="lab zh">'+x[0]+'<i>'+x[1]+'</i></div><div class="val">'+esc(x[2])+'</div></div>';
     }).join("");
 
+    markSalaryWindow(r);
+    renderChain(d);
     var vs = variants(d);
     renderAnswers(d, vs);
     renderRange(d, vs);
@@ -965,6 +1153,7 @@ payee + hfClause + "\n" +
       render(); return;
     }
     if (b.id === "voice-toggle"){ firstPerson = !firstPerson; buildScript(read()); return; }
+    if (b.id === "applyraise"){ buildSalaries(false); render(); return; }
 
     var what = b.getAttribute("data-copy"), text;
     if (what === "script"){
@@ -1007,6 +1196,8 @@ payee + hfClause + "\n" +
       });
       ["f-early","f-kept","f-hf","f-remember"].forEach(function(id){ o.v[id] = $(id).checked; });
       document.querySelectorAll("[data-step]").forEach(function(b){ o.s.push(b.checked); });
+      o.sal = {};
+      document.querySelectorAll("[data-year]").forEach(function(i){ o.sal[i.getAttribute("data-year")] = i.value; });
       localStorage.setItem(KEY, JSON.stringify(o));
     } catch(err){}
   }
@@ -1023,6 +1214,13 @@ payee + hfClause + "\n" +
         });
       }
       if (typeof o.fp === "boolean") firstPerson = o.fp;
+      if (o.sal){
+        buildSalaries(false);
+        document.querySelectorAll("[data-year]").forEach(function(i){
+          var v = o.sal[i.getAttribute("data-year")];
+          if (v) i.value = v;
+        });
+      }
       if (o && o.s){
         document.querySelectorAll("[data-step]").forEach(function(b, i){
           if (o.s[i]){ b.checked = true; var st = b.closest(".step"); if (st) st.classList.add("done"); }
@@ -1032,10 +1230,14 @@ payee + hfClause + "\n" +
   }
 
   buildSteps();
+  buildSalaries(false);
   load();
   buildClock();
   render();
   updateSeal();
+  document.querySelector("#calc .panel-b").addEventListener("change", function(e){
+    if (e.target.id === "f-start" || e.target.id === "f-end") buildSalaries(true);
+  });
   ["input","change"].forEach(function(ev){
     document.querySelector("#calc .panel-b").addEventListener(ev, render);
   });
