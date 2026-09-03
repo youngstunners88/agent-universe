@@ -68,6 +68,52 @@ anyway still created a real account, and the balance is still claimable.
 - Translation: any non-Chinese document needs a Chinese translation bearing a translation agency's
   chop.
 
+## Shanghai district branches 社保分中心
+
+The file sits at the branch for the district the **employer** was registered in, which is often not
+where the person lived. Counter hours weekdays 09:00–11:30 and 13:30–16:30.
+
+| District | Address | Notes |
+|---|---|---|
+| 宝山 Baoshan | 淞兴路309号 | 200940 · Metro Line 3 |
+| 黄浦 Huangpu | 陆家浜路265号 | |
+| 徐汇 Xuhui | 徐虹北路80号 | |
+| 长宁 Changning | 天山路38号 | |
+| 静安 Jing'an | 沪太路711号 | also 人才大厦 梅园路77号 |
+| 普陀 Putuo | 武宁路1032号 | |
+| 虹口 Hongkou | 曲阳路179号 | |
+| 杨浦 Yangpu | 江浦路736号 | |
+| 闵行 Minhang | 莘北路385号 | |
+| 嘉定 Jiading | 博乐路69号 | |
+| 浦东 Pudong | 浦东南路3993号 | also 环科路999弄2号楼 · 惠南 拱极路3623号 |
+| 金山 Jinshan | 卫零路357号 | |
+| 松江 Songjiang | 荣乐中路248号 | |
+| 青浦 Qingpu | 公园路200号 | |
+| 奉贤 Fengxian | 南桥镇人民南路156号 | |
+| 崇明 Chongming | 城桥镇人民路207号 | |
+
+**Treat these as navigation, not an address book.** Published directories go stale — a widely cited
+one still labels Chongming a 县, which it ceased to be in 2016. Confirm on the hotline or 一网通办
+before anyone travels. A 社区事务受理服务中心 can also accept some filings.
+
+## Firms that publicly document this procedure
+
+Not vetted, not endorsed — listed only because they publish about this exact service, which most
+general visa agencies do not. Always try the free routes first: someone the claimant already knows,
+or going in person if they are close enough.
+
+| Firm | Relevance |
+|---|---|
+| HROne | Most directly on point; states it can assist with remote submissions |
+| S.J. Grand | Names social insurance refunds alongside tax filing |
+| Dezan Shira & Associates | Publishes the China Briefing guidance; large, Shanghai office |
+| Hawksford | Standing guide on pension refunds for departing foreigners |
+| Acclime China | Detailed public guides on expatriate social insurance |
+| China Legal Center | Dedicated service page; offers payment after the refund succeeds |
+
+Vetting: verify the 营业执照 on **gsxt.gov.cn**. A success fee is normal; the payout arriving in the
+agent's account is not — it defaults to an account in the claimant's own name.
+
 ## Hotlines
 
 | Number | Who | Hours (Shanghai time, UTC+8) |

@@ -357,8 +357,13 @@ footer p{max-width:none}
           </div>
           <div class="row" style="margin-top:12px">
             <label><span class="lbl">Agent's phone <span class="zh">联系电话</span></span><input id="f-agph" type="text" placeholder="required" data-req="1"></label>
-            <label><span class="lbl">District branch <span class="zh">社保分中心</span></span><input id="f-branch" type="text" placeholder="ask on the call" data-req="1"></label>
+            <label><span class="lbl">District branch <span class="zh">社保分中心</span></span>
+              <select id="f-branch" data-req="1">
+                <option value="">— ask on the call —</option>
+              </select>
+            </label>
           </div>
+          <p id="branch-addr" style="font-size:12.5px;color:var(--ink-2);margin-top:10px"></p>
         </fieldset>
 
         <label class="chk" style="margin-top:16px"><input type="checkbox" id="f-remember"><span>Remember my passport and agent details on this device. Off by default — everything else is saved locally either way, and nothing ever leaves your browser.</span></label>
@@ -504,29 +509,52 @@ footer p{max-width:none}
   <p>Your file sits at <em>one</em> of these — whichever district your employer was registered in. Ask on the call which one; it is the single fact you cannot look up from outside China. Counter hours everywhere are weekdays 09:00–11:30 and 13:30–16:30.</p>
   <div class="scroll">
     <table>
-      <thead><tr><th>District</th><th>Address</th></tr></thead>
-      <tbody>
-        <tr><td><b>黄浦</b> Huangpu</td><td class="zh">陆家浜路265号</td></tr>
-        <tr><td><b>徐汇</b> Xuhui</td><td class="zh">徐虹北路80号</td></tr>
-        <tr><td><b>长宁</b> Changning</td><td class="zh">天山路38号</td></tr>
-        <tr><td><b>静安</b> Jing'an</td><td class="zh">沪太路1026号 · 人才大厦：梅园路77号</td></tr>
-        <tr><td><b>普陀</b> Putuo</td><td class="zh">武宁路1032号</td></tr>
-        <tr><td><b>虹口</b> Hongkou</td><td class="zh">曲阳路179号</td></tr>
-        <tr><td><b>杨浦</b> Yangpu</td><td class="zh">江浦路736号</td></tr>
-        <tr><td><b>闵行</b> Minhang</td><td class="zh">莘松路385号</td></tr>
-        <tr><td><b>浦东</b> Pudong</td><td class="zh">环科路999弄2号楼 · 惠南：拱极路3623号</td></tr>
+      <thead><tr><th>District</th><th>Address <span class="zh">地址</span></th><th>Notes</th></tr></thead>
+      <tbody id="dist-body">
       </tbody>
     </table>
   </div>
-  <small class="note">Addresses drift and branches relocate. Confirm on the call before anyone travels — and note that a <span class="zh">社区事务受理服务中心</span> (neighbourhood service centre) can accept some filings too, which may be closer for your agent.</small>
+  <small class="note"><b>Confirm before anyone travels.</b> Branches relocate, and published directories go stale — one widely-cited list still calls Chongming a <span class="zh">县</span>, which it stopped being in 2016. Treat the above as a navigation aid, not an address book: the hotline or <span class="zh">一网通办</span> is authoritative. Note too that a <span class="zh">社区事务受理服务中心</span> (neighbourhood service centre) can accept some filings and may be closer for your agent.</small>
 
-  <h3 style="margin-top:30px">Finding an agent</h3>
-  <p>You need one thing: a person holding a PRC resident ID card who will spend two mornings at a counter. That is the entire job specification.</p>
+  <h3 style="margin-top:30px">Finding someone to file for you</h3>
+  <p>The job specification is one line: <b>a person holding a PRC resident ID card who will spend two mornings at a counter.</b> Work down this list in order — the cheapest option is first for a reason.</p>
+
+  <div class="steps" style="margin-top:18px">
+    <div class="step"><div class="num">1</div><div>
+      <div class="step-h"><h3>Someone you already know</h3><div class="meta"><span class="tag t-free">¥0</span></div></div>
+      <p>A former colleague, a Chinese friend, a partner's family, an ex-student, the school's old office manager. This is how most of these actually get done, and it costs nothing. Ask before you pay anyone.</p>
+    </div></div>
+    <div class="step"><div class="num">2</div><div>
+      <div class="step-h"><h3>Go yourself, if you are close enough</h3><div class="meta"><span class="tag t-cost">Flight</span><span class="tag t-free">No agent</span></div></div>
+      <p>From anywhere in East Asia this often beats the paperwork on both cost and time. Going in person removes the agent, the power of attorney, the notary, the apostille and the translation — the entire expensive half — and it is the only realistic way to reopen a frozen Chinese bank account. Price a three-day trip before assuming remote filing is cheaper.</p>
+    </div></div>
+    <div class="step"><div class="num">3</div><div>
+      <div class="step-h"><h3>A professional firm</h3><div class="meta"><span class="tag t-cost">¥2,000–6,000</span></div></div>
+      <p>The firms below publish guidance on this exact procedure, which at least means they know it exists — most general visa agencies do not. <b>This is not a recommendation.</b> I have not contacted, used or vetted any of them, and their appearance here is based only on what they publish about their own services. Get a written scope and a written fee before you send a single document.</p>
+    </div></div>
+  </div>
+
+  <div class="scroll">
+    <table>
+      <thead><tr><th>Firm</th><th>What they publish about this</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td><b>HROne</b><span class="zh">hrone.com</span></td><td>Several articles specifically on foreigners withdrawing social insurance accounts, including the per-city differences between Shanghai, Beijing and Shenzhen.</td><td>States it can assist with remote submissions where you have documentation and local contacts — the closest public match to this situation.</td></tr>
+        <tr><td><b>S.J. Grand</b><span class="zh">sjgrand.cn</span></td><td>Names social insurance refund procedures as a service alongside tax filing.</td><td>Accounting-led. Useful if there is also an unfinished tax position.</td></tr>
+        <tr><td><b>Dezan Shira &amp; Associates</b><span class="zh">dezshira.com</span></td><td>Publishes the China Briefing guidance on claiming social insurance when leaving China.</td><td>Large and long-established, with a Shanghai office. Likely the most expensive option here.</td></tr>
+        <tr><td><b>Hawksford</b><span class="zh">hawksford.com</span></td><td>A standing guide on pension insurance refunds for foreigners leaving China.</td><td>Corporate services firm; individual cases may be below their usual threshold.</td></tr>
+        <tr><td><b>Acclime China</b><span class="zh">china.acclime.com</span></td><td>Detailed public guides on expatriate social insurance and on claiming when leaving.</td><td>As above — corporate-focused, worth asking whether they take individuals.</td></tr>
+        <tr><td><b>China Legal Center</b><span class="zh">chinalegalcenter.com</span></td><td>A dedicated social insurance refund service page, and the only one offering to be <b>paid after the refund succeeds</b>.</td><td>Publishes no fee, timeline or document list — ask for all three in writing. Contact is a form plus WeChat.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3 style="margin-top:30px">Vetting whoever you pick</h3>
   <ul style="font-size:14px;color:var(--ink-2);padding-left:19px;margin-top:12px">
-    <li style="margin-top:7px"><b>Ask first, pay second.</b> A former colleague, a Chinese friend, a partner's family, an ex-student. This costs nothing and is how most of these actually get done.</li>
-    <li style="margin-top:7px"><b>If you must pay:</b> a licensed HR, payroll or visa agency in Shanghai. Ask for their <span class="zh">营业执照</span> (business licence) and check the company exists on <b>gsxt.gov.cn</b>, the national enterprise credit system. Expect ¥2,000–6,000.</li>
-    <li style="margin-top:7px"><b>Also worth asking:</b> your country's chamber of commerce in Shanghai, and the expat community groups that outlast any individual agency.</li>
-    <li style="margin-top:7px"><b>Red flags, any one of which ends the conversation:</b> a percentage of the payout rather than a flat fee; a request that the money be paid into their account (the counter will not do it); a promise of a guaranteed amount before anyone has seen your record; pressure to notarise before you have confirmed the document list.</li>
+    <li style="margin-top:7px"><b>Verify the company exists.</b> Ask for the <span class="zh">营业执照</span> (business licence) and check the registration on <b>gsxt.gov.cn</b>, the national enterprise credit system. A firm that will not show you a licence number is not a firm.</li>
+    <li style="margin-top:7px"><b>Get the scope in writing</b> — specifically whether it covers the medical account and the housing fund, which are separate offices and the usual hidden extras.</li>
+    <li style="margin-top:7px"><b>A success fee is fine. Routing the money is not.</b> Being paid only if the claim works is a normal arrangement. The payout arriving in <em>their</em> account is not — it defaults to an account in your own name, and anyone proposing otherwise is either mistaken about the procedure or not planning to follow it.</li>
+    <li style="margin-top:7px"><b>Walk away from:</b> a guaranteed figure quoted before anyone has seen your record; pressure to notarise before the document list is confirmed; a percentage of the payout rather than a flat or fixed success fee; any reluctance to put the fee in writing.</li>
+    <li style="margin-top:7px"><b>Also worth asking:</b> your country's chamber of commerce in Shanghai, and long-running expat community groups — both outlast any individual agency.</li>
   </ul>
 </section>
 
@@ -591,6 +619,26 @@ footer p{max-width:none}
   var TREATY = { CA:1,DE:1,KR:1,JP:1,NL:1,ES:1,CH:1,DK:1,FI:1,LU:1,RS:1,KG:1 };
   var SH_MANDATORY = "2021-08";
   var INTEREST = 0.03;
+
+  // Shanghai social insurance district branches. Addresses drift — always confirm on the call.
+  var DISTRICTS = [
+    ["宝山","Baoshan","淞兴路309号","200940 · Metro Line 3"],
+    ["黄浦","Huangpu","陆家浜路265号",""],
+    ["徐汇","Xuhui","徐虹北路80号",""],
+    ["长宁","Changning","天山路38号",""],
+    ["静安","Jing'an","沪太路711号","also 人才大厦 梅园路77号"],
+    ["普陀","Putuo","武宁路1032号",""],
+    ["虹口","Hongkou","曲阳路179号",""],
+    ["杨浦","Yangpu","江浦路736号",""],
+    ["闵行","Minhang","莘北路385号",""],
+    ["嘉定","Jiading","博乐路69号",""],
+    ["浦东","Pudong","浦东南路3993号","also 环科路999弄2号楼 · 惠南 拱极路3623号"],
+    ["金山","Jinshan","卫零路357号",""],
+    ["松江","Songjiang","荣乐中路248号",""],
+    ["青浦","Qingpu","公园路200号",""],
+    ["奉贤","Fengxian","南桥镇人民南路156号",""],
+    ["崇明","Chongming","城桥镇人民路207号",""]
+  ];
 
   var CHAINS = {
     ZA: { name:"South Africa", party:true, notary:"Any notary public",
@@ -687,6 +735,35 @@ footer p{max-width:none}
     r.interest = (r.pension + r.medical) * INTEREST * years;
     r.years = years;
     return r;
+  }
+
+  function buildDistrictTable(){
+    var b = $("dist-body");
+    if (!b) return;
+    b.innerHTML = DISTRICTS.map(function(d){
+      return '<tr><td><b class="zh">' + d[0] + '</b> ' + d[1] + '</td>' +
+             '<td class="zh">' + d[2] + '</td>' +
+             '<td style="color:var(--ink-3);font-size:12.5px">' + (d[3] || "—") + '</td></tr>';
+    }).join("");
+  }
+
+  function buildDistricts(){
+    var sel = $("f-branch");
+    DISTRICTS.forEach(function(d){
+      var o = document.createElement("option");
+      o.value = d[0]; o.textContent = d[0] + " " + d[1];
+      sel.appendChild(o);
+    });
+  }
+
+  function renderBranchAddr(d){
+    var hit = null;
+    DISTRICTS.forEach(function(x){ if (x[0] === d.branch) hit = x; });
+    $("branch-addr").innerHTML = hit
+      ? '<b class="zh">' + hit[0] + '分中心</b> · <span class="zh">' + hit[2] + '</span>' +
+        (hit[3] ? ' <span style="color:var(--ink-3)">(' + hit[3] + ')</span>' : '') +
+        '<br><span style="color:var(--ink-3)">Weekdays 09:00–11:30 and 13:30–16:30. Confirm this address on the call before anyone travels — branches relocate.</span>'
+      : '<span style="color:var(--ink-3)">Your file sits at the branch for the district your <em>employer</em> was registered in, which may not be where you lived. The hotline will tell you which.</span>';
   }
 
   function buildSalaries(preserve){
@@ -869,6 +946,7 @@ footer p{max-width:none}
     }).join("");
 
     markSalaryWindow(r);
+    renderBranchAddr(d);
     renderChain(d);
     var vs = variants(d);
     renderAnswers(d, vs);
@@ -948,7 +1026,7 @@ footer p{max-width:none}
     var agn = d.agn.trim() || "________________________";
     var agid = d.agid.trim() || "________________________";
     var agph = d.agph.trim() || "________________________";
-    var branch = d.branch.trim() || "____________";
+    var branch = d.branch.trim() ? d.branch.trim() : "____________";
     var ppLine = d.pp + (d.ppold ? "  (原护照号 former: " + d.ppold + ")" : "");
 
     var payee = d.bank === "live"
@@ -1230,6 +1308,8 @@ payee + hfClause + "\n" +
   }
 
   buildSteps();
+  buildDistricts();
+  buildDistrictTable();
   buildSalaries(false);
   load();
   buildClock();
