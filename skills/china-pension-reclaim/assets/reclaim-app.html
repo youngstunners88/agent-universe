@@ -262,7 +262,7 @@ footer p{max-width:none}
         <fieldset>
           <legend>Identity <span class="zh">身份信息</span></legend>
           <div class="row">
-            <label><span class="lbl">Name on passport <span class="zh">姓名</span></span><input id="f-name" type="text" value="Example Applicant"></label>
+            <label><span class="lbl">Name on passport <span class="zh">姓名</span></span><input id="f-name" type="text" value="Example Applicant" maxlength="80"></label>
             <label><span class="lbl">Nationality <span class="zh">国籍</span></span>
               <select id="f-nat">
                 <option value="ZA" selected>South Africa</option><option value="GB">United Kingdom</option>
@@ -279,8 +279,8 @@ footer p{max-width:none}
             </label>
           </div>
           <div class="row">
-            <label><span class="lbl">Passport no. now <span class="zh">现护照号</span></span><input id="f-pp" type="text" value="A01234567"></label>
-            <label><span class="lbl">Passport no. used in China <span class="zh">原护照号</span></span><input id="f-ppold" type="text" placeholder="if renewed since"></label>
+            <label><span class="lbl">Passport no. now <span class="zh">现护照号</span></span><input id="f-pp" type="text" value="A01234567" maxlength="20"></label>
+            <label><span class="lbl">Passport no. used in China <span class="zh">原护照号</span></span><input id="f-ppold" type="text" placeholder="if renewed since" maxlength="20"></label>
           </div>
           <small class="note">The record is keyed to the passport number on file when you enrolled. If yours has been renewed since, the operator searching the new number finds nothing — which reads exactly like never having been enrolled.</small>
         </fieldset>
@@ -352,11 +352,11 @@ footer p{max-width:none}
         <fieldset>
           <legend>Your agent in China <span class="zh">受托人</span> <em>required for the documents</em></legend>
           <div class="row">
-            <label><span class="lbl">Agent's full name <span class="zh">受托人姓名</span></span><input id="f-agn" type="text" placeholder="required" data-req="1"></label>
-            <label><span class="lbl">Agent's PRC ID no. <span class="zh">身份证号</span></span><input id="f-agid" type="text" placeholder="required" data-req="1"></label>
+            <label><span class="lbl">Agent's full name <span class="zh">受托人姓名</span></span><input id="f-agn" type="text" placeholder="required" data-req="1" maxlength="60"></label>
+            <label><span class="lbl">Agent's PRC ID no. <span class="zh">身份证号</span></span><input id="f-agid" type="text" placeholder="required" data-req="1" maxlength="18"></label>
           </div>
           <div class="row" style="margin-top:12px">
-            <label><span class="lbl">Agent's phone <span class="zh">联系电话</span></span><input id="f-agph" type="text" placeholder="required" data-req="1"></label>
+            <label><span class="lbl">Agent's phone <span class="zh">联系电话</span></span><input id="f-agph" type="text" placeholder="required" data-req="1" maxlength="20"></label>
             <label><span class="lbl">District branch <span class="zh">社保分中心</span></span>
               <select id="f-branch" data-req="1">
                 <option value="">— ask on the call —</option>
@@ -413,6 +413,7 @@ footer p{max-width:none}
     </div>
     <div id="script"></div>
   </div>
+  <small class="note">The ▶ button only ever uses a voice installed <em>on this device</em> — never a cloud voice — because a network voice would send your passport number, spoken aloud, to a third-party server to be read out. If your browser has no offline Mandarin voice, the button says so instead of silently switching to one; the pinyin above it works regardless.</small>
 
   <div class="scroll">
     <table>
@@ -677,6 +678,11 @@ footer p{max-width:none}
     return n < mi(BASES[0].from) ? BASES[0] : BASES[BASES.length-1];
   }
   function money(n){ return Math.round(n).toLocaleString("en-US"); }
+  // Invariant: every free-text field (name, passport numbers, agent name/ID/phone) is user-
+  // controlled and persisted to localStorage. Any of it reaching an innerHTML sink MUST go
+  // through esc() first (the POA/statement panes are exempt only because they use
+  // .textContent, which cannot execute markup). Do not add a new innerHTML template that
+  // concatenates a form field without wrapping it in esc().
   function esc(s){ return String(s).replace(/[&<>]/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;"}[c]; }); }
 
   function read(){
@@ -1011,11 +1017,35 @@ footer p{max-width:none}
     $("voice-toggle").textContent = firstPerson ? "Calling: myself" : "Calling: for a friend";
   }
 
-  function speak(i){
-    if (!("speechSynthesis" in window)) return;
+  // Chrome and others often implement non-local voices as cloud TTS: the utterance text
+  // (which can include a passport number) leaves the device. Only ever speak through a
+  // voice flagged localService === true, so an on-page promise of "nothing leaves your
+  // browser" stays true even for this feature. If no local zh voice exists, say so instead
+  // of silently falling back to a network one.
+  var localZhVoice = null, voiceScanDone = false;
+  function scanVoices(){
+    if (!("speechSynthesis" in window)) { voiceScanDone = true; return; }
+    var voices = window.speechSynthesis.getVoices() || [];
+    localZhVoice = voices.find(function(v){ return v.localService && /^zh/i.test(v.lang); }) || null;
+    voiceScanDone = true;
+  }
+  if ("speechSynthesis" in window){
+    scanVoices();
+    window.speechSynthesis.addEventListener("voiceschanged", scanVoices);
+  }
+
+  function speak(i, btn){
+    if (!voiceScanDone) scanVoices();
+    if (!localZhVoice){
+      if (btn){
+        var old = btn.textContent; btn.textContent = "No offline voice"; btn.disabled = true;
+        setTimeout(function(){ btn.textContent = old; btn.disabled = false; }, 2200);
+      }
+      return;
+    }
     var d = read();
     var u = new SpeechSynthesisUtterance(lineText(LINES[i], d));
-    u.lang = "zh-CN"; u.rate = 0.85;
+    u.voice = localZhVoice; u.lang = localZhVoice.lang; u.rate = 0.85;
     window.speechSynthesis.cancel();
     window.speechSynthesis.speak(u);
   }
@@ -1219,7 +1249,7 @@ payee + hfClause + "\n" +
   // ---------- events ----------
   document.addEventListener("click", function(e){
     var spk = e.target.closest(".spk");
-    if (spk){ speak(+spk.getAttribute("data-line")); return; }
+    if (spk){ speak(+spk.getAttribute("data-line"), spk); return; }
 
     var b = e.target.closest(".copy");
     if (!b || b.disabled) return;
