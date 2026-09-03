@@ -1,0 +1,206 @@
+{
+  "model": "anthropic/claude-fable-5.1",
+  "effort": "high",
+  "target": "../assets/reclaim-app.html",
+  "raw_count": 32,
+  "findings": [
+    {
+      "title": "Split 'employment ended' from 'last day physically in China'",
+      "severity": "critical",
+      "category": "correctness",
+      "blind_spot": false,
+      "detail": "One 'Job ended' field drives both the end of the contributing window and the 离境 date in the generated 情况说明. For the brief case (left Aug 2022, employed to Feb 2023) the truthful entry adds six non-contributing remote months (~¥9,600 phantom) and produces a notarised, apostilled statement whose exit date contradicts his passport stamp — in a document that invites the branch to check 出入境记录. The sample defaults (2019-09 / ¥20,000) also don't match the case the lede describes.",
+      "fix": "Replace 'Job ended' with two month inputs: 'Last month physically working in China on a work permit' (f-exit) and 'Employment formally ended' (f-end). Use min(f-exit, f-end) as the contribution end. Render two sentences in the statement: '本人于 [f-exit] 离境，此后未在中国境内工作；劳动关系于 [f-end] 终止。' Show a warn flag when f-end > f-exit: 'Months worked remotely from abroad are not contributing months and are excluded.' Set sample defaults to 2018-07 / 2022-08 / 2023-02 / ¥16,000.",
+      "money_at_stake": "~¥9,600 overstated; rejection of the whole ~¥19,000 filing on an inconsistent sworn statement",
+      "rank": 1,
+      "verdict": "build"
+    },
+    {
+      "title": "Use the fixed 60% voluntary base for pre-Aug-2021 Shanghai months",
+      "severity": "high",
+      "category": "correctness",
+      "blind_spot": false,
+      "detail": "With 'enrolled before Aug 2021' ticked, compute() applies actual salary to every earlier month and the flag promises the figure 'will rise sharply'. Under 沪人社养发〔2009〕38号 the voluntary scheme's base was pegged at ~60% of the prior-year citywide average wage regardless of pay, so a ¥16,000 earner enrolled from Jul 2018 is overstated by roughly ¥40,000 — enough to make someone pay notary fees for a balance that does not exist. The BASES table also repeats 4,927/24,633 for two different years.",
+      "fix": "In compute(), for city==='SH' && month < 2021-08 && early, set base = band.lo (the floor is the 60% peg), add a toggle 'medical was included in my voluntary contributions' (default off), and show a separate breakdown row '前期自愿参保月（低基数）'. Correct BASES to {2019-04→2020-03: 4699/23496}, {2020-04→2020-06: 4699/23496 carried}, {2020-07→2021-06: 4927/28017} and cite the 沪人社 notice numbers beside the table. Change the tick label to 'earlier months count at the scheme's fixed minimum base, not your salary'.",
+      "money_at_stake": "¥35,000–45,000 overstated for a 2018–2021 enrollee on ¥16k",
+      "rank": 2,
+      "verdict": "build"
+    },
+    {
+      "title": "Add a payout-account branch, PoA payee clause and honest verdict",
+      "severity": "critical",
+      "category": "harm",
+      "blind_spot": true,
+      "detail": "The verdict says 'Must he fly? No' while the risk card admits the most common failure is a closed Chinese bank account and Step 03 says the payout 'cannot' land in an agent's account — contradicting Risk 1's 'varies by branch and has been loosening'. For someone gone since 2022 the account is very likely closed or under 非柜面 restriction (banks restrict foreigner accounts when the residence permit on file expires), and the 社保卡 financial account issued after 2021 was often never activated. The PoA gives the agent no authority to name a receiving account, so the counter refuses and a second notarisation round follows.",
+      "fix": "Add a three-way selector under the result: 'My Chinese bank account is (a) live and I can log in, (b) exists but I cannot access it, (c) closed/unknown'. For (b)/(c) add optional PoA clause 4: '本人指定下列账户接收上述个人账户支取款项：开户行 ____ 账号 ____ 户名 ____' with English rendering, filled by the claimant, never the agent. Make the bank question line zero of the call script: '请问支取款项是否必须打到本人中国境内银行账户？能否汇往境外或受托人指定账户？需要在委托书里写明吗？' Change the verdict tile to 'Probably not to file — possibly to collect, unless the branch pays a designated or overseas account' and reconcile Step 03 to 'default is own-name account; some branches accept an account named in the notarised PoA; never pay an agent who insists on receiving the money'.",
+      "money_at_stake": "Entire claim (~¥19,000 / R48,000) plus R1,500–3,500 in sunk paperwork",
+      "rank": 3,
+      "verdict": "build"
+    },
+    {
+      "title": "Notarise passport copy, exit page, statement and application form together",
+      "severity": "critical",
+      "category": "correctness",
+      "blind_spot": true,
+      "detail": "The enclosure list says 护照首页及签证页复印件 and 'boarding pass', and only the PoA goes through notary→apostille. Shanghai's 外籍人员养老保险个人账户终止 material list wants a notarised copy of the passport bio page plus the last exit-stamp page when an agent files; a plain photocopy is refused on sight and a boarding pass is not an 出境证明. Counters also want the 《终止社会保险关系申请表》 signed by 本人, and the foreign-signed 情况说明 arrives as unauthenticated paper. Separately, any SA High Court Registrar can apostille notarised documents, not only DIRCO Pretoria, which has appointment backlogs.",
+      "fix": "In Step 04 make the notary bundle four items: (1) PoA, (2) passport bio page + exit-stamp page certified as true copies, (3) the 情况说明, (4) the Shanghai application form downloaded from 一网通办, pre-filled and signed before the notary. Apostille as one set, translate as one set. Replace 'boarding pass' with 'passport exit stamp page (or 出入境记录 print-out obtained by your agent)'. List 'High Court Registrar (nearest division) or DIRCO Pretoria' with realistic elapsed times in Step 04 and the cost table. Update the 附件 checklist in the statement.",
+      "money_at_stake": "Blocks the whole ~¥20,000 claim; second notary+apostille round R1,500–3,000 and 4–6 weeks",
+      "rank": 4,
+      "verdict": "build"
+    },
+    {
+      "title": "Block PoA generation while agent and branch fields are blank",
+      "severity": "high",
+      "category": "harm",
+      "blind_spot": true,
+      "detail": "The generated PoA prints ________ for the agent's name, PRC ID number and phone, and the statement prints ______ 分中心. A notarised, apostilled instrument with handwriting added after the seal is rejected at Shanghai counters as 涂改/空白委托 — staff compare against the notary's copy. The template invites exactly that.",
+      "fix": "Add required inputs for agent name, 身份证号, phone and branch name in the form. Grey out the PoA/statement copy buttons and show a red banner 'Do not notarise until these are filled' until populated; pre-fill the 分中心 field from the branch input.",
+      "money_at_stake": "Second notarisation and apostille round, R1,500–3,000 and 4–6 weeks",
+      "rank": 5,
+      "verdict": "build"
+    },
+    {
+      "title": "Ask for the passport number used in China",
+      "severity": "medium",
+      "category": "missing-feature",
+      "blind_spot": true,
+      "detail": "The record is keyed to the passport number on file at enrolment. Anyone who left in 2022 and files in 2026 may hold a renewed passport with a different number; the operator finds nothing and the kit tells them they were probably never enrolled.",
+      "fix": "Add an optional 'Passport number used in China (if different)' field. Include both numbers in the phone script, PoA and statement; add 'old passport, or a notarised statement linking the two numbers' to the enclosure list. Next to the 'no qualifying account' flag add: 'If your passport has been renewed, search under the old number first.'",
+      "money_at_stake": "Entire claim if the account is deemed not to exist",
+      "rank": 6,
+      "verdict": "build"
+    },
+    {
+      "title": "Make Step 01 promise only what the call can deliver",
+      "severity": "high",
+      "category": "trust",
+      "blind_spot": true,
+      "detail": "The page says the operator 'can look you up on your passport number and tell you what is in it'. 12333 will not read personal 参保 data to an unverified caller; 12345's English desk only opens a 工单. The script is third-person (他现在人在国外) — a request about someone else's account — and Chinese characters only with a 'Copy Chinese' button, useless on a voice call for a non-speaker. This is the step most likely to end the attempt, and a refusal will be read as 'no account exists'.",
+      "fix": "Rewrite lines 2–5 in first person with a toggle 'I am calling / a friend is calling for me' that switches 我/他. Add pinyin and a play button per line (SpeechSynthesis zh-CN). Add +86 21 12345 to the phone table. Reword the expectation: 'The call gets you three things: confirmation a record exists, the district branch, and the payout-account rule. The balance usually comes only at the counter (PoA scope item 1) or online.' Insert Step 01a: register at si.12333.gov.cn or 电子社保卡 in WeChat/Alipay with 证件类型→外国护照, screenshot 参保缴费明细 (Chinese SIM may be needed for SMS). State that refusal to give a balance is not evidence of no account.",
+      "money_at_stake": "none directly; this is where the claimant gives up",
+      "rank": 7,
+      "verdict": "build"
+    },
+    {
+      "title": "Add housing fund to calculator, PoA and call script",
+      "severity": "high",
+      "category": "missing-feature",
+      "blind_spot": true,
+      "detail": "公积金 appears once as a bullet in Step 05 but is absent from the estimate, PoA scope and script, so the agent is turned away at the 公积金 centre. Unlike pension, both employee and employer shares (typically 7%+7% in Shanghai) belong to the worker and are withdrawable on 离职离境: for 13 months at ¥16,000 that is ~¥29,000, more than the pension personal account, and often the sum that makes notary fees worthwhile. Enrolment was not compulsory for foreigners, so it must be conditional.",
+      "fix": "Add a checkbox 'My payslip showed a 公积金 deduction' with employee/employer % inputs (default 7/7, capped per the Shanghai annual notice). Show 'Housing fund (both shares recoverable)' as a separate breakdown line added to the headline. Add PoA item: '办理本人住房公积金账户封存、销户及提取手续'; add script line '请问我有没有住房公积金账户？余额多少？外籍人员离境提取需要什么材料？'; add 12329 to the phone table.",
+      "money_at_stake": "¥20,000–30,000 for the sample case if enrolled",
+      "rank": 8,
+      "verdict": "build"
+    },
+    {
+      "title": "Check 参保状态 and arrears before filing; count post-exit months if paid",
+      "severity": "high",
+      "category": "correctness",
+      "blind_spot": true,
+      "detail": "Termination cannot be processed on an account still 正常参保 or showing 欠费. If the vanished employer never filed 减员 in Aug 2022, or declared through Feb 2023 without paying, the counter says 先处理欠费, which needs an 欠费剔除 based on the deregistration record — not the self-written statement. Conversely, some employers kept paying for remote staff; if so Sep 2022–Feb 2023 sit in the account and the calculator under-counts.",
+      "fix": "Add a Step 02 bullet: agent pulls 参保缴费明细 at the counter first and checks 状态 (封存/中断 is what you want) and any 欠费 months; if arrears exist, request 欠费剔除 citing the employer's 注销 record. Add a calculator toggle 'employer kept paying after I left China' that extends the window to f-end. Replace 'status drops to terminated automatically' in the risk card with this caveat.",
+      "money_at_stake": "~¥9,600 extra if paid; arrears block the whole claim until cleared",
+      "rank": 9,
+      "verdict": "build"
+    },
+    {
+      "title": "Add a repatriation step: RMB in China is not money in hand",
+      "severity": "high",
+      "category": "harm",
+      "blind_spot": true,
+      "detail": "The cost table ends at 'bank fees' as if a Chinese-account credit equals recovery. For a non-resident without a Chinese SIM, converting and remitting needs live mobile banking or the account holder at the bank counter with proof of source (the 一次性支付凭证), within the USD 50,000 annual quota; an agent's PoA is rarely accepted for FX purchase. Many people recover the sum and cannot move it.",
+      "fix": "Add Step 06 '把钱汇出 · Get it out' with three routes and limits: (1) UnionPay card at foreign ATMs (¥10,000/day, ¥100,000/year); (2) bank-app international transfer — needs live 手机银行 with Chinese SIM, valid passport, and the 支付凭证 as source-of-funds; (3) agent counter remittance only if the bank accepts a 委托 — add an optional PoA line 办理购汇及境外汇款. Add 'Keep the 一次性支付凭证' to Step 05. Tell the reader to test their Chinese card and mobile banking before spending anything on notaries.",
+      "money_at_stake": "Full recovered sum stranded in RMB; R35,000–75,000 in the sample case",
+      "rank": 10,
+      "verdict": "note"
+    },
+    {
+      "title": "Route medical clearance through the 社保卡 original and 医保中心",
+      "severity": "medium",
+      "category": "missing-feature",
+      "blind_spot": true,
+      "detail": "The 医保个人账户 lump sum is processed at the 区医保中心, which requires the physical 社保卡 surrendered and cancelled plus the 养老 termination notice as prerequisite. The kit lists 社保卡复印件 and treats medical as a same-visit add-on; an agent with a photocopy is turned away and must first do a 补卡, which the PoA does not cover.",
+      "fix": "Add the original 社保卡 to the Step 04 courier list. Add PoA scope item: 办理社会保障卡补换、注销及医疗保险个人账户清算. Split Step 05 into 5a (养老 at 社保分中心, wait for 终止通知) and 5b (医保 at 区医保中心 with card original and the notice).",
+      "money_at_stake": "≈¥3,300–4,200 medical account unrecoverable without it",
+      "rank": 11,
+      "verdict": "build"
+    },
+    {
+      "title": "Flag claimants near the 15-year threshold before generating termination papers",
+      "severity": "medium",
+      "category": "harm",
+      "blind_spot": false,
+      "detail": "The PoA and statement irrevocably terminate the relationship the moment the form is filled, and the calculator shows a lump sum for any range. The 'Withdrawing is one-way' warning never checks the user's own months; a long-tenured reader in a city that enrolled foreigners from 2011 may be at or near 180 months and entitled to a lifelong pension worth far more than the 8% refund.",
+      "fix": "In render(), if r.months >= 150 show a red flag above the amount: 'You are within N months of the 15-year threshold. Do not terminate before confirming with the branch whether you qualify for, or can top up to, a monthly pension payable abroad.' Add a year-of-birth field and flag anyone past statutory pension age.",
+      "money_at_stake": "Potentially hundreds of thousands RMB in lifetime pension for edge cases",
+      "rank": 12,
+      "verdict": "build"
+    },
+    {
+      "title": "Build a per-city rule table; Shanghai is the exception",
+      "severity": "high",
+      "category": "missing-feature",
+      "blind_spot": true,
+      "detail": "The audience is any former foreign worker in China, but 'Beijing / Shenzhen / other' collapses into a Shanghai kit with Shanghai bases, hotline and counter rules. Nationally enrolment has been compulsory since 15 Oct 2011 (MOHRSS Order 16) — only Shanghai had the opt-out — so a Beijing teacher from 2014 has eight years of contributions the current copy under-explains, and cities differ on online self-filing and agent requirements.",
+      "fix": "Add a CITIES object keyed by code with mandatoryFrom, bases[] (only rows verified against the city's published notice), hotline (area code + 12333: Beijing 010, Shenzhen 0755, Guangzhou 020), counterOnly, agentIdRule and branchName for the PoA/statement header. Drive compute(), the clock strip, the statement addressee and step copy from it. Show 'rules not verified for this city — call first' for unlisted cities.",
+      "money_at_stake": "¥50,000–150,000 per non-Shanghai applicant with 5–10 years",
+      "rank": 13,
+      "verdict": "build"
+    },
+    {
+      "title": "Add 'Clear my details' and stop persisting the passport number by default",
+      "severity": "low",
+      "category": "harm",
+      "blind_spot": false,
+      "detail": "Name and passport number are written to localStorage on every keystroke and pre-filled into the PoA. A broke claimant is plausibly on a library or borrowed machine; the only wipe is 'Reset to sample', which does not read as 'delete my passport number'.",
+      "fix": "Rename the button 'Clear my details', add a one-line note near the form ('Saved on this device only — clear before leaving a shared computer'), and persist the passport field only when a 'remember on this device' box is ticked.",
+      "money_at_stake": "none",
+      "rank": 14,
+      "verdict": "build"
+    },
+    {
+      "title": "Warn that under-declaration and non-enrolment remedies expire in two years",
+      "severity": "medium",
+      "category": "harm",
+      "blind_spot": true,
+      "detail": "The page repeats 'there is no deadline' and notes employers under-declaring the base is common, but never says the remedy — a 劳动保障监察 complaint for 补缴 — is generally time-barred two years after the violation (劳动保障监察条例 art. 20), and labour arbitration one year. Readers with a living employer who find a shortfall may wait and lose the larger sum.",
+      "fix": "Add a flag under the estimate and a Step 02 bullet: 'The balance itself has no deadline. Recovering contributions your employer failed to make or under-declared does — labour inspection generally will not accept complaints more than 2 years after the shortfall. If the counter figure is well below the estimate and the employer still exists, act immediately.'",
+      "money_at_stake": "Declared-vs-true base gap, ~¥1,000+/month × 10% × months",
+      "rank": 15,
+      "verdict": "note"
+    },
+    {
+      "title": "Tell readers how to find, verify and pay an agent",
+      "severity": "medium",
+      "category": "missing-feature",
+      "blind_spot": false,
+      "detail": "Step 03 assumes a former colleague or Chinese friend; someone whose employer vanished three years ago often has neither. 'A licensed HR or visa agency' gives no way to find or verify one, and a WeChat 'agency' asking ¥6,000 up front on a ¥19,000 claim is exactly the pattern he fears.",
+      "fix": "Add a sub-block: find via expat groups, the old school's Chinese staff on LinkedIn/WeChat, 上海市人力资源服务机构 listings; verify by asking for the 营业执照 and checking the 统一社会信用代码 on gsxt.gov.cn; pay via written 委托合同, small deposit, balance on photo of the branch's 受理回执, never a percentage; redact passport scans except the bio page, never send the original, keep PoA scope to the listed acts. State plainly: the agent never touches the money.",
+      "money_at_stake": "¥2,000–6,000 fees; loss of the full claim to a fake agent",
+      "rank": 16,
+      "verdict": "note"
+    },
+    {
+      "title": "Give the agent a printable apostille-acceptance insert",
+      "severity": "medium",
+      "category": "usability",
+      "blind_spot": true,
+      "detail": "District 材料清单 templates still read 经我国驻外使领馆认证. Staff who have never seen a DIRCO 附加证明书 bounce it, and the agent has nothing to argue with. The page states the law correctly but leaves the counter fight to a proxy.",
+      "fix": "Add script line: '贵中心是否接受海牙公约附加证明书（Apostille）代替使馆认证？' Add a printable one-page insert quoting the 外交部 announcement of entry into force on 7 Nov 2023 and the Chinese Embassy Pretoria cessation notice, for the agent to hand over with the pack; advise asking for the 窗口负责人 if refused.",
+      "money_at_stake": "Avoids a wasted trip and a R2,000+ detour attempting legalisation that no longer exists",
+      "rank": 17,
+      "verdict": "note"
+    },
+    {
+      "title": "Compute interest from the published annual 记账利率",
+      "severity": "low",
+      "category": "correctness",
+      "blind_spot": false,
+      "detail": "The page says 'add a few percent'. The personal-account rate is set nationally each year and has ranged from ~8% (2016–2019) to ~3–4% recently, which materially changes the headline for long tenures and the fees-worth-it decision.",
+      "fix": "Add RATES = {2016:8.31,2017:7.12,2018:8.29,2019:7.61,2020:6.04,2021:6.69,2022:4.5,2023:3.97,2024:2.84}, compound the pension personal account annually from each contribution year to now, show 'Interest to date' as a breakdown line, and delete the 'few percent' sentence.",
+      "money_at_stake": "~¥1,500–3,000 on the sample case; more for long tenures",
+      "rank": 18,
+      "verdict": "build"
+    }
+  ]
+}
