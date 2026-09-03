@@ -185,8 +185,20 @@ country's competent authority (South Africa: **DIRCO Legalisation Section, Preto
 ## Assets
 
 - `assets/reclaim-app.html` — the claim kit: balance estimator using each period's official
-  contribution floor and ceiling, live hotline-hours clock, bilingual call script, and both
-  documents auto-filled from the intake. Publishable as an artifact; state persists locally.
+  contribution floor and ceiling, live hotline-hours clock, bilingual call script, three
+  auto-filled documents (power of attorney, statement of circumstances, and a Chinese-language
+  agent handoff pack with a fill-in report form), and a full case-pack copy that bundles all
+  three for pasting into an email. Publishable as an artifact; state persists locally.
+
+  **Hand someone a pre-filled kit directly** by encoding the case in the URL fragment rather than
+  asking them to retype it: `reclaim-app.html#c=<base64url-encoded-JSON>`. The JSON object takes
+  the non-identity fields only — `nat, city, start, exit, end, pay, raise_, fx, where, hfe, hfr,
+  bank, branch, f-early, f-kept, f-hf, sal` (`sal` is `{"2019":"12000", ...}`) — name, both
+  passport numbers, and agent details are never accepted from a hash by design, so a link never
+  carries anyone's identity even by mistake. The page also has its own "Copy share link" button
+  that generates the same thing from whatever is currently filled in, and "Export case JSON" for
+  a structured `{inputs, computed, scenarios}` snapshot including the estimated total — paste
+  either back into a future conversation to resume exactly where a case left off.
 - `references/jurisdictions.md` — enrolment start dates, contribution bases, treaty countries,
   and per-city counter practice.
 - `scripts/optimize.py` — adversarial review pass over the claim kit on Claude Fable 5.1 via

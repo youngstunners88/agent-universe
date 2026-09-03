@@ -256,7 +256,7 @@ footer p{max-width:none}
 
   <div class="calc">
     <div class="panel">
-      <div class="panel-h"><div class="t zh">参保情况<i>Your enrolment</i></div><div class="btns"><button class="copy" id="reset">Sample</button><button class="copy" id="wipe">Clear my details</button></div></div>
+      <div class="panel-h"><div class="t zh">参保情况<i>Your enrolment</i></div><div class="btns"><button class="copy" id="sharelink">Copy share link</button><button class="copy" id="exportjson">Export case JSON</button><button class="copy" id="reset">Sample</button><button class="copy" id="wipe">Clear my details</button></div></div>
       <div class="panel-b">
 
         <fieldset>
@@ -449,6 +449,12 @@ footer p{max-width:none}
   <p>The single most expensive mistake in this process is notarising and apostilling one document, then discovering the counter wants three more — another R1,500–3,000 and another month. Both documents below fill themselves from the form above, and neither unlocks until your agent's details are in, because <b>a notarised instrument with blanks filled in afterwards is refused as</b> <b class="zh">涂改</b>.</p>
 
   <div class="doc">
+    <div class="doc-h"><div class="dt"><b class="zh">完整案卷</b>Everything at once — for your agent, your notary, or your own records</div><button class="copy" data-copy="casepack">Copy full case pack</button></div>
+    <p class="gate" id="gate-casepack" hidden></p>
+    <p style="padding:13px 14px;margin:0;font-size:13px;color:var(--ink-2)">One block of text: a cover summary of your case, then both documents below, in the order a notary or agent would want them. Paste it whole into an email or a message — this is the single fastest way to actually hand this off to someone.</p>
+  </div>
+
+  <div class="doc">
     <div class="doc-h"><div class="dt"><b class="zh">授权委托书</b>Power of attorney · notarise + apostille</div><button class="copy" data-copy="poa">Copy</button></div>
     <p class="gate" id="gate-poa" hidden></p>
     <pre class="body" id="poa"></pre>
@@ -458,6 +464,13 @@ footer p{max-width:none}
     <div class="doc-h"><div class="dt"><b class="zh">情况说明</b>Statement of circumstances · employer dissolved</div><button class="copy" data-copy="stmt">Copy</button></div>
     <p class="gate" id="gate-stmt" hidden></p>
     <pre class="body" id="stmt"></pre>
+  </div>
+
+  <div class="doc">
+    <div class="doc-h"><div class="dt"><b class="zh">代办指引</b>For your agent — in Chinese, with a report-back form</div><button class="copy" data-copy="agentpack">Copy</button></div>
+    <p class="gate" id="gate-agentpack" hidden></p>
+    <p style="padding:13px 14px 0;margin:0;font-size:13px;color:var(--ink-2)">Send this to whoever is filing for you, on its own — it's written to them, in Chinese, not to you. It turns "can you help me with this" into two scoped visits and a form they fill in and send back, so you find out what's actually in the account before anyone pays for a notary.</p>
+    <pre class="body" id="agentpack"></pre>
   </div>
   <div class="chain">
     <div class="chain-h" id="chain-h">Authentication chain</div>
@@ -694,6 +707,62 @@ footer p{max-width:none}
   // through esc() first (the POA/statement panes are exempt only because they use
   // .textContent, which cannot execute markup). Do not add a new innerHTML template that
   // concatenates a form field without wrapping it in esc().
+  // Share links are deliberately non-sensitive-only, always - no opt-in to include a name or
+  // passport number in a URL, which ends up in browser history and any log that sees the
+  // request. Anything identifying travels through "Copy full case pack" instead, as text the
+  // user chooses to paste somewhere, never as a link.
+  function b64urlEncode(obj){
+    try { return btoa(unescape(encodeURIComponent(JSON.stringify(obj)))).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,""); }
+    catch(e){ return ""; }
+  }
+  function b64urlDecode(str){
+    try {
+      var b64 = str.replace(/-/g,"+").replace(/_/g,"/");
+      while (b64.length % 4) b64 += "=";
+      return JSON.parse(decodeURIComponent(escape(atob(b64))));
+    } catch(e){ return null; }
+  }
+  function shareState(){
+    var out = { sal: {} };
+    Object.keys(F).forEach(function(k){
+      if (SENSITIVE.indexOf(F[k]) !== -1) return;
+      out[k] = $(F[k]).value;
+    });
+    ["f-early","f-kept","f-hf"].forEach(function(id){ out[id] = $(id).checked; });
+    document.querySelectorAll("[data-year]").forEach(function(i){ out.sal[i.getAttribute("data-year")] = i.value; });
+    return out;
+  }
+  function applyShareState(o){
+    if (!o) return;
+    Object.keys(F).forEach(function(k){
+      if (SENSITIVE.indexOf(F[k]) !== -1) return;
+      if (o[k] !== undefined) {
+        var el = $(F[k]);
+        if (el.tagName === "SELECT"){
+          var ok = Array.prototype.some.call(el.options, function(o2){ return o2.value === o[k]; });
+          if (!ok) return;
+        }
+        el.value = o[k];
+      }
+    });
+    ["f-early","f-kept","f-hf"].forEach(function(id){ if (o[id] !== undefined) $(id).checked = o[id]; });
+    if (o.start || o.end) buildSalaries(false);
+    if (o.sal){
+      document.querySelectorAll("[data-year]").forEach(function(i){
+        var v = o.sal[i.getAttribute("data-year")];
+        if (v) i.value = v;
+      });
+    }
+  }
+  function loadFromHash(){
+    if (location.hash.indexOf("#c=") !== 0) return false;
+    var o = b64urlDecode(location.hash.slice(3));
+    if (!o) return false;
+    applyShareState(o);
+    history.replaceState(null, "", location.pathname + location.search);
+    return true;
+  }
+
   function esc(s){ return String(s).replace(/[&<>]/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;"}[c]; }); }
 
   function read(){
@@ -954,7 +1023,7 @@ footer p{max-width:none}
     } else if (r.months >= 144){
       f.push(["warn","<b>You are within three years of the 15-year threshold</b> that unlocks a lifetime monthly pension. Leaving the account dormant and returning to China later may be worth far more than this lump sum."]);
     }
-    if (TREATY[d.nat]) f.push(["good","<b>" + d.natText + " has a social-security treaty with China</b>, so you may have been lawfully exempt and no account may exist. If your employer enrolled you anyway, the balance is still yours."]);
+    if (TREATY[d.nat]) f.push(["good","<b>" + d.natText + " has a social-security treaty with China</b>, so you may have been lawfully exempt from <em>pension</em> contributions and no pension account may exist. Almost none of these treaties exempt medical — <b>your medical personal account, and any housing fund, are unaffected</b> and are still worth checking even if the pension line comes back empty. If your employer enrolled you in pension anyway, that balance is still yours too."]);
     else if (r.months) f.push(["good","<b>" + d.natText + " has no social-security treaty with China</b>, so no exemption applied — enrolment was compulsory and an account should exist."]);
     if (d.hf) f.push(["good","<b>The housing fund is the one where the employer's share is yours too.</b> It is a separate institution (12329), a separate claim, and frequently the largest of the three. Add it to your agent's authority — the template below does."]);
     if (d.bank !== "live"){
@@ -1072,6 +1141,29 @@ footer p{max-width:none}
   }
 
   // ---------- documents ----------
+  function buildCasePack(){
+    var d = read(), r = compute(d);
+    var vs = variants(d);
+    var total = vs[0].total;
+    var cover =
+"UNCLAIMED IN CHINA — CASE PACK\n" +
+"境外人员社保个人账户清算 — 完整案卷\n" +
+"════════════════════════════════════════\n\n" +
+"Prepared " + (new Date()).toISOString().slice(0,10) + " · figures are an estimate, not a statement.\n\n" +
+"Applicant 申请人 ....... " + d.name + " (" + d.natText + ")\n" +
+"Passport 护照号 ........ " + d.pp + (d.ppold ? " (formerly " + d.ppold + ")" : "") + "\n" +
+"City 参保城市 ........... " + (d.city === "SH" ? "Shanghai 上海" : "Other") + "\n" +
+"District branch 分中心 .. " + (d.branch || "— ask 12345/12333 —") + "\n" +
+"Contributing period ..... " + (r.from ? r.from + " to " + r.to + " (" + r.months + " months)" : "not yet established") + "\n" +
+"Estimated recoverable ... ¥" + money(total) + (d.fx > 0 ? " (≈ " + money(total * d.fx) + " at " + d.fx.toFixed(2) + ")" : "") + "\n" +
+"Agent 受托人 ............ " + (d.agn || "— not yet named —") + (d.agph ? " · " + d.agph : "") + "\n\n" +
+"Enclosed below: (1) power of attorney, (2) statement of circumstances, (3) instructions for\n" +
+"your agent in Chinese. (1) and (2) need notarising and apostilling together, in one sitting,\n" +
+"before anyone signs. (3) is not a legal document - send it on its own to whoever is filing.\n" +
+"────────────────────────────────────────\n\n";
+    return cover + "[1] " + $("poa").textContent + "\n\n\n" + "[2] " + $("stmt").textContent + "\n\n\n" + "[3] " + $("agentpack").textContent;
+  }
+
   function buildDocs(d, r){
     var period = r.from ? r.from + " – " + r.to : (d.start + " – " + (d.exit || d.end));
     var agn = d.agn.trim() || "________________________";
@@ -1174,6 +1266,44 @@ payee + hfClause + "\n" +
 
     $("poa").textContent = poa;
     $("stmt").textContent = stmt;
+    $("agentpack").textContent = buildAgentPack(d, r, branch);
+  }
+
+  function buildAgentPack(d, r, branch){
+    var period = r.from ? r.from + " 至 " + r.to : "________ 至 ________";
+    return (
+"致受托人的办理说明\n" +
+"INSTRUCTIONS FOR YOUR AGENT — this half is written to them, in Chinese\n" +
+"════════════════════════════════════════\n\n" +
+"您好，感谢您帮忙办理以下事务。委托人信息如下：\n\n" +
+"  姓名 ................ " + d.name + "\n" +
+"  护照号 .............. " + d.pp + (d.ppold ? "（原护照号 " + d.ppold + "）" : "") + "\n" +
+"  参保城市 ............ " + (d.city === "SH" ? "上海市" : "____________") + "\n" +
+"  参保期间（估计） .... " + period + "\n" +
+"  社保分中心 .......... " + branch + "\n\n" +
+"请分两次前往办理，第一次只是查询，不需要提交任何公证材料：\n\n" +
+"第一次 · 查询\n" +
+"  1. 前往上述分中心，查询委托人的社保参保记录及养老保险个人账户余额；\n" +
+"  2. 确认账户状态：正常参保 / 封存 / 中断 / 停保；\n" +
+"  3. 确认是否存在欠费；\n" +
+"  4. 询问一次性支取个人账户所需的完整材料清单；\n" +
+"  5. 询问支取款项能否汇入委托人指定的账户，而非本人账户；\n" +
+"  6. 如方便，请一并查询医疗保险个人账户及住房公积金账户情况。\n\n" +
+"查询后，请将以下信息回复给委托人：\n\n" +
+"  账户状态 ............................ ____________________\n" +
+"  养老保险个人账户余额 ................ ____________________\n" +
+"  医疗保险个人账户余额 ................ ____________________\n" +
+"  住房公积金余额（如有） .............. ____________________\n" +
+"  是否存在欠费 ........................ ____________________\n" +
+"  收款账户要求 ........................ ____________________\n" +
+"  仍需补充的材料 ...................... ____________________\n\n" +
+"第二次 · 递交申请（材料齐全、公证认证完成后）\n" +
+"  1. 携带经公证认证的授权委托书原件及您本人身份证原件；\n" +
+"  2. 携带情况说明、翻译件及申请表；\n" +
+"  3. 递交终止社会保险关系及一次性支取个人账户的申请；\n" +
+"  4. 保留回执或受理凭证，并拍照发给委托人。\n\n" +
+"如有任何疑问，请联系委托人：____________________\n"
+    );
   }
 
   function gate(){
@@ -1181,12 +1311,16 @@ payee + hfClause + "\n" +
     ["f-agn","f-agid","f-agph","f-branch"].forEach(function(id){
       $(id).classList.toggle("req-empty", !$(id).value.trim());
     });
-    var msg = miss.length
+    var notaryMsg = miss.length
       ? "<b>Do not notarise yet.</b> Fill in your agent's name, PRC ID number and phone, and the district branch, before you print this. A notarised, apostilled document with blanks completed afterwards is refused at the counter as <span class=\"zh\">涂改</span> — and redoing it costs another R1,500–3,000 and a month."
       : "";
-    ["poa","stmt"].forEach(function(k){
+    var fillMsg = miss.length
+      ? "<b>Fill in your agent's name, PRC ID number and phone, and the district branch first</b> — this isn't notarised, but it's addressed to a specific person at a specific branch and won't make sense with blanks."
+      : "";
+    var msgs = { poa: notaryMsg, stmt: notaryMsg, casepack: notaryMsg, agentpack: fillMsg };
+    Object.keys(msgs).forEach(function(k){
       var g = $("gate-" + k);
-      g.innerHTML = msg; g.hidden = !miss.length;
+      if (g){ g.innerHTML = msgs[k]; g.hidden = !miss.length; }
       var btn = document.querySelector('[data-copy="' + k + '"]');
       if (btn) btn.disabled = miss.length > 0;
     });
@@ -1283,11 +1417,39 @@ payee + hfClause + "\n" +
     }
     if (b.id === "voice-toggle"){ firstPerson = !firstPerson; buildScript(read()); return; }
     if (b.id === "applyraise"){ buildSalaries(false); render(); return; }
+    if (b.id === "sharelink" || b.id === "exportjson"){
+      var payload, text;
+      if (b.id === "sharelink"){
+        text = location.origin + location.pathname + location.search + "#c=" + b64urlEncode(shareState());
+      } else {
+        var d2 = read(), r2 = compute(d2), vs2 = variants(d2);
+        payload = {
+          inputs: shareState(),
+          computed: { from:r2.from, to:r2.to, months:r2.months, pension:Math.round(r2.pension),
+                      medical:Math.round(r2.medical), housingFund:Math.round(r2.hf),
+                      interest:Math.round(r2.interest), totalRmb:Math.round(vs2[0].total),
+                      totalZar: d2.fx > 0 ? Math.round(vs2[0].total * d2.fx) : null },
+          scenarios: vs2.map(function(v){ return { key:v.key, label:v.label, months:v.r.months, totalRmb:Math.round(v.total) }; }),
+          note: "Non-financial identity fields (name, passport numbers, agent details) are deliberately excluded from this export - re-enter them by hand wherever this is used."
+        };
+        text = JSON.stringify(payload, null, 2);
+      }
+      var doneShare = function(){
+        var old2 = b.textContent; b.textContent = "Copied"; b.classList.add("ok");
+        setTimeout(function(){ b.textContent = old2; b.classList.remove("ok"); }, 1600);
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText){
+        navigator.clipboard.writeText(text).then(doneShare, function(){ fallback(text, doneShare); });
+      } else fallback(text, doneShare);
+      return;
+    }
 
     var what = b.getAttribute("data-copy"), text;
     if (what === "script"){
       var d = read();
       text = LINES.map(function(l){ return lineText(l, d); }).join("\n");
+    } else if (what === "casepack"){
+      text = buildCasePack();
     } else { text = $(what).textContent; }
     var done = function(){
       var old = b.textContent; b.textContent = "Copied"; b.classList.add("ok");
@@ -1368,9 +1530,13 @@ payee + hfClause + "\n" +
 
   buildSteps();
   buildDistricts();
+  var sharedCase = loadFromHash();
   buildDistrictTable();
-  buildSalaries(false);
-  load();
+  // applyShareState() (inside loadFromHash) already builds and fills the salary grid from the
+  // shared link's own data - rebuilding it here unconditionally would silently overwrite that
+  // with computed defaults before the user ever sees it.
+  if (!sharedCase) buildSalaries(false);
+  if (!sharedCase) load();
   buildClock();
   render();
   updateSeal();
