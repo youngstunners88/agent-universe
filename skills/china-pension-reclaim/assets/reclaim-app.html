@@ -79,6 +79,16 @@ small.note{display:block;margin-top:9px;font-size:12.5px;color:var(--ink-3);max-
 .v .a.yes{color:var(--jade)} .v .a.no{color:var(--seal)} .v .a.mid{color:var(--amber)}
 .v .why{font-size:13px;color:var(--ink-2);margin-top:8px;line-height:1.5}
 
+.ansgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:1px;background:var(--rule);border:1px solid var(--rule);border-radius:3px;overflow:hidden;margin-top:22px}
+.ans{background:var(--card);padding:17px 17px 18px}
+.ans .k{font-family:var(--mono);font-size:10px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink-3)}
+.ans .k .zh{font-family:var(--cjk);letter-spacing:.05em;text-transform:none;font-size:11.5px}
+.ans .n{font-family:var(--mono);font-weight:600;font-size:26px;letter-spacing:-.02em;margin-top:9px;line-height:1.05;font-variant-numeric:tabular-nums;color:var(--seal)}
+.ans .n small{font-size:13px;font-weight:400;color:var(--ink-3);display:block;margin-top:5px;letter-spacing:0}
+.ans.t .n{color:var(--ink)}
+.ans .d{font-size:12.5px;color:var(--ink-2);margin-top:8px;line-height:1.5}
+tr.sel td{background:var(--jade-soft);box-shadow:inset 2px 0 0 var(--jade)}
+td.pick{white-space:nowrap}
 .calc{display:grid;grid-template-columns:1.08fr .92fr;gap:22px;margin-top:24px;align-items:start}
 @media(max-width:840px){.calc{grid-template-columns:1fr}}
 .panel{background:var(--card);border:1px solid var(--rule);border-radius:3px;box-shadow:var(--shadow)}
@@ -130,7 +140,7 @@ input.req-empty{border-color:var(--seal);background:var(--seal-soft)}
 .steps{margin-top:26px;display:flex;flex-direction:column;gap:1px;background:var(--rule);border:1px solid var(--rule);border-radius:3px;overflow:hidden}
 .step{background:var(--card);padding:19px 19px 20px;display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:start}
 .step.done{background:var(--jade-soft)}
-.num{width:33px;height:33px;border-radius:50%;border:1.5px solid var(--seal);color:var(--seal);display:grid;place-content:center;font-family:var(--mono);font-size:12px;font-weight:600;flex:none}
+.step .num{width:33px;height:33px;border-radius:50%;border:1.5px solid var(--seal);color:var(--seal);display:grid;place-content:center;font-family:var(--mono);font-size:12px;font-weight:600;flex:none}
 .step.done .num{background:var(--jade);border-color:var(--jade);color:var(--card)}
 .step-h{display:flex;justify-content:space-between;gap:14px;align-items:flex-start;flex-wrap:wrap}
 .meta{display:flex;gap:7px;flex-wrap:wrap;flex:none}
@@ -215,6 +225,14 @@ footer p{max-width:none}
     <div class="v"><div class="q">What does the state charge?</div><div class="a yes">Nothing</div><div class="why"><span class="zh">不收费</span> at every counter. The cost is notary, apostille and translation.</div></div>
     <div class="v"><div class="q">Is it too late?</div><div class="a no">No</div><div class="why">The personal account has no claim deadline. Under-declaration complaints do — those expire in two years.</div></div>
   </div>
+</section>
+
+
+<section id="answers">
+  <div class="eyebrow">The four answers <span class="zh">一图看懂</span></div>
+  <h2>How much, how long, what it costs, what to do first</h2>
+  <p class="lede">These update live from the estimator below. The amount is a range because two facts are still unknown — and the last tile is how you close them.</p>
+  <div class="ansgrid" id="answers-grid"></div>
 </section>
 
 <section id="calc">
@@ -318,6 +336,20 @@ footer p{max-width:none}
     </div>
   </div>
   <small class="note">Estimate, not a statement. Months are priced against Shanghai's official contribution floor and ceiling for each period (¥5,975–31,014 to Jun 2022; ¥6,520–34,188 to Jun 2023; ¥7,310–36,549 to Jun 2024; ¥7,384–36,921 to Jun 2025, carried forward after). Pre-Aug-2021 voluntary months use the scheme's minimum base, which is approximate. Employers under-declaring the base is common and pushes the real figure down. Treat this as a ceiling until an operator or the counter reads you the actual number.</small>
+</section>
+
+
+<section id="range">
+  <div class="eyebrow">The range <span class="zh">情景对比</span></div>
+  <h2>Four scenarios, because two facts are still unknown</h2>
+  <p>A 2018–2023 job does not mean 2018–2023 of contributions. Two filters sit on top of the dates: whether Shanghai's pre-2021 carve-out applied to you, and whether contributions continued after you physically left. All four combinations are priced below at once, so you can see what is actually at stake before you spend anything finding out. The highlighted row is what the estimator is currently assuming.</p>
+  <div class="scroll">
+    <table>
+      <thead><tr><th>Scenario</th><th>Contributing</th><th>Pension + medical</th><th>Housing fund</th><th>Total RMB</th><th>Total ZAR</th></tr></thead>
+      <tbody id="range-body"></tbody>
+    </table>
+  </div>
+  <small class="note" id="range-note"></small>
 </section>
 
 <section id="call">
@@ -525,6 +557,67 @@ footer p{max-width:none}
     return r;
   }
 
+  function variants(d){
+    var mk = function(early, kept, hf){
+      var c = {}; Object.keys(d).forEach(function(k){ c[k] = d[k]; });
+      c.early = early; c.kept = kept; c.hf = hf; return c;
+    };
+    var defs = [
+      ["A","Enrolled only from Aug 2021, stopped when you left","The default assumption for Shanghai",false,false],
+      ["B","…and the employer kept paying after you left","Adds the remote months to the window",false,true],
+      ["C","…enrolled from the start under the voluntary scheme","Earlier months at the scheme's low fixed base",true,false],
+      ["D","Both — the best realistic case","Longest window, still on the low early base",true,true]
+    ];
+    return defs.map(function(x){
+      var v = { key:x[0], label:x[1], sub:x[2], early:x[3], kept:x[4] };
+      v.r  = compute(mk(x[3], x[4], d.hf));
+      v.rh = compute(mk(x[3], x[4], true));
+      v.total  = v.r.pension  + v.r.medical  + v.r.hf  + v.r.interest;
+      v.totalh = v.rh.pension + v.rh.medical + v.rh.hf + v.rh.interest;
+      v.sel = (d.early === x[3] && d.kept === x[4]);
+      return v;
+    });
+  }
+
+  function renderRange(d, vs){
+    $("range-body").innerHTML = vs.map(function(v){
+      var pm = v.r.pension + v.r.medical + v.r.interest;
+      return '<tr class="' + (v.sel ? "sel" : "") + '">' +
+        '<td class="pick"><b>' + v.key + '</b> &nbsp;' + v.label + '<span class="zh">' + v.sub + '</span></td>' +
+        '<td class="num">' + (v.r.months ? v.r.months + " mo" : "—") + '</td>' +
+        '<td class="num">¥' + money(pm) + '</td>' +
+        '<td class="num">' + (d.hf ? "¥" + money(v.r.hf) : '<span style="opacity:.5">not ticked</span>') + '</td>' +
+        '<td class="num"><b>¥' + money(v.total) + '</b></td>' +
+        '<td class="num">' + (d.fx > 0 ? "R" + money(v.total * d.fx) : "—") + '</td></tr>';
+    }).join("");
+    var lo = vs[0].total, hi = vs[3].totalh;
+    $("range-note").innerHTML = d.hf
+      ? "Housing fund is included above at " + (d.hfe + d.hfr) + "% of base, counted only on months priced at your real salary. Untick it in the estimator to see the floor without it."
+      : "<b>Tick the housing fund box in the estimator to see these figures with it included</b> — on the best case it adds roughly ¥" + money(vs[3].totalh - vs[3].total) + " (R" + money((vs[3].totalh - vs[3].total) * d.fx) + "). It is the one pot where your employer's share is also yours.";
+  }
+
+  function renderAnswers(d, vs){
+    var lo = vs[0].total, hi = vs[3].totalh;
+    var fx = d.fx > 0 ? d.fx : 0;
+    var cells = [
+      ["How much<span class=\"zh\"> 金额</span>", "",
+       "¥" + money(lo) + " – " + money(hi),
+       fx ? "R" + money(lo*fx) + " – R" + money(hi*fx) : "",
+       "The spread is the two unknown facts below, plus the housing fund. The floor is what you get on the most pessimistic reading."],
+      ["How long<span class=\"zh\"> 时限</span>", "t", "3 – 6", "months, end to end",
+       "20 working days is the counter's statutory limit. The rest is apostille, courier and getting the money out of China."],
+      ["What it costs<span class=\"zh\"> 费用</span>", "t", "R1,500 – 4,000", "if a friend acts as your agent",
+       "The state charges nothing. Add ¥2,000–6,000 if you use an agency instead of a friend."],
+      ["Do this first<span class=\"zh\"> 第一步</span>", "t", "1 payslip", "from before Aug 2021",
+       "Look for a 社保 line and a 公积金 line. That single piece of paper collapses the range above to one number."]
+    ];
+    $("answers-grid").innerHTML = cells.map(function(c){
+      return '<div class="ans ' + c[1] + '"><div class="k">' + c[0] + '</div>' +
+        '<div class="n">' + c[2] + (c[3] ? '<small>' + c[3] + '</small>' : '') + '</div>' +
+        '<div class="d">' + c[4] + '</div></div>';
+    }).join("");
+  }
+
   function missingReq(){
     return ["f-agn","f-agid","f-agph","f-branch"].filter(function(id){ return !$(id).value.trim(); });
   }
@@ -588,6 +681,10 @@ footer p{max-width:none}
     $("cover-fields").innerHTML = cf.map(function(x){
       return '<div class="fg"><div class="lab zh">'+x[0]+'<i>'+x[1]+'</i></div><div class="val">'+esc(x[2])+'</div></div>';
     }).join("");
+
+    var vs = variants(d);
+    renderAnswers(d, vs);
+    renderRange(d, vs);
 
     buildScript(d);
     buildDocs(d, r);
