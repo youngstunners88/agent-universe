@@ -605,7 +605,10 @@ footer p{max-width:none}
   "use strict";
   var $ = function(id){ return document.getElementById(id); };
   var KEY = "unclaimed-cn-v2";
-  var SENSITIVE = ["f-pp","f-ppold","f-agn","f-agid","f-agph"];
+  // A person's own name is at least as identifying as their agent's, so it gets the same
+  // opt-in-only persistence - inconsistent to protect one name and not the other, and
+  // "Clear my details" should mean all of them, not just the passport/ID numbers.
+  var SENSITIVE = ["f-name","f-pp","f-ppold","f-agn","f-agid","f-agph"];
 
   var BASES = [
     { from:"2016-04", to:"2018-03", lo:3563, hi:17817, approx:true },
@@ -671,13 +674,21 @@ footer p{max-width:none}
             hfe:"f-hfe", hfr:"f-hfr", bank:"f-bank",
             agn:"f-agn", agid:"f-agid", agph:"f-agph", branch:"f-branch" };
 
-  function mi(s){ if(!s) return null; var p = s.split("-"); return (+p[0])*12 + (+p[1]) - 1; }
+  // type="month" falls back to a free-text field in some browsers (Firefox desktop),
+  // so validate the shape rather than trusting split("-") — a malformed string must
+  // become "no date" (null), never NaN silently propagating into the total.
+  function mi(s){
+    var m = /^(\d{4})-(\d{2})$/.exec(s || "");
+    if (!m) return null;
+    return (+m[1])*12 + (+m[2]) - 1;
+  }
   function ms(n){ var y = Math.floor(n/12), m = n%12 + 1; return y + "-" + (m<10?"0":"") + m; }
   function band(n){
     for (var i=0;i<BASES.length;i++){ if (n >= mi(BASES[i].from) && n <= mi(BASES[i].to)) return BASES[i]; }
     return n < mi(BASES[0].from) ? BASES[0] : BASES[BASES.length-1];
   }
   function money(n){ return Math.round(n).toLocaleString("en-US"); }
+  function hfPct(d){ return Math.round((d.hfe + d.hfr) * 100) / 100; }
   // Invariant: every free-text field (name, passport numbers, agent name/ID/phone) is user-
   // controlled and persisted to localStorage. Any of it reaching an innerHTML sink MUST go
   // through esc() first (the POA/statement panes are exempt only because they use
@@ -691,10 +702,10 @@ footer p{max-width:none}
     o.name = o.name.trim() || "—";
     o.pp = o.pp.trim() || "—";
     o.ppold = o.ppold.trim();
-    o.natText = $("f-nat").options[$("f-nat").selectedIndex].text.replace(" (treaty)","");
-    o.pay = +o.pay || 0; o.fx = +o.fx || 0;
-    o.hfe = +o.hfe || 0; o.hfr = +o.hfr || 0;
-    o.pay = +o.pay || 0; o.raise_ = +o.raise_ || 0;
+    var natSel = $("f-nat"), natOpt = natSel.options[natSel.selectedIndex];
+    o.natText = (natOpt ? natOpt.text : natSel.value).replace(" (treaty)","");
+    o.pay = Math.max(0, +o.pay || 0); o.fx = Math.max(0, +o.fx || 0); o.raise_ = Math.max(0, +o.raise_ || 0);
+    o.hfe = Math.min(12, Math.max(0, +o.hfe || 0)); o.hfr = Math.min(12, Math.max(0, +o.hfr || 0));
     o.early = $("f-early").checked; o.kept = $("f-kept").checked; o.hf = $("f-hf").checked;
     o.sal = {};
     document.querySelectorAll("[data-year]").forEach(function(inp){
@@ -714,11 +725,17 @@ footer p{max-width:none}
     var r = { months:0, lowMonths:0, pension:0, medical:0, pooled:0, hf:0, interest:0,
               from:null, to:null, capped:false, gap:0, remoteExcluded:0, approx:false };
     if (s === null || e === null) return r;
-    var contribEnd = d.kept ? e : Math.min(x === null ? e : x, e);
+    // A blank "left China" date is an unknown, not a zero-length window - compute it as such
+    // by returning immediately rather than coercing it through the same arithmetic as a real
+    // date, which produced a phantom contributing month whenever from === s, and a fabricated
+    // remoteExcluded figure since e - s is not actually "months excluded after you left."
+    if (x === null && !d.kept) return r;
+    var contribEnd = d.kept ? e : Math.min(x, e);
     r.remoteExcluded = Math.max(0, e - contribEnd);
     var floorM = (d.city === "SH" && !d.early) ? mi(SH_MANDATORY) : s;
     var from = Math.max(s, floorM);
     r.gap = Math.max(0, from - s);
+    if (contribEnd - from > 720){ contribEnd = from + 720; r.truncated = true; }
     if (contribEnd < from) return r;
     r.from = ms(from); r.to = ms(contribEnd);
     for (var n = from; n <= contribEnd; n++){
@@ -785,7 +802,7 @@ footer p{max-width:none}
     for (var y = y1; y <= y2; y++){
       var v = (preserve && old[y]) ? old[y] : (pay + inc * (y - y1));
       html += '<label><span class="y">' + y + '</span>' +
-              '<input type="number" min="0" step="500" data-year="' + y + '" value="' + v + '"></label>';
+              '<input type="number" min="0" step="500" data-year="' + y + '" value="' + esc(v) + '"></label>';
     }
     $("salgrid").innerHTML = html;
   }
@@ -861,8 +878,8 @@ footer p{max-width:none}
     }).join("");
     var lo = vs[0].total, hi = vs[3].totalh;
     $("range-note").innerHTML = d.hf
-      ? "Housing fund is included above at " + (d.hfe + d.hfr) + "% of base, counted only on months priced at your real salary. Untick it in the estimator to see the floor without it."
-      : "<b>Tick the housing fund box in the estimator to see these figures with it included</b> — on the best case it adds roughly ¥" + money(vs[3].totalh - vs[3].total) + " (R" + money((vs[3].totalh - vs[3].total) * d.fx) + "). It is the one pot where your employer's share is also yours.";
+      ? "Housing fund is included above at " + hfPct(d) + "% of base, counted only on months priced at your real salary. Untick it in the estimator to see the floor without it."
+      : "<b>Tick the housing fund box in the estimator to see these figures with it included</b> — on the best case it adds roughly ¥" + money(vs[3].totalh - vs[3].total) + (d.fx > 0 ? " (R" + money((vs[3].totalh - vs[3].total) * d.fx) + ")" : "") + ". It is the one pot where your employer's share is also yours.";
   }
 
   function renderAnswers(d, vs){
@@ -902,7 +919,7 @@ footer p{max-width:none}
       ["Pension personal account","养老保险个人账户 · your 8%","¥" + money(r.pension),""],
       ["Medical personal account","医保个人账户 · your 2%","¥" + money(r.medical),""]
     ];
-    if (d.hf) rows.push(["Housing fund, both shares","住房公积金 · " + (d.hfe+d.hfr) + "% of base","¥" + money(r.hf),"plus"]);
+    if (d.hf) rows.push(["Housing fund, both shares","住房公积金 · " + hfPct(d) + "% of base","¥" + money(r.hf),"plus"]);
     rows.push(["Interest since " + (r.to || "—"),"记账利息 · at " + (INTEREST*100).toFixed(0) + "%/yr, conservative","¥" + money(r.interest),"plus"]);
     rows.push(["Employer's 16% pension share","统筹账户 — never recoverable","¥" + money(r.pooled),"gone"]);
     rows.push(["Contributing months", r.from ? r.from + " → " + r.to : "none on these dates", r.months ? r.months + " mo" : "0",""]);
@@ -911,7 +928,9 @@ footer p{max-width:none}
     }).join("");
 
     var f = [];
-    if (!r.months){
+    if (!d.exit && !d.kept){
+      f.push(["bad","<b>\"Left China\" is blank.</b> Without it the estimate can't tell whether you were still contributing, so it's treating your window as effectively zero rather than guessing generously. Fill it in — or tick <em>employer kept paying</em> if contributions genuinely continued after you left."]);
+    } else if (!r.months){
       f.push(["bad","<b>No contributing months on these dates.</b> " + (d.city === "SH"
         ? "Shanghai only made enrolment compulsory for foreigners on 16 Aug 2021. If you left before then and were never voluntarily enrolled, there may be nothing to claim — but check an old payslip for a 社保 line before believing it, and tick the box above if you find one."
         : "Check the dates.")]);
@@ -926,6 +945,10 @@ footer p{max-width:none}
       f.push(["warn","<b>" + r.lowMonths + " voluntary-scheme months counted at the minimum base</b>, not your ¥" + money(d.pay) + " salary — that scheme pegged contributions near 60% of the citywide average wage regardless of pay. Those early base figures are approximate; the counter's record is authoritative."]);
     }
     if (r.capped) f.push(["warn","Your pay exceeds the contribution ceiling in at least one period, so those months were calculated on the capped base."]);
+    if (r.truncated) f.push(["bad","<b>That date range is implausibly long</b> and has been capped at 60 years for this estimate — check your dates."]);
+    if (r.months && d.pay <= 0 && !Object.keys(d.sal || {}).some(function(y){ return (d.sal[y] || 0) > 0; })){
+      f.push(["warn","<b>No salary entered.</b> Every month above is priced at the statutory minimum base because no pay figure was given — fill in your actual salary for a real estimate rather than a floor guess."]);
+    }
     if (r.months >= 180){
       f.push(["bad","<b>You are at or past 15 years of contributions.</b> That is the threshold for an actual monthly pension for life, payable even if you live abroad. Withdrawing the lump sum destroys it. Get advice before filing anything."]);
     } else if (r.months >= 144){
@@ -1022,20 +1045,18 @@ footer p{max-width:none}
   // voice flagged localService === true, so an on-page promise of "nothing leaves your
   // browser" stays true even for this feature. If no local zh voice exists, say so instead
   // of silently falling back to a network one.
-  var localZhVoice = null, voiceScanDone = false;
-  function scanVoices(){
-    if (!("speechSynthesis" in window)) { voiceScanDone = true; return; }
+  // getVoices() is cheap once populated, so just re-query it fresh on every play instead of
+  // caching a "scanned" flag — Chrome fills the list asynchronously after 'voiceschanged',
+  // and a one-shot cache taken before that fires would lock in a false "no voice" result for
+  // the rest of the session.
+  function findLocalZhVoice(){
+    if (!("speechSynthesis" in window)) return null;
     var voices = window.speechSynthesis.getVoices() || [];
-    localZhVoice = voices.find(function(v){ return v.localService && /^zh/i.test(v.lang); }) || null;
-    voiceScanDone = true;
-  }
-  if ("speechSynthesis" in window){
-    scanVoices();
-    window.speechSynthesis.addEventListener("voiceschanged", scanVoices);
+    return voices.find(function(v){ return v.localService && /^zh/i.test(v.lang); }) || null;
   }
 
   function speak(i, btn){
-    if (!voiceScanDone) scanVoices();
+    var localZhVoice = findLocalZhVoice();
     if (!localZhVoice){
       if (btn){
         var old = btn.textContent; btn.textContent = "No offline voice"; btn.disabled = true;
@@ -1316,7 +1337,15 @@ payee + hfClause + "\n" +
       if (!raw) return;
       var o = JSON.parse(raw);
       if (o && o.v){
-        Object.keys(F).forEach(function(k){ if (o.v[k]) $(F[k]).value = o.v[k]; });
+        Object.keys(F).forEach(function(k){
+          var el = $(F[k]), val = o.v[k];
+          if (!val) return;
+          if (el.tagName === "SELECT"){
+            var ok = Array.prototype.some.call(el.options, function(o2){ return o2.value === val; });
+            if (!ok) return;
+          }
+          el.value = val;
+        });
         ["f-early","f-kept","f-hf","f-remember"].forEach(function(id){
           if (o.v[id] !== undefined) $(id).checked = o.v[id];
         });
