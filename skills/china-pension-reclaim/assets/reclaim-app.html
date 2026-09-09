@@ -288,7 +288,7 @@ footer p{max-width:none}
         <fieldset>
           <legend>Dates and pay <span class="zh">参保期间</span></legend>
           <label><span class="lbl">City of employment <span class="zh">参保城市</span></span>
-            <select id="f-city"><option value="SH" selected>Shanghai</option><option value="OTHER">Beijing / Shenzhen / Guangzhou / other</option></select>
+            <select id="f-city"><option value="SH" selected>Shanghai 上海</option><option value="BJ">Beijing 北京</option><option value="SZ">Shenzhen 深圳</option><option value="GZ">Guangzhou 广州</option><option value="OTHER">Another city</option></select>
           </label>
           <div class="row3" style="margin-top:12px">
             <label><span class="lbl">Job started <span class="zh">入职</span></span><input id="f-start" type="month" value="2018-07"></label>
@@ -304,7 +304,15 @@ footer p{max-width:none}
             <label><span class="lbl">&nbsp;</span><button class="copy" id="applyraise" style="width:100%;padding:8px">Apply raise to all years</button></label>
           </div>
           <label class="chk"><input type="checkbox" id="f-kept"><span>My employer <b>kept paying contributions after I left China</b>. Leave unticked unless you have seen the record — social insurance attaches to employment inside China on a valid permit, so months worked remotely from abroad normally stop contributing on the day you leave.</span></label>
-          <label class="chk"><input type="checkbox" id="f-early"><span>I was enrolled in Shanghai social insurance <b>before</b> August 2021. Those earlier months count at the old voluntary scheme's <b>fixed low base</b>, not your salary — so they add less than you would expect.</span></label>
+          <label class="chk"><input type="checkbox" id="f-early"><span><b>Shanghai only —</b> I was enrolled in Shanghai social insurance <b>before</b> August 2021. Those earlier months count at the old voluntary scheme's <b>fixed low base</b>, not your salary — so they add less than you would expect.</span></label>
+        </fieldset>
+
+        <fieldset>
+          <legend>Your actual record <span class="zh">参保缴费明细</span> <em>beats every estimate</em></legend>
+          <p style="font-size:12.5px;color:var(--ink-2);margin:0 0 8px">If you can reach <b>si.12333.gov.cn</b> or the <b class="zh">电子社保卡</b> mini-programme, copy your <b class="zh">参保缴费明细</b> and paste it here. Every month it finds replaces a guess with the base your employer actually declared — which also shows under-declaration and gaps the estimate can't see.</p>
+          <textarea id="f-record" rows="4" placeholder="2019-03    12000.00    960.00&#10;2019-04    12000.00    960.00&#10;… or paste the whole table, tabs and all" style="width:100%;font-family:var(--mono);font-size:12.5px;padding:8px 10px;border:1px solid var(--rule);border-radius:2px;background:var(--paper);color:var(--ink);resize:vertical"></textarea>
+          <div style="display:flex;gap:8px;margin-top:8px"><button class="copy" id="parserec">Parse record</button><button class="copy" id="clearrec">Use estimate instead</button></div>
+          <div id="rec-out"></div>
         </fieldset>
 
         <fieldset>
@@ -491,8 +499,8 @@ footer p{max-width:none}
       <tbody>
         <tr><td><b>National floor</b></td><td class="num">15 Oct 2011</td><td>MOHRSS Order No. 16 made participation compulsory nationwide.</td></tr>
         <tr class="hi"><td><b>Shanghai</b></td><td class="num">16 Aug 2021</td><td><b>The exception.</b> A local carve-out let employers opt foreigners out, or enrol them in only three of the five funds. Most opted out. Everything before that date is a question, not an assumption.</td></tr>
-        <tr><td><b>Beijing</b></td><td class="num">2011</td><td>Enforced from the national date. A long window is likely, and the balance correspondingly larger.</td></tr>
-        <tr><td><b>Shenzhen / Guangzhou</b></td><td class="num">2011</td><td>As above. Guangdong branches are generally used to foreign-national terminations.</td></tr>
+        <tr class="hi"><td><b>Beijing</b></td><td class="num">2011</td><td><b>Priced from Beijing's own published bands</b> (floor ¥3,387 in 2018 rising to ¥7,162 in 2025). No carve-out ever applied, so the window is usually the whole job — often far larger than a Shanghai claim of the same length.</td></tr>
+        <tr><td><b>Shenzhen / Guangzhou</b></td><td class="num">2011</td><td>Compulsory from the national date, so the window is the whole job — but their own contribution bands aren't built in yet, so the estimator substitutes Shanghai's and says so. Guangdong branches are generally used to foreign-national terminations.</td></tr>
       </tbody>
     </table>
   </div>
@@ -623,7 +631,7 @@ footer p{max-width:none}
   // "Clear my details" should mean all of them, not just the passport/ID numbers.
   var SENSITIVE = ["f-name","f-pp","f-ppold","f-agn","f-agid","f-agph"];
 
-  var BASES = [
+  var SH_BASES = [
     { from:"2016-04", to:"2018-03", lo:3563, hi:17817, approx:true },
     { from:"2018-04", to:"2019-03", lo:4279, hi:21396, approx:true },
     { from:"2019-04", to:"2020-06", lo:4699, hi:23496, approx:true },
@@ -633,8 +641,34 @@ footer p{max-width:none}
     { from:"2023-07", to:"2024-06", lo:7310, hi:36549 },
     { from:"2024-07", to:"2099-12", lo:7384, hi:36921 }
   ];
+  // Beijing's own published table (北京市历年养老、失业、工伤保险缴费基数上下限一览表).
+  // Beijing never had Shanghai's carve-out, so a foreigner employed there was compulsorily
+  // enrolled from the national date - which usually means a far longer window than Shanghai.
+  var BJ_BASES = [
+    { from:"2016-04", to:"2018-06", lo:3082, hi:23118, approx:true },
+    { from:"2018-07", to:"2019-06", lo:3387, hi:25401 },
+    { from:"2019-07", to:"2020-06", lo:3613, hi:23565 },
+    { from:"2020-07", to:"2021-06", lo:3613, hi:26541 },
+    { from:"2021-07", to:"2022-06", lo:5360, hi:28221 },
+    { from:"2022-07", to:"2023-06", lo:5869, hi:31884 },
+    { from:"2023-07", to:"2024-06", lo:6326, hi:33891 },
+    { from:"2024-07", to:"2025-06", lo:6821, hi:35283 },
+    { from:"2025-07", to:"2099-12", lo:7162, hi:35811 }
+  ];
+  var CITIES = {
+    SH: { en:"Shanghai", zh:"上海", mandatory:"2021-08", dial:"+86 21",
+          carveout:true, verified:true, bases:SH_BASES },
+    BJ: { en:"Beijing", zh:"北京", mandatory:"2011-10", dial:"+86 10",
+          carveout:false, verified:true, bases:BJ_BASES },
+    SZ: { en:"Shenzhen", zh:"深圳", mandatory:"2011-10", dial:"+86 755",
+          carveout:false, verified:false, bases:SH_BASES },
+    GZ: { en:"Guangzhou", zh:"广州", mandatory:"2011-10", dial:"+86 20",
+          carveout:false, verified:false, bases:SH_BASES },
+    OTHER: { en:"Another city", zh:"其他城市", mandatory:"2011-10", dial:"+86",
+          carveout:false, verified:false, bases:SH_BASES }
+  };
+  function cityOf(d){ return CITIES[d.city] || CITIES.OTHER; }
   var TREATY = { CA:1,DE:1,KR:1,JP:1,NL:1,ES:1,CH:1,DK:1,FI:1,LU:1,RS:1,KG:1 };
-  var SH_MANDATORY = "2021-08";
   var INTEREST = 0.03;
 
   // Shanghai social insurance district branches. Addresses drift — always confirm on the call.
@@ -696,9 +730,10 @@ footer p{max-width:none}
     return (+m[1])*12 + (+m[2]) - 1;
   }
   function ms(n){ var y = Math.floor(n/12), m = n%12 + 1; return y + "-" + (m<10?"0":"") + m; }
-  function band(n){
-    for (var i=0;i<BASES.length;i++){ if (n >= mi(BASES[i].from) && n <= mi(BASES[i].to)) return BASES[i]; }
-    return n < mi(BASES[0].from) ? BASES[0] : BASES[BASES.length-1];
+  function band(n, c){
+    var t = (c && c.bases) || SH_BASES;
+    for (var i=0;i<t.length;i++){ if (n >= mi(t[i].from) && n <= mi(t[i].to)) return t[i]; }
+    return n < mi(t[0].from) ? t[0] : t[t.length-1];
   }
   function money(n){ return Math.round(n).toLocaleString("en-US"); }
   function hfPct(d){ return Math.round((d.hfe + d.hfr) * 100) / 100; }
@@ -789,6 +824,58 @@ footer p{max-width:none}
     return (v && v > 0) ? v : d.pay;
   }
 
+  // Parsed 参保缴费明细. Deliberately never applied silently: parse() fills this, the rows are
+  // rendered for the user to eyeball against their own record, and only then does compute()
+  // prefer it over the estimate. A parser that quietly produced a wrong "exact" figure would
+  // be worse than the honest range it replaces.
+  var RECORD = null;
+
+  function parseRecord(text){
+    var lines = String(text || "").split(/[\r\n]+/);
+    var rows = [], statuses = {}, seen = {};
+    var STATUS = ["正常参保","封存","中断","欠费","停保","暂停"];
+    lines.forEach(function(line){
+      STATUS.forEach(function(w){ if (line.indexOf(w) !== -1) statuses[w] = true; });
+      // Two-digit alternatives MUST come first: with (0?[1-9]|1[0-2]), "2021-10" matches the
+      // leading "1" via 0?[1-9] and silently becomes 2021-01.
+      var m = /(20\d{2})\s*[-年\/.]\s*(1[0-2]|0[1-9]|[1-9])(?!\d)/.exec(line);
+      if (!m) return;
+      var key = m[1] + "-" + (m[2].length === 1 ? "0" + m[2] : m[2]);
+      if (seen[key]) return;
+      // The contribution base is the largest plausible money figure on the line; the employee's
+      // own 8% share is usually also present and much smaller, so "largest" picks the base.
+      var nums = (line.match(/\d[\d,]*(?:\.\d+)?/g) || []).map(function(x){
+        return parseFloat(x.replace(/,/g, ""));
+      }).filter(function(v){ return v >= 1000 && v <= 200000 && String(Math.floor(v)).length !== 6; });
+      if (!nums.length) return;
+      var base = Math.max.apply(null, nums);
+      seen[key] = true;
+      rows.push({ m:key, base:base });
+    });
+    rows.sort(function(a,b){ return a.m < b.m ? -1 : 1; });
+    return rows.length ? { rows:rows, statuses:Object.keys(statuses) } : null;
+  }
+
+  function renderRecord(){
+    var o = $("rec-out");
+    if (!RECORD){ o.innerHTML = ""; return; }
+    var rows = RECORD.rows;
+    var sum = rows.reduce(function(a,r){ return a + r.base; }, 0);
+    var gaps = [];
+    for (var n = mi(rows[0].m) + 1; n < mi(rows[rows.length-1].m); n++){
+      if (!rows.some(function(r){ return mi(r.m) === n; })) gaps.push(ms(n));
+    }
+    o.innerHTML =
+      '<p class="flag good" style="margin-top:10px"><b>' + rows.length + ' months read from your record</b> — ' +
+      rows[0].m + ' to ' + rows[rows.length-1].m + ', average declared base ¥' + money(sum / rows.length) +
+      '. <b>Check these against your own record before trusting the figure</b>; the estimate is now built from them, not from your salary.</p>' +
+      (gaps.length ? '<p class="flag warn"><b>' + gaps.length + ' month' + (gaps.length>1?'s':'') + ' missing inside that span</b> (' + gaps.slice(0,6).join(", ") + (gaps.length>6?"…":"") + ') — either your employer skipped them, or the paste was partial.</p>' : '') +
+      (RECORD.statuses.length ? '<p class="flag warn"><b>Status words found:</b> <span class="zh">' + RECORD.statuses.join("、") + '</span>. <span class="zh">欠费</span> blocks a termination until cleared; <span class="zh">封存</span> or <span class="zh">中断</span> is what you want to see.</p>' : '') +
+      '<div class="scroll" style="margin-top:8px;max-height:200px;overflow-y:auto"><table><thead><tr><th>Month</th><th>Declared base</th></tr></thead><tbody>' +
+      rows.map(function(r){ return '<tr><td class="num">' + r.m + '</td><td class="num">¥' + money(r.base) + '</td></tr>'; }).join("") +
+      '</tbody></table></div>';
+  }
+
   function compute(d){
     var s = mi(d.start), x = mi(d.exit), e = mi(d.end);
     var r = { months:0, lowMonths:0, pension:0, medical:0, pooled:0, hf:0, interest:0,
@@ -801,15 +888,32 @@ footer p{max-width:none}
     if (x === null && !d.kept) return r;
     var contribEnd = d.kept ? e : Math.min(x, e);
     r.remoteExcluded = Math.max(0, e - contribEnd);
-    var floorM = (d.city === "SH" && !d.early) ? mi(SH_MANDATORY) : s;
+    var c = cityOf(d);
+    var floorM = (c.carveout && !d.early) ? mi(c.mandatory) : Math.max(s, mi(c.mandatory));
     var from = Math.max(s, floorM);
     r.gap = Math.max(0, from - s);
     if (contribEnd - from > 720){ contribEnd = from + 720; r.truncated = true; }
     if (contribEnd < from) return r;
+    if (RECORD && RECORD.rows.length){
+      r.fromRecord = true;
+      r.from = RECORD.rows[0].m; r.to = RECORD.rows[RECORD.rows.length-1].m;
+      RECORD.rows.forEach(function(row){
+        r.months++;
+        r.pension += row.base * 0.08;
+        r.medical += row.base * 0.02;
+        r.pooled  += row.base * 0.16;
+        if (d.hf) r.hf += row.base * (d.hfe + d.hfr) / 100;
+      });
+      var nowM0 = new Date().getFullYear()*12 + new Date().getMonth();
+      var yrs0 = Math.max(0, (nowM0 - mi(r.to)) / 12);
+      r.interest = (r.pension + r.medical) * INTEREST * yrs0;
+      r.years = yrs0;
+      return r;
+    }
     r.from = ms(from); r.to = ms(contribEnd);
     for (var n = from; n <= contribEnd; n++){
-      var b = band(n), base, low = false;
-      if (d.city === "SH" && d.early && n < mi(SH_MANDATORY)){
+      var b = band(n, c), base, low = false;
+      if (c.carveout && d.early && n < mi(c.mandatory)){
         base = b.lo; low = true; r.lowMonths++; if (b.approx) r.approx = true;
       } else {
         base = salaryFor(d, n);
@@ -982,6 +1086,10 @@ footer p{max-width:none}
     var total = r.pension + r.medical + r.hf + r.interest;
 
     $("amt-n").textContent = money(total);
+    var lab = document.querySelector("#calc .res-lab");
+    if (lab) lab.innerHTML = r.fromRecord
+      ? '<span class="zh">按实际缴费记录计算</span> · <b style="color:var(--jade)">From your record</b>'
+      : '<span class="zh">可支取金额（估算）</span> · Recoverable, estimated';
     $("amt-zar").textContent = d.fx > 0 ? "≈ R" + money(total * d.fx) + " at " + d.fx.toFixed(2) + " ZAR/RMB" : "";
 
     var rows = [
@@ -1000,15 +1108,20 @@ footer p{max-width:none}
     if (!d.exit && !d.kept){
       f.push(["bad","<b>\"Left China\" is blank.</b> Without it the estimate can't tell whether you were still contributing, so it's treating your window as effectively zero rather than guessing generously. Fill it in — or tick <em>employer kept paying</em> if contributions genuinely continued after you left."]);
     } else if (!r.months){
-      f.push(["bad","<b>No contributing months on these dates.</b> " + (d.city === "SH"
+      f.push(["bad","<b>No contributing months on these dates.</b> " + (cityOf(d).carveout
         ? "Shanghai only made enrolment compulsory for foreigners on 16 Aug 2021. If you left before then and were never voluntarily enrolled, there may be nothing to claim — but check an old payslip for a 社保 line before believing it, and tick the box above if you find one."
-        : "Check the dates.")]);
+        : cityOf(d).en + " has required enrolment since Oct 2011, so a window this short usually means the dates are wrong rather than that nothing is owed — check them.")]);
     }
     if (r.remoteExcluded > 0){
       f.push(["warn","<b>" + r.remoteExcluded + " months excluded after you left China.</b> Social insurance attaches to employment inside China on a valid permit, so remote months from abroad normally stop contributing on your exit date. Counting them would also put a date in your sworn statement that contradicts your passport stamp. If the record shows contributions continuing, tick <em>employer kept paying</em>."]);
     }
-    if (r.gap > 0){
+    if (r.gap > 0 && cityOf(d).carveout){
       f.push(["warn","<b>" + r.gap + " months before Aug 2021 excluded.</b> Shanghai let employers opt foreigners out until 16 Aug 2021. This is the single highest-value thing to check: <b>find one payslip from before then</b> and look for a 社保 deduction. If it is there, tick the box — though note those months count at the old scheme's low fixed base, not your salary."]);
+    } else if (r.gap > 0){
+      f.push(["warn","<b>" + r.gap + " months before Oct 2011 excluded</b> — that is when enrolment became compulsory nationwide. Contributions before it were possible but unusual for foreign staff; if a payslip from then shows a 社保 line, the counter's record is what settles it."]);
+    }
+    if (!cityOf(d).verified && r.months){
+      f.push(["warn","<b>" + cityOf(d).en + "'s own contribution floor and ceiling aren't built in yet</b> — this estimate applies Shanghai's bands as a stand-in, so the figure is the right shape but the wrong precision. Shanghai and Beijing are the two cities priced from their own published tables. Ask 12333 for your city's 缴费基数上下限 for the years you worked, or treat this as an order-of-magnitude answer."]);
     }
     if (r.lowMonths > 0){
       f.push(["warn","<b>" + r.lowMonths + " voluntary-scheme months counted at the minimum base</b>, not your ¥" + money(d.pay) + " salary — that scheme pegged contributions near 60% of the citywide average wage regardless of pay. Those early base figures are approximate; the counter's record is authoritative."]);
@@ -1034,7 +1147,7 @@ footer p{max-width:none}
     var cf = [
       ["申请人","APPLICANT", d.name],
       ["国籍","NATIONALITY", d.natText],
-      ["参保城市","CITY", d.city === "SH" ? "Shanghai 上海" : "Other"],
+      ["参保城市","CITY", cityOf(d).en + " " + cityOf(d).zh],
       ["缴费期间","CONTRIBUTING", r.from ? r.from + " → " + r.to : "—"],
       ["离境","DEPARTED", d.exit || "—"],
       ["案件状态","STATUS", r.months ? "待办 / Pending" : "待核实 / Unverified"]
@@ -1044,6 +1157,7 @@ footer p{max-width:none}
     }).join("");
 
     markSalaryWindow(r);
+    renderRecord();
     renderBranchAddr(d);
     renderChain(d);
     var vs = variants(d);
@@ -1152,7 +1266,7 @@ footer p{max-width:none}
 "Prepared " + (new Date()).toISOString().slice(0,10) + " · figures are an estimate, not a statement.\n\n" +
 "Applicant 申请人 ....... " + d.name + " (" + d.natText + ")\n" +
 "Passport 护照号 ........ " + d.pp + (d.ppold ? " (formerly " + d.ppold + ")" : "") + "\n" +
-"City 参保城市 ........... " + (d.city === "SH" ? "Shanghai 上海" : "Other") + "\n" +
+"City 参保城市 ........... " + cityOf(d).en + " " + cityOf(d).zh + "\n" +
 "District branch 分中心 .. " + (d.branch || "— ask 12345/12333 —") + "\n" +
 "Contributing period ..... " + (r.from ? r.from + " to " + r.to + " (" + r.months + " months)" : "not yet established") + "\n" +
 "Estimated recoverable ... ¥" + money(total) + (d.fx > 0 ? " (≈ " + money(total * d.fx) + " at " + d.fx.toFixed(2) + ")" : "") + "\n" +
@@ -1195,7 +1309,7 @@ footer p{max-width:none}
 "  姓名 Name ............ " + d.name + "\n" +
 "  国籍 Nationality ..... " + d.natText + "\n" +
 "  护照号 Passport No. .. " + ppLine + "\n" +
-"  参保城市 City ....... " + (d.city === "SH" ? "上海市 Shanghai" : "____________") + "\n" +
+"  参保城市 City ....... " + cityOf(d).zh + "市 " + cityOf(d).en + "\n" +
 "  参保期间 Period ..... " + period + "\n" +
 "  离境日期 Departed ... " + (d.exit || "____________") + "\n\n" +
 "受托人 ATTORNEY-IN-FACT\n" +
@@ -1278,7 +1392,7 @@ payee + hfClause + "\n" +
 "您好，感谢您帮忙办理以下事务。委托人信息如下：\n\n" +
 "  姓名 ................ " + d.name + "\n" +
 "  护照号 .............. " + d.pp + (d.ppold ? "（原护照号 " + d.ppold + "）" : "") + "\n" +
-"  参保城市 ............ " + (d.city === "SH" ? "上海市" : "____________") + "\n" +
+"  参保城市 ............ " + cityOf(d).zh + "市\n" +
 "  参保期间（估计） .... " + period + "\n" +
 "  社保分中心 .......... " + branch + "\n\n" +
 "请分两次前往办理，第一次只是查询，不需要提交任何公证材料：\n\n" +
@@ -1417,6 +1531,12 @@ payee + hfClause + "\n" +
     }
     if (b.id === "voice-toggle"){ firstPerson = !firstPerson; buildScript(read()); return; }
     if (b.id === "applyraise"){ buildSalaries(false); render(); return; }
+    if (b.id === "parserec"){
+      RECORD = parseRecord($("f-record").value);
+      if (!RECORD) $("rec-out").innerHTML = '<p class="flag bad" style="margin-top:10px"><b>Nothing recognisable in that paste.</b> Each line needs a month (2019-03, 2019年3月) and the declared base as a number. Paste the rows themselves rather than a screenshot or a summary.</p>';
+      render(); return;
+    }
+    if (b.id === "clearrec"){ RECORD = null; $("f-record").value = ""; render(); return; }
     if (b.id === "sharelink" || b.id === "exportjson"){
       var payload, text;
       if (b.id === "sharelink"){
