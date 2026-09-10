@@ -93,6 +93,25 @@ small.note{display:block;margin-top:9px;font-size:12.5px;color:var(--ink-3);max-
 .callout{border-left:2px solid var(--jade);background:var(--jade-soft);padding:14px 16px;margin-top:16px;border-radius:0 3px 3px 0}
 .callout h3{font-size:14.5px;color:var(--jade)}
 .callout p{margin-top:7px;font-size:13.5px;color:var(--ink-2);max-width:66ch}
+.ocount{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px;font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase}
+.ocount span{padding:5px 11px;border:1px solid var(--rule);border-radius:2px;color:var(--ink-2)}
+.ocount span b{color:var(--ink)}
+.oc{background:var(--card);border:1px solid var(--rule);border-radius:3px;margin-top:12px;overflow:hidden;box-shadow:var(--shadow)}
+.oc.done{border-color:var(--jade)}
+.oc-h{display:grid;grid-template-columns:auto 1fr auto;gap:14px;align-items:start;padding:15px 16px;border-bottom:1px solid var(--rule-2)}
+.oc-n{width:29px;height:29px;border-radius:50%;border:1.5px solid var(--seal);color:var(--seal);display:grid;place-content:center;font-family:var(--mono);font-size:12px;font-weight:600;flex:none}
+.oc.done .oc-n{background:var(--jade);border-color:var(--jade);color:var(--card)}
+.oc-t{font-weight:600;font-size:15px}
+.oc-t .zh{font-weight:400;color:var(--ink-3);font-size:13px}
+.oc-w{font-size:13px;color:var(--ink-2);margin-top:5px;line-height:1.5}
+.oc-c{font-family:var(--mono);font-size:12.5px;margin-top:7px;color:var(--seal);word-break:break-all}
+.oc-b{padding:0 16px 15px}
+.oc-msg{background:var(--sunk);border:1px solid var(--rule);border-radius:2px;padding:12px 13px;font-family:var(--mono);font-size:12px;line-height:1.65;white-space:pre-wrap;word-break:break-word;max-height:230px;overflow-y:auto;margin-top:12px}
+.oc-act{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px;align-items:center}
+.oc-note{width:100%;margin-top:9px;font-family:var(--sans);font-size:13px;padding:8px 10px;border:1px solid var(--rule);border-radius:2px;background:var(--paper);color:var(--ink);resize:vertical}
+.oc-st{font-family:var(--mono);font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;padding:5px 10px;border:1px solid var(--rule);border-radius:2px;background:var(--paper);color:var(--ink-2);cursor:pointer}
+.oc-st.on{border-color:var(--jade);color:var(--jade);background:var(--jade-soft)}
+.tag.t-free2{border-color:var(--jade);color:var(--jade)}
 .ansgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:1px;background:var(--rule);border:1px solid var(--rule);border-radius:3px;overflow:hidden;margin-top:22px}
 .ans{background:var(--card);padding:17px 17px 18px}
 .ans .k{font-family:var(--mono);font-size:10px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink-3)}
@@ -507,8 +526,17 @@ footer p{max-width:none}
 </section>
 
 
+<section id="outreach">
+  <div class="eyebrow">Start here today <span class="zh">对外联络</span></div>
+  <h2>Ten parties, in the order worth contacting them</h2>
+  <p>Each one is a real office or firm, with what it can actually tell you, a message written for that specific recipient from your own details above, and somewhere to record what comes back. <b>Work top to bottom</b> — the free official channels answer the questions that decide whether you need a paid firm at all, so contacting them first can save the fee entirely.</p>
+  <div class="ocount" id="ocount"></div>
+  <div id="outreach-list"></div>
+  <small class="note"><b>The page cannot send these for you</b> — it has no server and never transmits anything. Copy each message into your own email, or press Open in email to hand it to your mail app pre-filled. Phone entries are scripts to read aloud, not things to send. Everything you record here stays in this browser.</small>
+</section>
+
 <section id="contacts">
-  <div class="eyebrow">Who to contact <span class="zh">办事机构一览</span></div>
+  <div class="eyebrow">Reference <span class="zh">办事机构一览</span></div>
   <h2>The offices, the hotlines, and how to find an agent without being fleeced</h2>
   <p>Everything below is a public office. There is no private company in this list, and you should be suspicious of any guide that puts one there — the state charges nothing, and the only paid help you need is a person with a PRC ID card who can stand at a counter.</p>
 
@@ -1250,6 +1278,7 @@ footer p{max-width:none}
 
     markSalaryWindow(r);
     renderRecord();
+    renderOutreach();
     renderBranchAddr(d);
     renderChain(d);
     var vs = variants(d);
@@ -1347,6 +1376,201 @@ footer p{max-width:none}
   }
 
   // ---------- documents ----------
+  // Ten real parties, ordered so the free official channels - which answer the questions that
+  // decide whether a paid firm is needed at all - come before anyone who charges.
+  var CONTACTS = [
+    { id:"c12345", kind:"call", free:true, name:"Shanghai citizen hotline 12345", zh:"市民服务热线",
+      how:"+86 21 12345", hours:"Daily 08:00–20:00 China time",
+      what:"The only channel that reliably reaches an English speaker. Ask for English immediately and wait through the Chinese prompt. Use it to find which district branch holds the file and what that branch wants." },
+    { id:"c12333", kind:"call", free:true, name:"Social insurance hotline 12333", zh:"人社服务热线",
+      how:"+86 21 12333", hours:"Weekdays 09:00–17:00 China time",
+      what:"The specialists. They will not read account data to an unverified caller, so do not treat a refusal as proof no account exists — but they will confirm the document list and the payout rule, which is what you actually need." },
+    { id:"c12329", kind:"call", free:true, name:"Housing fund hotline 12329", zh:"住房公积金热线",
+      how:"+86 21 12329", hours:"Weekdays 09:00–17:00 China time",
+      what:"A completely separate institution and a separate claim. Where an employer paid it, both their share and yours are withdrawable — often more than the pension account. Nobody at 12333 will mention it." },
+    { id:"cportal", kind:"portal", free:true, name:"National social insurance portal", zh:"国家社会保险公共服务平台",
+      how:"si.12333.gov.cn  ·  or 电子社保卡 in WeChat / Alipay",
+      what:"Self-service. Register with 证件类型 → 外国护照 and read your own 参保缴费明细 — the month-by-month record that settles the whole question. Registration usually needs a Chinese mobile for the SMS code, so this is often a job for your agent." },
+    { id:"cbranch", kind:"visit", free:true, name:"Your district branch", zh:"社保分中心",
+      how:"Chosen in the estimator above  ·  weekdays 09:00–11:30, 13:30–16:30",
+      what:"Where the file physically sits and the only place the termination can be filed. Your agent goes twice: once to read the record and ask what is needed, once to submit." },
+    { id:"chrone", kind:"email", free:false, name:"HROne", zh:"上海",
+      how:"info@hrone.com  ·  +86 21 5211 0025",
+      what:"Publishes specifically on foreigners withdrawing these accounts and states it can assist with remote submissions — the closest public match to this situation. Not vetted or endorsed." },
+    { id:"cdezan", kind:"email", free:false, name:"Dezan Shira & Associates", zh:"上海",
+      how:"shanghai@dezshira.com  ·  +86 21 6358 8686",
+      what:"Publishes the China Briefing guidance on claiming social insurance when leaving. Large and long-established; an individual case may be below their usual threshold, which is worth asking outright." },
+    { id:"csjg", kind:"email", free:false, name:"S.J. Grand", zh:"上海",
+      how:"sjgrand.cn/contact  ·  +86 21 6341 1177",
+      what:"Names social insurance refunds as a service alongside tax filing. Accounting-led, so useful if there is also an unfinished tax position. Contact via their form — no public case-work address found." },
+    { id:"cacclime", kind:"email", free:false, name:"Acclime China", zh:"上海",
+      how:"china.acclime.com/contact  ·  +86 21 6389 8288",
+      what:"Detailed public guides on expatriate social insurance and on claiming when leaving. Corporate-focused; ask first whether they take individuals at all." },
+    { id:"cclc", kind:"email", free:false, name:"China Legal Center", zh:"微信",
+      how:"chinalegalcenter.com  ·  WeChat 18513415507",
+      what:"The only one with a dedicated social insurance refund page, and the only one offering to be paid after the refund lands. Publishes no fee, timeline or document list — ask for all three in writing before sending anything." }
+  ];
+
+  function outreachMsg(c){
+    var d = read(), r = compute(d), cy = cityOf(d);
+    var period = r.from ? r.from + " to " + r.to : (d.start || "____") + " to " + (d.exit || d.end || "____");
+    var who = d.name && d.name !== "—" ? d.name : "[name]";
+    var pp  = d.pp && d.pp !== "—" ? d.pp : "[passport number]";
+
+    if (c.kind === "call" || c.kind === "portal" || c.kind === "visit"){
+      var lines = [];
+      if (c.id === "c12345") lines = [
+        "Hello, I need English service, please. 你好，我需要英文服务，请帮我转接。",
+        "",
+        "I worked in " + cy.en + " from " + (d.start||"____") + " to " + (d.exit||"____") + " on a work permit and have left China.",
+        "Passport number " + pp + ".",
+        "",
+        "1. Which district social insurance branch holds my record?",
+        "2. What documents are needed to terminate the relationship and withdraw the personal account?",
+        "3. Must the payment go to a Chinese bank account in my own name, or can it go to an account named in a notarised power of attorney, or overseas?",
+        "4. My former employer has been deregistered and I have no termination certificate — what is accepted instead?"
+      ];
+      else if (c.id === "c12333") lines = [
+        "你好，我需要英文服务。 (Hello, I need English service.)",
+        "",
+        "我于 " + (d.start||"____") + " 至 " + (d.exit||"____") + " 在" + cy.zh + "工作并参保，护照号 " + pp + "，现已离境。",
+        "(I worked and was insured in " + cy.en + " for the period above; passport " + pp + "; I have left China.)",
+        "",
+        "1. 终止社会保险关系并一次性支取个人账户，需要哪些材料？",
+        "2. 原单位已注销、无解除劳动合同证明，可以用什么替代？",
+        "3. 支取款项是否必须打到本人中国境内银行账户？能否汇往境外或委托书指定账户？",
+        "4. 应该到哪个区的社保分中心办理？"
+      ];
+      else if (c.id === "c12329") lines = [
+        "你好。我是外籍人员，" + (d.start||"____") + " 至 " + (d.exit||"____") + " 在" + cy.zh + "工作，护照号 " + pp + "，现已离境。",
+        "(I am a foreign national who worked in " + cy.en + " over the period above and has now left China.)",
+        "",
+        "1. 请问我有没有住房公积金账户？余额是多少？",
+        "   (Do I have a housing fund account, and what is the balance?)",
+        "2. 外籍人员离境提取住房公积金需要什么材料？",
+        "   (What documents does a departing foreign national need to withdraw it?)",
+        "3. 可以委托他人代办吗？受托人需要什么证件？",
+        "   (Can an agent do this for me, and what ID do they need?)",
+        "4. 提取的钱可以汇到哪里？",
+        "   (Where can the money be paid?)"
+      ];
+      else if (c.id === "cportal") lines = [
+        "Register at si.12333.gov.cn, or open 电子社保卡 inside WeChat or Alipay.",
+        "",
+        "Choose 证件类型 → 外国护照 and register with passport number " + pp + ".",
+        "",
+        "Then find and screenshot 参保缴费明细 — the month-by-month contribution record.",
+        "Paste it into the record box in this page and every month is priced at the base your",
+        "employer actually declared, instead of an estimate.",
+        "",
+        "Watch for: the account status (封存 or 中断 is what you want; 正常参保 means the employer",
+        "never filed your departure) and any 欠费 months, which block a termination until cleared.",
+        "",
+        "The SMS code usually needs a Chinese mobile number — if yours is dead, ask your agent."
+      ];
+      else lines = [
+        "Two visits, and the first one needs no notarised documents at all.",
+        "",
+        "VISIT 1 — read the record:",
+        "  · Print the 参保缴费明细 for " + period,
+        "  · Note the account status: 正常参保 / 封存 / 中断 / 停保",
+        "  · Check for 欠费 (arrears) — these block everything until cleared",
+        "  · Ask for the full document list, and whether payment can go to an account",
+        "    named in the power of attorney rather than the claimant's own",
+        "",
+        "VISIT 2 — file, once the notarised and apostilled documents have arrived:",
+        "  · Power of attorney, the agent's own PRC ID, passport copies, the statement,",
+        "    the application form, and the original social security card",
+        "  · Keep the 一次性支付凭证 — it is both proof and the bank's source-of-funds document",
+        "",
+        "The agent handoff pack above says all of this in Chinese, addressed to them."
+      ];
+      return lines.join("\n");
+    }
+
+    // Email to a firm. Short, specific, and answerable in one reply - that is what gets a
+    // response from a practice that mostly serves companies.
+    return [
+      "Subject: Foreign national — social insurance refund, " + cy.en + ", employer deregistered",
+      "",
+      "Dear " + c.name + ",",
+      "",
+      "I am enquiring on behalf of " + who + ", a national of " + d.natText + " who worked in " +
+        cy.en + " and has since left China. He would like to terminate his social insurance",
+      "relationship and withdraw his pension and medical personal account balances.",
+      "",
+      "The circumstances:",
+      "  · Nationality: " + d.natText + (TREATY[d.nat] ? " (bilateral social security agreement in force)" : " — no bilateral social security agreement with China"),
+      "  · Employed in " + cy.en + ", " + (d.start||"____") + " to " + (d.end||"____"),
+      "  · Departed China " + (d.exit || "____") + " and has not returned",
+      "  · Passport " + pp,
+      "  · The former employer has been deregistered; no termination certificate is obtainable",
+      "  · He is outside China and cannot easily travel there",
+      "",
+      "Could you tell me:",
+      "  1. Do you take individual clients for this, rather than only corporate ones?",
+      "  2. What is your fee, and is it fixed, hourly, or contingent on the refund landing?",
+      "  3. Can the whole filing be completed on a notarised and apostilled power of attorney",
+      "     with him outside China, and does your agent hold a PRC resident ID card?",
+      "  4. Does your scope include the medical personal account and the housing fund? Both are",
+      "     separate offices from the pension branch and are commonly left out.",
+      "  5. If the payout must go to a Chinese bank account in his own name and his is dormant,",
+      "     how do you normally handle that?",
+      "  6. Roughly how long does this take end to end?",
+      "",
+      "I am contacting a few firms and will compare on scope and fee. A short reply to the six",
+      "points above is all I need at this stage.",
+      "",
+      "With thanks,",
+      ""
+    ].join("\n");
+  }
+
+  function renderOutreach(){
+    var host = $("outreach-list");
+    if (!host) return;
+    var st = {};
+    try { st = JSON.parse(localStorage.getItem(KEY + "-outreach") || "{}"); } catch(e){}
+    var done = 0;
+    host.innerHTML = CONTACTS.map(function(c, i){
+      var mine = st[c.id] || {};
+      if (mine.done) done++;
+      var mail = c.how.indexOf("@") !== -1 ? c.how.split(/\s|·/)[0] : "";
+      var msg = outreachMsg(c);
+      var label = c.kind === "email" ? "Copy email" : "Copy script";
+      return '<div class="oc' + (mine.done ? " done" : "") + '" data-oc="' + c.id + '">' +
+        '<div class="oc-h"><div class="oc-n">' + (i+1) + '</div>' +
+        '<div><div class="oc-t">' + esc(c.name) + ' <span class="zh">' + esc(c.zh) + '</span></div>' +
+        '<div class="oc-w">' + c.what + '</div>' +
+        '<div class="oc-c">' + esc(c.how) + (c.hours ? '  ·  ' + esc(c.hours) : '') + '</div></div>' +
+        '<div class="meta"><span class="tag ' + (c.free ? 't-free2">Free' : 't-cost">Paid') + '</span>' +
+        '<span class="tag">' + (c.kind === "email" ? "Email" : c.kind === "call" ? "Phone" : c.kind === "portal" ? "Online" : "In person") + '</span></div></div>' +
+        '<div class="oc-b"><div class="oc-msg">' + esc(msg) + '</div>' +
+        '<div class="oc-act">' +
+          '<button class="copy" data-ocopy="' + c.id + '">' + label + '</button>' +
+          (mail ? '<a class="copy" style="text-decoration:none;display:inline-block" href="mailto:' + esc(mail) +
+                  '?subject=' + encodeURIComponent("Foreign national - social insurance refund enquiry") + '">Open in email</a>' : '') +
+          '<button class="oc-st' + (mine.done ? " on" : "") + '" data-ocdone="' + c.id + '">' +
+            (mine.done ? "✓ Contacted" : "Mark contacted") + '</button>' +
+        '</div>' +
+        '<textarea class="oc-note" rows="2" data-ocnote="' + c.id + '" placeholder="What did they say? Balance, document list, payout rule, fee…">' +
+          esc(mine.note || "") + '</textarea></div></div>';
+    }).join("");
+    var free = CONTACTS.filter(function(c){ return c.free; }).length;
+    $("ocount").innerHTML = '<span><b>' + CONTACTS.length + '</b> parties</span>' +
+      '<span><b>' + free + '</b> free / official</span>' +
+      '<span><b>' + done + '</b> contacted</span>' +
+      '<span>Shanghai is <b>' + (new Date(Date.now() + (8*60 + new Date().getTimezoneOffset())*60000)
+        .getHours().toString().padStart(2,"0")) + ':00</b> now</span>';
+  }
+
+  function saveOutreach(id, patch){
+    var st = {};
+    try { st = JSON.parse(localStorage.getItem(KEY + "-outreach") || "{}"); } catch(e){}
+    st[id] = Object.assign({}, st[id] || {}, patch);
+    try { localStorage.setItem(KEY + "-outreach", JSON.stringify(st)); } catch(e){}
+  }
+
   function buildCasePack(){
     var d = read(), r = compute(d);
     var vs = variants(d);
@@ -1622,11 +1846,37 @@ payee + hfClause + "\n" +
       // government contribution history - so a control labelled "Clear my details" has to
       // take it too, along with the parsed copy held in memory and rendered on screen.
       $("f-record").value = ""; RECORD = null;
+      try { localStorage.removeItem(KEY + "-outreach"); } catch(err){}
       $("f-remember").checked = false;
       render(); return;
     }
     if (b.id === "voice-toggle"){ firstPerson = !firstPerson; buildScript(read()); return; }
     if (b.id === "applyraise"){ buildSalaries(false); render(); return; }
+    var ocp = e.target.closest("[data-ocopy]");
+    if (ocp){
+      var cid = ocp.getAttribute("data-ocopy"), cc = null;
+      CONTACTS.forEach(function(x){ if (x.id === cid) cc = x; });
+      if (cc){
+        var t = outreachMsg(cc);
+        var fin = function(){
+          var o0 = ocp.textContent; ocp.textContent = "Copied"; ocp.classList.add("ok");
+          setTimeout(function(){ ocp.textContent = o0; ocp.classList.remove("ok"); }, 1600);
+        };
+        if (navigator.clipboard && navigator.clipboard.writeText){
+          navigator.clipboard.writeText(t).then(fin, function(){ fallback(t, fin); });
+        } else fallback(t, fin);
+      }
+      return;
+    }
+    var ocd = e.target.closest("[data-ocdone]");
+    if (ocd){
+      var did = ocd.getAttribute("data-ocdone");
+      var cur = {};
+      try { cur = JSON.parse(localStorage.getItem(KEY + "-outreach") || "{}"); } catch(err){}
+      saveOutreach(did, { done: !((cur[did] || {}).done) });
+      renderOutreach();
+      return;
+    }
     if (b.id === "parserec"){
       RECORD = parseRecord($("f-record").value);
       if (!RECORD) $("rec-out").innerHTML = '<p class="flag bad" style="margin-top:10px"><b>Nothing recognisable in that paste.</b> Each line needs a month (2019-03, 2019年3月) and the declared base as a number. Paste the rows themselves rather than a screenshot or a summary.</p>';
@@ -1692,6 +1942,11 @@ payee + hfClause + "\n" +
     try { document.execCommand("copy"); done(); } catch(err){}
     document.body.removeChild(ta);
   }
+
+  document.addEventListener("input", function(e){
+    var n = e.target.closest && e.target.closest("[data-ocnote]");
+    if (n) saveOutreach(n.getAttribute("data-ocnote"), { note: n.value });
+  });
 
   document.addEventListener("change", function(e){
     if (e.target.hasAttribute && e.target.hasAttribute("data-step")){
