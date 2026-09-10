@@ -991,10 +991,16 @@ footer p{max-width:none}
     var contribEnd = d.kept ? e : Math.min(x, e);
     r.remoteExcluded = Math.max(0, e - contribEnd);
     var c = cityOf(d);
-    var floorM = (c.carveout && !d.early) ? mi(c.mandatory) : Math.max(s, mi(c.mandatory));
+    // Three cases, and the middle one was lost when this became city-aware: a carve-out city
+    // WITH early enrolment ticked counts from the job start (those pre-mandatory months are
+    // real, priced at the period floor by the loop below); a carve-out city without it starts
+    // at the mandatory date; every other city starts at its own national date. Writing the
+    // else-branch as Math.max(s, mandatory) made the ticked and unticked cases identical, so
+    // the checkbox did nothing and the low-base branch below was unreachable.
+    var floorM = (c.carveout && d.early) ? s : Math.max(s, mi(c.mandatory));
     var from = Math.max(s, floorM);
     r.gap = Math.max(0, from - s);
-    if (contribEnd - from > 720){ contribEnd = from + 720; r.truncated = true; }
+    if (contribEnd - from >= 720){ contribEnd = from + 719; r.truncated = true; }
     if (contribEnd < from) return r;
     r.from = ms(from); r.to = ms(contribEnd);
     for (var n = from; n <= contribEnd; n++){

@@ -87,3 +87,37 @@ preference rule needs a fallback; a heuristic that can't tell needs to say so ra
 
 A 14-case regression suite covering all three rounds lives in the session scratchpad pattern
 described in SKILL.md — extract `parseRecord` verbatim and run it under node.
+
+## Round 2, calc-verifier (reported late)
+
+Twelve scenarios re-derived from the spec in an independent Python implementation and compared
+against the app rendered headlessly. Eleven matched to the yuan — every ceiling-clamp boundary in
+both the Shanghai and Beijing tables, below-floor and mid-band salaries, housing fund,
+kept-paying on/off, blank departure date, and a pasted record with bases deliberately outside the
+band. That agreement is what makes the twelfth finding credible.
+
+**The Shanghai carve-out checkbox did nothing.** Introduced by my own multi-city refactor:
+
+```js
+var floorM = (c.carveout && !d.early) ? mi(c.mandatory) : Math.max(s, mi(c.mandatory));
+var from   = Math.max(s, floorM);
+```
+
+Both branches collapse to `max(s, mandatory)`, so `d.early` never moved `from`, months before the
+mandatory date never entered the loop, and the in-loop low-base pricing branch was unreachable.
+Worth **¥19,542 on the worked case — 46% of the correct total** — for any Shanghai claimant
+enrolled under the pre-2021 voluntary scheme.
+
+The refactor caused it: the pre-refactor else-branch was `s`, and widening it to
+`Math.max(s, mi(c.mandatory))` so other cities would honour their own 2011 date silently
+collapsed Shanghai's early case into its non-early one. Fixed as
+`(c.carveout && d.early) ? s : Math.max(s, mi(c.mandatory))`.
+
+**Why three specialists rather than one reviewer.** This bug was *visible in the UI the whole
+time* — the four-scenario table rendered rows A and C identically, and B and D identically,
+despite C and D being defined as the early-enrolment variants. A reader checking the code against
+its own intent agrees with it; only a re-derivation from the spec disagrees. The fuzzer and the
+security auditor both read this same function and neither flagged it, because neither was asking
+whether the arithmetic was *right* — only whether it could be broken or abused.
+
+Also noted: the 720-month cap used an inclusive loop and yielded 721 months. Tightened.
