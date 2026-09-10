@@ -880,20 +880,12 @@ footer p{max-width:none}
     var s = mi(d.start), x = mi(d.exit), e = mi(d.end);
     var r = { months:0, lowMonths:0, pension:0, medical:0, pooled:0, hf:0, interest:0,
               from:null, to:null, capped:false, gap:0, remoteExcluded:0, approx:false };
-    if (s === null || e === null) return r;
-    // A blank "left China" date is an unknown, not a zero-length window - compute it as such
-    // by returning immediately rather than coercing it through the same arithmetic as a real
-    // date, which produced a phantom contributing month whenever from === s, and a fabricated
-    // remoteExcluded figure since e - s is not actually "months excluded after you left."
-    if (x === null && !d.kept) return r;
-    var contribEnd = d.kept ? e : Math.min(x, e);
-    r.remoteExcluded = Math.max(0, e - contribEnd);
-    var c = cityOf(d);
-    var floorM = (c.carveout && !d.early) ? mi(c.mandatory) : Math.max(s, mi(c.mandatory));
-    var from = Math.max(s, floorM);
-    r.gap = Math.max(0, from - s);
-    if (contribEnd - from > 720){ contribEnd = from + 720; r.truncated = true; }
-    if (contribEnd < from) return r;
+
+    // A parsed record supersedes every date-based inference, so it is handled before any of
+    // it - including the blank-exit-date and empty-window early returns below, which would
+    // otherwise throw away a perfectly good record and show zero, and before gap/
+    // remoteExcluded are computed, which would otherwise raise date-derived warnings that
+    // contradict the record that replaced those dates.
     if (RECORD && RECORD.rows.length){
       r.fromRecord = true;
       r.from = RECORD.rows[0].m; r.to = RECORD.rows[RECORD.rows.length-1].m;
@@ -910,6 +902,21 @@ footer p{max-width:none}
       r.years = yrs0;
       return r;
     }
+
+    if (s === null || e === null) return r;
+    // A blank "left China" date is an unknown, not a zero-length window - compute it as such
+    // by returning immediately rather than coercing it through the same arithmetic as a real
+    // date, which produced a phantom contributing month whenever from === s, and a fabricated
+    // remoteExcluded figure since e - s is not actually "months excluded after you left."
+    if (x === null && !d.kept) return r;
+    var contribEnd = d.kept ? e : Math.min(x, e);
+    r.remoteExcluded = Math.max(0, e - contribEnd);
+    var c = cityOf(d);
+    var floorM = (c.carveout && !d.early) ? mi(c.mandatory) : Math.max(s, mi(c.mandatory));
+    var from = Math.max(s, floorM);
+    r.gap = Math.max(0, from - s);
+    if (contribEnd - from > 720){ contribEnd = from + 720; r.truncated = true; }
+    if (contribEnd < from) return r;
     r.from = ms(from); r.to = ms(contribEnd);
     for (var n = from; n <= contribEnd; n++){
       var b = band(n, c), base, low = false;
@@ -1105,7 +1112,7 @@ footer p{max-width:none}
     }).join("");
 
     var f = [];
-    if (!d.exit && !d.kept){
+    if (!d.exit && !d.kept && !r.fromRecord){
       f.push(["bad","<b>\"Left China\" is blank.</b> Without it the estimate can't tell whether you were still contributing, so it's treating your window as effectively zero rather than guessing generously. Fill it in — or tick <em>employer kept paying</em> if contributions genuinely continued after you left."]);
     } else if (!r.months){
       f.push(["bad","<b>No contributing months on these dates.</b> " + (cityOf(d).carveout
