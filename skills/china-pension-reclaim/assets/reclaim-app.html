@@ -867,11 +867,13 @@ footer p{max-width:none}
       // Prefer figures written with decimals - that is how RMB amounts appear in these
       // exports, and it excludes bare ID and reference numbers that would otherwise outrank
       // the real base simply by being larger.
-      var dec = (rest.match(/\d[\d,]*\.\d{1,2}/g) || []).map(toNum);
-      var all = (rest.match(/\d[\d,]*(?:\.\d+)?/g) || []).map(toNum);
-      var pool = (dec.length ? dec : all).filter(function(v){
-        return isFinite(v) && v >= MIN_BASE && v <= MAX_BASE;
-      });
+      var plausible = function(v){ return isFinite(v) && v >= MIN_BASE && v <= MAX_BASE; };
+      var dec = (rest.match(/\d[\d,]*\.\d{1,2}/g) || []).map(toNum).filter(plausible);
+      var all = (rest.match(/\d[\d,]*(?:\.\d+)?/g) || []).map(toNum).filter(plausible);
+      // Prefer decimals only when one is actually a plausible base. Preferring them outright
+      // loses a whole month on the common layout "2019-03  12000  960.00", where the base is
+      // a bare integer and the only decimal is the employee's contribution.
+      var pool = dec.length ? dec : all;
       if (!pool.length){ unreadable.push(key); return; }
 
       var base = Math.max.apply(null, pool);
