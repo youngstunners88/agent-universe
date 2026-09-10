@@ -616,7 +616,7 @@ footer p{max-width:none}
 
 <footer>
   <p><b>What this is.</b> A working kit, not legal advice. The rules come from the Interim Measures for the Participation in Social Insurance of Foreigners Employed in China (MOHRSS Order No. 16, 2011), but they are administered branch by branch and counter practice moves faster than published guidance. Verify the document list on the call before you spend money on notarisation.</p>
-  <p style="margin-top:10px">Sources: Shanghai Municipal Human Resources and Social Security Bureau service guide <span class="zh">「外籍、台港澳居民养老保险个人账户终止」</span> · Shanghai One-Stop service portal item catalogue · Shanghai Circular <span class="zh">沪人社养发〔2009〕38号</span> · Notice on the Cessation of Legalisation Service, Chinese Embassy in South Africa, 26 October 2023. Everything you type stays in this browser.</p>
+  <p style="margin-top:10px">Sources: Shanghai Municipal Human Resources and Social Security Bureau service guide <span class="zh">「外籍、台港澳居民养老保险个人账户终止」</span> · Shanghai One-Stop service portal item catalogue · Shanghai Circular <span class="zh">沪人社养发〔2009〕38号</span> · Notice on the Cessation of Legalisation Service, Chinese Embassy in South Africa, 26 October 2023. Everything you type stays in this browser — there is no server, no analytics and no upload, and a pasted contribution record never reaches a share link. The one thing that does leave your machine is a request to Google Fonts for the page's typefaces on load, which tells Google your IP address but nothing you typed. Open the page offline, or self-host the file, and even that stops.</p>
 </footer>
 
 </div>
@@ -798,7 +798,13 @@ footer p{max-width:none}
     return true;
   }
 
-  function esc(s){ return String(s).replace(/[&<>]/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;"}[c]; }); }
+  // Escapes quotes as well as angle brackets because this helper is used in attribute
+  // contexts too (buildSalaries' value="..."), where &lt;/&gt; alone would not stop a breakout.
+  function esc(s){
+    return String(s).replace(/[&<>"']/g, function(c){
+      return { "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[c];
+    });
+  }
 
   function read(){
     var o = {};
@@ -832,41 +838,87 @@ footer p{max-width:none}
 
   function parseRecord(text){
     var lines = String(text || "").split(/[\r\n]+/);
-    var rows = [], statuses = {}, seen = {};
+    var byMonth = {}, statuses = {}, adjustments = [], unreadable = [];
     var STATUS = ["正常参保","封存","中断","欠费","停保","暂停"];
+    // Header, example and footer rows carry month-shaped text that is not a contribution.
+    // Left in, a header like "月份(格式如2020-01)" claims that month and shadows the real row.
+    var NOISE = /合计|小计|总计|累计|共\s*\d+\s*个月|格式如|示例|例如|表头|total/i;
+    // A real 缴费基数 is never below any city's floor (~3,000 in the covered era). Anything
+    // smaller on the line is a contribution amount, an ID, or noise - not a base.
+    var MIN_BASE = 2000, MAX_BASE = 200000;
+    var toNum = function(x){ return parseFloat(String(x).replace(/,/g, "")); };
+
     lines.forEach(function(line){
       STATUS.forEach(function(w){ if (line.indexOf(w) !== -1) statuses[w] = true; });
-      // Two-digit alternatives MUST come first: with (0?[1-9]|1[0-2]), "2021-10" matches the
-      // leading "1" via 0?[1-9] and silently becomes 2021-01.
+      if (NOISE.test(line)) return;
+
       var m = /(20\d{2})\s*[-年\/.]\s*(1[0-2]|0[1-9]|[1-9])(?!\d)/.exec(line);
       if (!m) return;
       var key = m[1] + "-" + (m[2].length === 1 ? "0" + m[2] : m[2]);
-      if (seen[key]) return;
-      // The contribution base is the largest plausible money figure on the line; the employee's
-      // own 8% share is usually also present and much smaller, so "largest" picks the base.
-      var nums = (line.match(/\d[\d,]*(?:\.\d+)?/g) || []).map(function(x){
-        return parseFloat(x.replace(/,/g, ""));
-      }).filter(function(v){ return v >= 1000 && v <= 200000 && String(Math.floor(v)).length !== 6; });
-      if (!nums.length) return;
-      var base = Math.max.apply(null, nums);
-      seen[key] = true;
-      rows.push({ m:key, base:base });
+
+      // Remove the month token before scanning for money, or the year itself (2019 is inside
+      // [1000,200000]) competes to be the largest number and wins on lines where the real
+      // figures are smaller.
+      var rest = line.slice(0, m.index) + "  " + line.slice(m.index + m[0].length);
+
+      // A reversal/correction row must not be booked as an ordinary positive contribution.
+      if (/[-−(（]\s*\d/.test(rest)){ adjustments.push(key); return; }
+
+      // Prefer figures written with decimals - that is how RMB amounts appear in these
+      // exports, and it excludes bare ID and reference numbers that would otherwise outrank
+      // the real base simply by being larger.
+      var dec = (rest.match(/\d[\d,]*\.\d{1,2}/g) || []).map(toNum);
+      var all = (rest.match(/\d[\d,]*(?:\.\d+)?/g) || []).map(toNum);
+      var pool = (dec.length ? dec : all).filter(function(v){
+        return isFinite(v) && v >= MIN_BASE && v <= MAX_BASE;
+      });
+      if (!pool.length){ unreadable.push(key); return; }
+
+      var base = Math.max.apply(null, pool);
+      // Same month twice (a corrected re-issue, or a stray line) - keep the larger plausible
+      // base rather than whichever happened to appear first.
+      if (!byMonth[key] || base > byMonth[key]) byMonth[key] = base;
     });
-    rows.sort(function(a,b){ return a.m < b.m ? -1 : 1; });
-    return rows.length ? { rows:rows, statuses:Object.keys(statuses) } : null;
+
+    var rows = Object.keys(byMonth).sort().map(function(k){ return { m:k, base:byMonth[k] }; });
+    if (!rows.length && !adjustments.length && !unreadable.length) return null;
+    return { rows:rows, statuses:Object.keys(statuses),
+             adjustments:adjustments, unreadable:unreadable };
   }
 
   function renderRecord(){
     var o = $("rec-out");
     if (!RECORD){ o.innerHTML = ""; return; }
     var rows = RECORD.rows;
+    if (!rows.length){
+      o.innerHTML = '<p class="flag bad" style="margin-top:10px"><b>No usable months in that paste.</b> ' +
+        ((RECORD.adjustments && RECORD.adjustments.length) ? RECORD.adjustments.length + ' looked like reversals. ' : '') +
+        ((RECORD.unreadable && RECORD.unreadable.length) ? RECORD.unreadable.length + ' had a month but no readable 缴费基数 on the line. ' : '') +
+        'Paste the rows with the base column included — the estimate below is unchanged.</p>';
+      return;
+    }
     var sum = rows.reduce(function(a,r){ return a + r.base; }, 0);
     var gaps = [];
     for (var n = mi(rows[0].m) + 1; n < mi(rows[rows.length-1].m); n++){
       if (!rows.some(function(r){ return mi(r.m) === n; })) gaps.push(ms(n));
     }
-    o.innerHTML =
-      '<p class="flag good" style="margin-top:10px"><b>' + rows.length + ' months read from your record</b> — ' +
+    var d0 = read(), c0 = cityOf(d0), odd = [];
+    rows.forEach(function(r0){
+      var b0 = band(mi(r0.m), c0);
+      if (r0.base > b0.hi * 1.05 || r0.base < b0.lo * 0.95) odd.push(r0.m);
+    });
+    var extra =
+      (RECORD.adjustments && RECORD.adjustments.length
+        ? '<p class="flag warn"><b>' + RECORD.adjustments.length + ' negative or bracketed row' + (RECORD.adjustments.length>1?'s':'') + ' skipped</b> (' + RECORD.adjustments.join(", ") + ') — those are corrections reversing an earlier month, not contributions, so counting them would inflate the total. Check them by hand.</p>'
+        : '') +
+      (RECORD.unreadable && RECORD.unreadable.length
+        ? '<p class="flag warn"><b>' + RECORD.unreadable.length + ' row' + (RECORD.unreadable.length>1?'s':'') + ' had a month but no readable contribution base</b> (' + RECORD.unreadable.join(", ") + ') — usually a line listing only the contribution amounts, not the 缴费基数 they were calculated from. Those months are not counted.</p>'
+        : '') +
+      (odd.length
+        ? '<p class="flag bad"><b>' + odd.length + (odd.length>1?' months sit':' month sits') + ' outside ' + c0.en + "'s published floor and ceiling</b> (" + odd.slice(0,6).join(", ") + (odd.length>6?"…":"") + ') — a real declared base is never far outside the band, so this is far more likely a mis-read line than money you are owed. Check those rows against your record before believing the total.</p>'
+        : '');
+    o.innerHTML = extra +
+      '<p class="flag good" style="margin-top:10px"><b>' + rows.length + (rows.length>1?' months':' month') + ' read from your record</b> — ' +
       rows[0].m + ' to ' + rows[rows.length-1].m + ', average declared base ¥' + money(sum / rows.length) +
       '. <b>Check these against your own record before trusting the figure</b>; the estimate is now built from them, not from your salary.</p>' +
       (gaps.length ? '<p class="flag warn"><b>' + gaps.length + ' month' + (gaps.length>1?'s':'') + ' missing inside that span</b> (' + gaps.slice(0,6).join(", ") + (gaps.length>6?"…":"") + ') — either your employer skipped them, or the paste was partial.</p>' : '') +
@@ -1127,7 +1179,7 @@ footer p{max-width:none}
     } else if (r.gap > 0){
       f.push(["warn","<b>" + r.gap + " months before Oct 2011 excluded</b> — that is when enrolment became compulsory nationwide. Contributions before it were possible but unusual for foreign staff; if a payslip from then shows a 社保 line, the counter's record is what settles it."]);
     }
-    if (!cityOf(d).verified && r.months){
+    if (!cityOf(d).verified && r.months && !r.fromRecord){
       f.push(["warn","<b>" + cityOf(d).en + "'s own contribution floor and ceiling aren't built in yet</b> — this estimate applies Shanghai's bands as a stand-in, so the figure is the right shape but the wrong precision. Shanghai and Beijing are the two cities priced from their own published tables. Ask 12333 for your city's 缴费基数上下限 for the years you worked, or treat this as an order-of-magnitude answer."]);
     }
     if (r.lowMonths > 0){
@@ -1135,7 +1187,7 @@ footer p{max-width:none}
     }
     if (r.capped) f.push(["warn","Your pay exceeds the contribution ceiling in at least one period, so those months were calculated on the capped base."]);
     if (r.truncated) f.push(["bad","<b>That date range is implausibly long</b> and has been capped at 60 years for this estimate — check your dates."]);
-    if (r.months && d.pay <= 0 && !Object.keys(d.sal || {}).some(function(y){ return (d.sal[y] || 0) > 0; })){
+    if (r.months && !r.fromRecord && d.pay <= 0 && !Object.keys(d.sal || {}).some(function(y){ return (d.sal[y] || 0) > 0; })){
       f.push(["warn","<b>No salary entered.</b> Every month above is priced at the statutory minimum base because no pay figure was given — fill in your actual salary for a real estimate rather than a floor guess."]);
     }
     if (r.months >= 180){
@@ -1533,6 +1585,10 @@ payee + hfClause + "\n" +
     if (b.id === "wipe"){
       localStorage.removeItem(KEY);
       SENSITIVE.forEach(function(id){ $(id).value = ""; });
+      // The pasted 参保缴费明细 is the most sensitive thing on the page - a real person's
+      // government contribution history - so a control labelled "Clear my details" has to
+      // take it too, along with the parsed copy held in memory and rendered on screen.
+      $("f-record").value = ""; RECORD = null;
       $("f-remember").checked = false;
       render(); return;
     }
@@ -1548,6 +1604,11 @@ payee + hfClause + "\n" +
       var payload, text;
       if (b.id === "sharelink"){
         text = location.origin + location.pathname + location.search + "#c=" + b64urlEncode(shareState());
+        if (RECORD && RECORD.rows.length){
+          var warn = $("rec-out");
+          if (warn) warn.insertAdjacentHTML("afterbegin",
+            '<p class="flag warn"><b>That link does not carry your pasted record.</b> Share links deliberately hold no personal data, and a contribution record is the most personal thing here — whoever opens it sees the estimate from your dates and salary, which is a different number from the one on your screen. Send the record itself only if you mean to.</p>');
+        }
       } else {
         var d2 = read(), r2 = compute(d2), vs2 = variants(d2);
         payload = {
@@ -1557,7 +1618,11 @@ payee + hfClause + "\n" +
                       interest:Math.round(r2.interest), totalRmb:Math.round(vs2[0].total),
                       totalZar: d2.fx > 0 ? Math.round(vs2[0].total * d2.fx) : null },
           scenarios: vs2.map(function(v){ return { key:v.key, label:v.label, months:v.r.months, totalRmb:Math.round(v.total) }; }),
-          note: "Non-financial identity fields (name, passport numbers, agent details) are deliberately excluded from this export - re-enter them by hand wherever this is used."
+          fromActualRecord: !!(RECORD && RECORD.rows.length),
+          note: (RECORD && RECORD.rows.length
+            ? "These totals are NOT an estimate - they are computed from a pasted 参保缴费明细, so they are the exact declared bases from a real government record. Treat this file as sensitive. "
+            : "These totals are an estimate computed from salary and dates, not from an official record. ") +
+            "Identity fields (name, passport numbers, agent details) are deliberately excluded - re-enter them by hand wherever this is used."
         };
         text = JSON.stringify(payload, null, 2);
       }
@@ -1616,6 +1681,7 @@ payee + hfClause + "\n" +
       document.querySelectorAll("[data-step]").forEach(function(b){ o.s.push(b.checked); });
       o.sal = {};
       document.querySelectorAll("[data-year]").forEach(function(i){ o.sal[i.getAttribute("data-year")] = i.value; });
+      o.rec = remember ? $("f-record").value : "";
       localStorage.setItem(KEY, JSON.stringify(o));
     } catch(err){}
   }
@@ -1640,6 +1706,7 @@ payee + hfClause + "\n" +
         });
       }
       if (typeof o.fp === "boolean") firstPerson = o.fp;
+      if (o.rec){ $("f-record").value = o.rec; RECORD = parseRecord(o.rec); }
       if (o.sal){
         buildSalaries(false);
         document.querySelectorAll("[data-year]").forEach(function(i){
