@@ -838,15 +838,16 @@ footer p{max-width:none}
 
   function parseRecord(text){
     var lines = String(text || "").split(/[\r\n]+/);
-    var byMonth = {}, statuses = {}, adjustments = [], unreadable = [];
+    var byMonth = {}, statuses = {}, adjustments = [], unreadable = [], ambiguous = [];
     var STATUS = ["正常参保","封存","中断","欠费","停保","暂停"];
-    // Header, example and footer rows carry month-shaped text that is not a contribution.
-    // Left in, a header like "月份(格式如2020-01)" claims that month and shadows the real row.
-    var NOISE = /合计|小计|总计|累计|共\s*\d+\s*个月|格式如|示例|例如|表头|total/i;
-    // A real 缴费基数 is never below any city's floor (~3,000 in the covered era). Anything
-    // smaller on the line is a contribution amount, an ID, or noise - not a base.
+    // Footer/header vocabulary, but anchored. A bare substring test fires inside ordinary
+    // words - 合计 sits inside 综合计算 ("comprehensive calculation"), and "total" inside
+    // "subtotal" - and dropping a real row is worse than letting a footer through, since a
+    // footer is visible in the table below while a dropped month simply vanishes.
+    var NOISE = /(?:^|[\s,，、:：（(])(?:合计|小计|总计|累计)|共\s*\d+\s*个月|格式如|示例|例如|表头|\btotals?\b/i;
     var MIN_BASE = 2000, MAX_BASE = 200000;
     var toNum = function(x){ return parseFloat(String(x).replace(/,/g, "")); };
+    var plausible = function(v){ return isFinite(v) && v >= MIN_BASE && v <= MAX_BASE; };
 
     lines.forEach(function(line){
       STATUS.forEach(function(w){ if (line.indexOf(w) !== -1) statuses[w] = true; });
@@ -856,36 +857,56 @@ footer p{max-width:none}
       if (!m) return;
       var key = m[1] + "-" + (m[2].length === 1 ? "0" + m[2] : m[2]);
 
-      // Remove the month token before scanning for money, or the year itself (2019 is inside
-      // [1000,200000]) competes to be the largest number and wins on lines where the real
-      // figures are smaller.
+      // Blank the month token so the year can't compete to be the money.
       var rest = line.slice(0, m.index) + "  " + line.slice(m.index + m[0].length);
 
-      // A reversal/correction row must not be booked as an ordinary positive contribution.
-      if (/[-−(（]\s*\d/.test(rest)){ adjustments.push(key); return; }
+      // Collect every plausible figure WITH its context, so sign and labelling are judged per
+      // number rather than by scanning the whole line - an official document number like
+      // (2020)128号, or a phone number with hyphens, otherwise disqualifies a valid row.
+      var cands = [], re = /\d[\d,]*(?:\.\d+)?/g, mm;
+      while ((mm = re.exec(rest)) !== null){
+        var v = toNum(mm[0]);
+        if (!plausible(v)) continue;
+        var pre = rest.slice(Math.max(0, mm.index - 14), mm.index);
+        var post = rest.slice(mm.index + mm[0].length, mm.index + mm[0].length + 2);
+        cands.push({
+          v: v,
+          dec: mm[0].indexOf(".") !== -1,
+          neg: /[-−]\s*$/.test(pre) || (/[(（]\s*$/.test(pre) && /^\s*[)）]/.test(post)),
+          labelled: /(?:缴费基数|基数|base)\s*[:：]?\s*$/i.test(pre)
+        });
+      }
 
-      // Prefer figures written with decimals - that is how RMB amounts appear in these
-      // exports, and it excludes bare ID and reference numbers that would otherwise outrank
-      // the real base simply by being larger.
-      var plausible = function(v){ return isFinite(v) && v >= MIN_BASE && v <= MAX_BASE; };
-      var dec = (rest.match(/\d[\d,]*\.\d{1,2}/g) || []).map(toNum).filter(plausible);
-      var all = (rest.match(/\d[\d,]*(?:\.\d+)?/g) || []).map(toNum).filter(plausible);
-      // Prefer decimals only when one is actually a plausible base. Preferring them outright
-      // loses a whole month on the common layout "2019-03  12000  960.00", where the base is
-      // a bare integer and the only decimal is the employee's contribution.
-      var pool = dec.length ? dec : all;
-      if (!pool.length){ unreadable.push(key); return; }
+      var positives = cands.filter(function(c){ return !c.neg; });
+      if (!positives.length){
+        if (cands.length) adjustments.push(key); else unreadable.push(key);
+        return;
+      }
 
-      var base = Math.max.apply(null, pool);
-      // Same month twice (a corrected re-issue, or a stray line) - keep the larger plausible
-      // base rather than whichever happened to appear first.
-      if (!byMonth[key] || base > byMonth[key]) byMonth[key] = base;
+      // A figure the record itself labels as the base beats any heuristic.
+      var labelled = positives.filter(function(c){ return c.labelled; });
+      var pool = labelled.length ? labelled
+               : positives.filter(function(c){ return c.dec; });
+      if (!pool.length) pool = positives;
+
+      var vals = pool.map(function(c){ return c.v; }).filter(function(v, i, a){ return a.indexOf(v) === i; });
+      if (!labelled.length && vals.length > 1){
+        // Two unlabelled plausible figures on one line - a base beside a bonus, a YTD total, an
+        // account balance. Taking the larger silently books the wrong one and nothing downstream
+        // can tell; say it is ambiguous instead of guessing.
+        ambiguous.push(key);
+        return;
+      }
+
+      // Later rows win: a re-issued month is a correction, and corrections are often downward,
+      // so "larger wins" would keep the superseded figure.
+      byMonth[key] = vals[0];
     });
 
     var rows = Object.keys(byMonth).sort().map(function(k){ return { m:k, base:byMonth[k] }; });
-    if (!rows.length && !adjustments.length && !unreadable.length) return null;
-    return { rows:rows, statuses:Object.keys(statuses),
-             adjustments:adjustments, unreadable:unreadable };
+    if (!rows.length && !adjustments.length && !unreadable.length && !ambiguous.length) return null;
+    return { rows:rows, statuses:Object.keys(statuses), adjustments:adjustments,
+             unreadable:unreadable, ambiguous:ambiguous };
   }
 
   function renderRecord(){
@@ -896,6 +917,7 @@ footer p{max-width:none}
       o.innerHTML = '<p class="flag bad" style="margin-top:10px"><b>No usable months in that paste.</b> ' +
         ((RECORD.adjustments && RECORD.adjustments.length) ? RECORD.adjustments.length + ' looked like reversals. ' : '') +
         ((RECORD.unreadable && RECORD.unreadable.length) ? RECORD.unreadable.length + ' had a month but no readable 缴费基数 on the line. ' : '') +
+        ((RECORD.ambiguous && RECORD.ambiguous.length) ? RECORD.ambiguous.length + ' had two or more possible bases and nothing saying which. ' : '') +
         'Paste the rows with the base column included — the estimate below is unchanged.</p>';
       return;
     }
@@ -912,6 +934,9 @@ footer p{max-width:none}
     var extra =
       (RECORD.adjustments && RECORD.adjustments.length
         ? '<p class="flag warn"><b>' + RECORD.adjustments.length + ' negative or bracketed row' + (RECORD.adjustments.length>1?'s':'') + ' skipped</b> (' + RECORD.adjustments.join(", ") + ') — those are corrections reversing an earlier month, not contributions, so counting them would inflate the total. Check them by hand.</p>'
+        : '') +
+      (RECORD.ambiguous && RECORD.ambiguous.length
+        ? '<p class="flag bad"><b>' + RECORD.ambiguous.length + ' row' + (RECORD.ambiguous.length>1?'s were':' was') + ' ambiguous and left out</b> (' + RECORD.ambiguous.join(", ") + ') — two or more figures on the line could each have been the contribution base, with nothing labelling which, so guessing the larger one would have quietly inflated your total. Re-paste those rows including the <span class="zh">缴费基数</span> column header, or add the base figure by hand.</p>'
         : '') +
       (RECORD.unreadable && RECORD.unreadable.length
         ? '<p class="flag warn"><b>' + RECORD.unreadable.length + ' row' + (RECORD.unreadable.length>1?'s':'') + ' had a month but no readable contribution base</b> (' + RECORD.unreadable.join(", ") + ') — usually a line listing only the contribution amounts, not the 缴费基数 they were calculated from. Those months are not counted.</p>'
