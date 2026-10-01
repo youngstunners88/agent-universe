@@ -75,10 +75,32 @@ def check_script(script: dict, history: list[str]) -> list[Gate]:
     top = max(sims) if sims else 0.0
     g.append(Gate("originality", top < cfg["gauntlet"]["similarity_max"], 8, True,
                   f"too close to an earlier video (similarity {top:.2f}); change the angle and hook."))
+    g += check_structure(script, low)
     sentences = [s for s in re.split(r"[.!?]+", text) if s.strip()]
     avg = sum(len(s.split()) for s in sentences) / max(1, len(sentences))
     g.append(Gate("readability", avg <= 16, 3, False, f"average sentence is {avg:.1f} words; aim for 8-14."))
     return g
+
+
+STEP_MARKERS = [r"\bstep (one|1)\b|\bfirst\b|^one\b", r"\bstep (two|2)\b|\bsecond\b|^two\b",
+                r"\bstep (three|3)\b|\bthird\b|^three\b"]
+
+
+def check_structure(script: dict, low: str) -> list[Gate]:
+    """Pillar formats are promises to the viewer; check the script keeps them."""
+    pillar = script.get("pillar", "")
+    if pillar == "playbook":
+        says = [b["say"].lower() for b in script["beats"]]
+        found = [any(re.search(m, x) for x in says) for m in STEP_MARKERS]
+        return [Gate("pillar_structure", all(found), 6, False,
+                     "a 'Do This Today' video must deliver three numbered steps: start beats with "
+                     "'Step one.', 'Step two.', 'Step three.' and keep each step concrete.")]
+    if pillar == "myth":
+        opening = " ".join(b["say"].lower() for b in script["beats"][:3])
+        ok = bool(re.search(r"myth|wrong|isn't|is not|lie|actually|truth", opening))
+        return [Gate("pillar_structure", ok, 4, False,
+                     "a 'Money Myths' video must name the belief and flip it within the first 3 beats.")]
+    return []
 
 
 def judge_script(script: dict, job_id: str | None = None) -> tuple[list[Gate], dict]:

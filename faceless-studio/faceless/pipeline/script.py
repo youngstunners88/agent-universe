@@ -41,6 +41,7 @@ def normalize(script: dict) -> dict:
         "first_comment": str(script.get("first_comment", "")).strip(),
         "facts": script.get("facts", []),
         "source": script.get("source", "llm"),
+        "pillar": script.get("pillar", ""),
     }
 
 
@@ -62,13 +63,14 @@ def write(job, angle: str = "", feedback: list[str] | None = None) -> dict:
     """Return the job's script, drafting one if no final script exists yet."""
     fp = final_path(job)
     if fp.exists() and not feedback:
-        script = normalize(json.loads(fp.read_text(encoding="utf-8")))
+        script = normalize({"pillar": job.pillar, **json.loads(fp.read_text(encoding="utf-8"))})
         events.emit("SCRIPT_LOADED", job=job.id, source=script["source"])
         return script
     pillar = config.pillar(job.pillar)
     prompt = script_prompt(pillar, job.topic, angle, feedback, recent_titles())
     from faceless.prompts import identity
     raw = llm.complete(prompt, system=identity(), want_json=True, job=job.id)
+    raw["pillar"] = job.pillar
     script = normalize(raw)
     rnd = len(list(Paths.drafts.glob(f"{job.id}*.json")))
     (Paths.drafts / f"{job.id}.r{rnd}.json").write_text(json.dumps(script, indent=2, ensure_ascii=False), encoding="utf-8")

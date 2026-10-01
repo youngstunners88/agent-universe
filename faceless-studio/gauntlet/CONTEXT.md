@@ -51,3 +51,12 @@ until a clean pass. Log each round below so the next session starts where this o
   visual rule steers to writing-free objects; hook_text trailing period stripped. Cloudflare's safety filter
   flagged 2/26 images → retry once with a new seed before the paid fallback. Images moved to 864x1536
   (same 156 neurons per image as 768x1344, less upscaling). Weak-word caption pass now loops (test caught it).
+- **R6 (batch results):** math 99 + playbook 91 published, psychology 91 + myth 89 held. Requiring digits made
+  Gemini under-write (119-125 words). Found that a duration-driven rewrite **skipped the script gates and
+  judge** and the report kept the first draft's gates. Fixed: one gated `script_loop` for every script that
+  ships; length rewrites get a concrete word target; word_count turns hard when far out of range; Gemini
+  per-model 75 s timeout (one hung call had cost 3 min).
+- **R7:** visual review of playbook: clean look, digits read well, no gibberish text, but it promised 3 steps
+  and delivered one. Added a `pillar_structure` gate (playbook: three numbered steps; myth: flip the belief
+  in the first 3 beats) and spelled the step format out in the pillar config. Held psychology re-run now
+  passes the calibrated judge.

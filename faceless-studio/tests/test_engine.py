@@ -204,3 +204,14 @@ def test_job_cannot_move_backwards(tmp_path, monkeypatch):
     with pytest.raises(TransitionError):
         job.advance("scripted")
     assert job.reached("scripted") and not job.reached("rendered")
+
+
+def test_playbook_needs_three_steps():
+    from faceless.gauntlet import check_structure
+    beats = lambda *xs: [{"say": x} for x in xs]  # noqa: E731
+    one = {"pillar": "playbook", "beats": beats("Hook.", "Step one. Open your bank app.", "Then save.")}
+    three = {"pillar": "playbook", "beats": beats("Hook.", "Step one. Open the app.", "Step two. Set a transfer.",
+                                                 "Step three. Turn on alerts.")}
+    assert not check_structure(one, "")[0].passed
+    assert check_structure(three, "")[0].passed
+    assert check_structure({"pillar": "story", "beats": []}, "") == []
