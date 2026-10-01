@@ -124,3 +124,5 @@
 {"day": "2026-10-01", "provider": "openrouter", "unit": "images", "amount": 1, "usd": 0.04, "job": null}
 {"day": "2026-10-01", "provider": "openrouter", "unit": "images", "amount": 1, "usd": 0.04, "job": null}
 {"day": "2026-10-01", "provider": "openrouter", "unit": "images", "amount": 1, "usd": 0.04, "job": null}
+{"day": "2026-10-01", "provider": "composio", "unit": "calls", "amount": 1, "usd": 0.0, "job": null}
+{"day": "2026-10-01", "provider": "composio", "unit": "calls", "amount": 1, "usd": 0.0, "job": null}
