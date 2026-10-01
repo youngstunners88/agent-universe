@@ -1,0 +1,36 @@
+{
+  "id": "2026-10-01-s2-psychology-lifestyle-creep-why-a-raise-rare",
+  "pillar": "psychology",
+  "topic": "Lifestyle creep: why a raise rarely makes people feel richer",
+  "day": "2026-10-01",
+  "slot": 2,
+  "status": "visualized",
+  "history": [
+    {
+      "from": "planned",
+      "to": "scripted",
+      "ts": "2026-10-01T14:20:13Z",
+      "words": 177
+    },
+    {
+      "from": "scripted",
+      "to": "voiced",
+      "ts": "2026-10-01T14:21:06Z",
+      "seconds": 63.384,
+      "provider": "edge"
+    },
+    {
+      "from": "voiced",
+      "to": "visualized",
+      "ts": "2026-10-01T14:22:15Z"
+    }
+  ],
+  "artifacts": {
+    "title": "Why a raise never makes you feel richer"
+  },
+  "scores": {},
+  "cost": {
+    "tts:edge:chars": 1058
+  },
+  "notes": []
+}
