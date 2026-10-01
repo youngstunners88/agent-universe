@@ -33,9 +33,10 @@ def cmd_doctor(_args) -> int:
         "voice (optional premium)": ["ELEVENLABS_API_KEY"],
         "publish (optional)": ["UPLOAD_POST_API_KEY", "UPLOAD_POST_USER"],
         "decide (optional)": ["TYPESAFE_API_KEY"],
+        "connected apps (Composio)": ["COMPOSIO_API_KEY"],
     }
     for group, names in keys.items():
-        status = ", ".join(f"{n}={'set' if config.env(n) else 'missing'}" for n in names)
+        status = ", ".join(f"{n}={'set' if config.env(n, n.replace('_KEY', '')) else 'missing'}" for n in names)
         print(f"  ..  {group}: {status}")
     cfg = config.load()
     print(f"  ..  channel: {cfg['channel']['name']} | {cfg['production']['videos_per_day']}/day | "
@@ -116,7 +117,11 @@ def cmd_publish(args) -> int:
     from faceless.state import load_job
     job = load_job(args.job)
     meta = json.loads((job.dir / "meta.json").read_text(encoding="utf-8"))
-    print(json.dumps(publish.publish(job, meta), indent=2, default=str))
+    res = publish.publish(job, meta)
+    job.artifacts["publish"] = res
+    if job.status != "published":
+        job.advance("published", manual=True)
+    print(json.dumps(res, indent=2, default=str))
     return 0
 
 

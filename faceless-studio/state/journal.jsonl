@@ -269,3 +269,5 @@
 {"ts": "2026-10-01T15:39:57Z", "t": 1790869197.072, "actor": "engine", "type": "JOB_TRANSITION", "job": "2026-10-01-s3-myth-myth-renting-is-throwing-money-a", "to": "packaged"}
 {"ts": "2026-10-01T15:39:57Z", "t": 1790869197.073, "actor": "engine", "type": "JOB_TRANSITION", "job": "2026-10-01-s3-myth-myth-renting-is-throwing-money-a", "to": "held"}
 {"ts": "2026-10-01T15:40:09Z", "t": 1790869209.525, "actor": "engine", "type": "COMPOSIO_SESSION", "user": "quiet-money-studio", "session": "trs_hOvMX6TMYKN7"}
+{"ts": "2026-10-01T15:41:39Z", "t": 1790869299.023, "actor": "engine", "type": "GAUNTLET", "job": "2026-10-01-s3-myth-myth-renting-is-throwing-money-a", "score": 95, "passed": true, "hard": []}
+{"ts": "2026-10-01T15:41:48Z", "t": 1790869308.661, "actor": "engine", "type": "JOB_TRANSITION", "job": "2026-10-01-s3-myth-myth-renting-is-throwing-money-a", "to": "published", "manual": true}

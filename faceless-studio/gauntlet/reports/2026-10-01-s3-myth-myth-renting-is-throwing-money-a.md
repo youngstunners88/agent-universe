@@ -1,9 +1,9 @@
 # Gauntlet: 2026-10-01-s3-myth-myth-renting-is-throwing-money-a
-Score **96/100**, FAIL
+Score **95/100**, PASS
 
 | gate | result | weight | detail |
 |---|---|---|---|
-| word_count (hard) | FAIL | 8 | 149 words; need 175-200. Add about 38 words. |
+| word_count | FAIL | 8 | 163 spoken words; need 180-225. Add about 39 words. |
 | beat_count (hard) | pass | 6 |  |
 | hook_length | pass | 6 |  |
 | hook_trigger | pass | 6 |  |
@@ -20,11 +20,6 @@ Score **96/100**, FAIL
 | originality (hard) | pass | 8 |  |
 | pillar_structure | pass | 4 |  |
 | readability | pass | 3 |  |
-| judge_hook | pass | 8 |  |
-| judge_retention | pass | 6 |  |
-| judge_value | pass | 5 |  |
-| judge_facts (hard) | pass | 10 |  |
-| judge_compliance (hard) | pass | 10 |  |
 | duration (hard) | pass | 10 |  |
 | word_timings (hard) | pass | 8 |  |
 | voice_provider | pass | 2 |  |

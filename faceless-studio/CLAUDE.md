@@ -31,6 +31,7 @@ humans set strategy, connect accounts, and review held videos.
 | Money: affiliates, products, rewards | `/channel` | `channel/monetization.md` | n/a |
 | Engine code: providers, routing, state | `/faceless` | `faceless/CONTEXT.md` | n/a |
 | Add / evaluate a repo or tool | `/repo-farm` | `repo-farm/registry.md` | n/a |
+| Connect an app (YouTube, TikTok, Drive...), pull channel stats | `/faceless/providers` | `composio_tools.py` | `faceless-composio` (+ `composio`) |
 
 ## Commands (run from this folder)
 
@@ -41,6 +42,7 @@ python -m faceless make --pillar story         # one video, topic from the backl
 python -m faceless make --pillar math --script path.json   # one video from a hand-written script
 python -m faceless gauntlet <job_id>           # re-run every gate on a finished job
 python -m faceless status                      # today's jobs + spend
+python -m faceless composio status             # connected apps (Composio)
 python -m pytest -q tests                      # engine tests
 ```
 

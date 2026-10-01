@@ -215,3 +215,54 @@ def test_playbook_needs_three_steps():
     assert not check_structure(one, "")[0].passed
     assert check_structure(three, "")[0].passed
     assert check_structure({"pillar": "story", "beats": []}, "") == []
+
+
+def test_spoken_words_expand_numbers():
+    from faceless.pipeline.script import spoken_words
+    assert spoken_words("$226,000") == 6          # two hundred twenty six thousand dollars
+    assert spoken_words("in 2014") == 3           # in twenty fourteen
+    assert spoken_words("8% a year") == 4         # eight percent a year
+    assert spoken_words("plain words only") == 3
+
+
+def test_normalize_caps_callouts_keeping_numbers():
+    beats = [{"say": "x", "callout": c, "visual": "v"} for c in
+             ["", "A", "B", "$1", "C", "$2", "D", "E", "$3", "F", "G"]]
+    out = normalize({"title": "t", "beats": beats})["beats"]
+    kept = [b["callout"] for b in out if b["callout"]]
+    assert len(kept) == 7 and {"$1", "$2", "$3"} <= set(kept)
+
+
+def test_composio_key_alias_and_execute_parsing(monkeypatch):
+    import os
+    from faceless.providers import composio_tools as ct
+    monkeypatch.delenv("COMPOSIO_API_KEY", raising=False)
+    monkeypatch.setenv("COMPOSIO_API", "ak_test_alias")
+    ct._ensure_key()
+    assert os.environ["COMPOSIO_API_KEY"] == "ak_test_alias"
+
+    class FakeSession:
+        def execute(self, slug, arguments):
+            assert slug == "YOUTUBE_LIST_CHANNELS" and arguments == {"mine": True}
+            return {"data": {"items": [{"id": "UC1"}]}, "successful": True, "error": None, "log_id": "log_123"}
+
+    monkeypatch.setattr(ct, "session", lambda: FakeSession())
+    monkeypatch.setattr("faceless.events.JOURNAL", Path("/dev/null"))
+    monkeypatch.setattr("faceless.ledger.LEDGER", Path("/dev/null"))
+    res = ct.execute("YOUTUBE_LIST_CHANNELS", {"mine": True})
+    assert res["log_id"] == "log_123" and res["data"]["items"][0]["id"] == "UC1"
+
+
+def test_composio_execute_raises_with_log_id(monkeypatch):
+    from faceless.providers import ProviderError
+    from faceless.providers import composio_tools as ct
+
+    class FailSession:
+        def execute(self, slug, arguments):
+            return {"data": {}, "successful": False, "error": "token expired", "log_id": "log_bad"}
+
+    monkeypatch.setattr(ct, "session", lambda: FailSession())
+    monkeypatch.setattr("faceless.events.JOURNAL", Path("/dev/null"))
+    monkeypatch.setattr("faceless.ledger.LEDGER", Path("/dev/null"))
+    with pytest.raises(ProviderError, match="log_bad"):
+        ct.execute("YOUTUBE_LIST_CHANNELS", {})

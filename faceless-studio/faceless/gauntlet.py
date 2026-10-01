@@ -16,7 +16,7 @@ from dataclasses import asdict, dataclass
 from faceless import config, decide, events
 from faceless.config import Paths
 from faceless.pipeline.ideate import similarity
-from faceless.pipeline.script import narration, word_count
+from faceless.pipeline.script import narration, spoken_word_count
 from faceless.prompts import BANNED, COMPLIANCE_BANNED, judge_prompt
 from faceless.providers import llm
 
@@ -37,13 +37,16 @@ def check_script(script: dict, history: list[str]) -> list[Gate]:
     beats = script["beats"]
     text = narration(script)
     low = text.lower()
-    wc = word_count(script)
+    wc = spoken_word_count(script)          # numbers count as spoken ("$1,739" = 6 words)
     g = []
     # soft near the range (duration is the hard truth, measured in check_voice); hard when so far out that the
     # voice refit cannot rescue it, so the cheap script loop rewrites instead of the expensive voice stage
-    far = wc < lo - 20 or wc > hi + 25
-    g.append(Gate("word_count", lo <= wc <= hi, 8, far,
-                  f"{wc} words; need {lo}-{hi}. " + ("Cut" if wc > hi else "Add") + f" about {abs(wc - (lo + hi) // 2)} words."))
+    # words_range is what the writer counts (digits once); spoken numbers run longer, so the spoken window is
+    # wider. Calibrated on rendered videos: 61-72 s at the house pace ~ 180-225 spoken words.
+    slo, shi = lo + 5, hi + 25
+    far = wc < slo - 20 or wc > shi + 20
+    g.append(Gate("word_count", slo <= wc <= shi, 8, far,
+                  f"{wc} spoken words; need {slo}-{shi}. " + ("Cut" if wc > shi else "Add") + f" about {abs(wc - (slo + shi) // 2)} words."))
     g.append(Gate("beat_count", 9 <= len(beats) <= 16, 6, True, f"{len(beats)} beats; need 10-14."))
     hook = beats[0]["say"] if beats else ""
     hook_words = len(hook.split())

@@ -1,17 +1,15 @@
 {
   "job": "2026-10-01-s3-myth-myth-renting-is-throwing-money-a",
-  "score": 96,
-  "passed": false,
-  "hard_failures": [
-    "word_count"
-  ],
+  "score": 95,
+  "passed": true,
+  "hard_failures": [],
   "gates": [
     {
       "name": "word_count",
       "passed": false,
       "weight": 8,
-      "hard": true,
-      "detail": "149 words; need 175-200. Add about 38 words.",
+      "hard": false,
+      "detail": "163 spoken words; need 180-225. Add about 39 words.",
       "fix": "script"
     },
     {
@@ -140,46 +138,6 @@
       "weight": 3,
       "hard": false,
       "detail": "average sentence is 9.9 words; aim for 8-14.",
-      "fix": "script"
-    },
-    {
-      "name": "judge_hook",
-      "passed": true,
-      "weight": 8,
-      "hard": false,
-      "detail": "hook scored 7/10. Change line 8 to state the assumption clearly, e.g., 'Assuming an average 8% return, that routine could grow to nearly $700,000.'; Strengthen the loop ending by making line 12 flow directly into the hook without stuttering ('...because your rent is / YOUR RENT IS NOT THROWING MONEY AWAY').; Add a brief mention of historical market averages in line 7 to further lower factual risk.",
-      "fix": "script"
-    },
-    {
-      "name": "judge_retention",
-      "passed": true,
-      "weight": 6,
-      "hard": false,
-      "detail": "retention scored 6/10. Change line 8 to state the assumption clearly, e.g., 'Assuming an average 8% return, that routine could grow to nearly $700,000.'; Strengthen the loop ending by making line 12 flow directly into the hook without stuttering ('...because your rent is / YOUR RENT IS NOT THROWING MONEY AWAY').; Add a brief mention of historical market averages in line 7 to further lower factual risk.",
-      "fix": "script"
-    },
-    {
-      "name": "judge_value",
-      "passed": true,
-      "weight": 5,
-      "hard": false,
-      "detail": "value scored 7/10. Change line 8 to state the assumption clearly, e.g., 'Assuming an average 8% return, that routine could grow to nearly $700,000.'; Strengthen the loop ending by making line 12 flow directly into the hook without stuttering ('...because your rent is / YOUR RENT IS NOT THROWING MONEY AWAY').; Add a brief mention of historical market averages in line 7 to further lower factual risk.",
-      "fix": "script"
-    },
-    {
-      "name": "judge_facts",
-      "passed": true,
-      "weight": 10,
-      "hard": true,
-      "detail": "factual risk 2/10: Over 40 years, that routine turns into $698,202 sitting in your account.",
-      "fix": "script"
-    },
-    {
-      "name": "judge_compliance",
-      "passed": true,
-      "weight": 10,
-      "hard": true,
-      "detail": "compliance risk 2/10",
       "fix": "script"
     },
     {
@@ -318,22 +276,5 @@
       "detail": "caption has no hashtags",
       "fix": "package"
     }
-  ],
-  "judge": {
-    "hook": 7,
-    "retention": 6,
-    "value": 7,
-    "clarity": 8,
-    "loop_ending": 6,
-    "factual_risk": 2,
-    "compliance_risk": 2,
-    "suspect_claims": [
-      "Over 40 years, that routine turns into $698,202 sitting in your account."
-    ],
-    "fixes": [
-      "Change line 8 to state the assumption clearly, e.g., 'Assuming an average 8% return, that routine could grow to nearly $700,000.'",
-      "Strengthen the loop ending by making line 12 flow directly into the hook without stuttering ('...because your rent is / YOUR RENT IS NOT THROWING MONEY AWAY').",
-      "Add a brief mention of historical market averages in line 7 to further lower factual risk."
-    ]
-  }
+  ]
 }

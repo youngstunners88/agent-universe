@@ -15,6 +15,7 @@
 | FFmpeg + libass, Pillow, OpenCV | Render | Core of `pipeline/render.py` |
 | anthropics/skills: **skill-creator** | Dev workflow | Used to shape `.claude/skills/faceless-*` |
 | **agent-reach** (osp.fyi/agent-reach; also `skills/agent-reach`) | Trend research | Referenced by the `faceless-trends` skill for platform research |
+| **Composio** (ComposioHQ/composio skill + `composio` SDK) | Connected apps: YouTube, TikTok, Instagram, Drive, Gmail | `providers/composio_tools.py`, `faceless composio ...`, skill `faceless-composio` |
 | Exa / Firecrawl / TinyFish (connected tools) | Trend + fact research | `faceless-trends` and `faceless-script` skills |
 
 ## PARKED (named future phase)

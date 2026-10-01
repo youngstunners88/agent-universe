@@ -19,6 +19,47 @@ def word_count(script: dict) -> int:
     return len(narration(script).split())
 
 
+def _number_words(n: int) -> int:
+    """How many words English uses to say n (226000 -> 'two hundred twenty six thousand' = 5)."""
+    if n < 20:
+        return 1
+    if n < 100:
+        return 1 if n % 10 == 0 else 2
+    if n < 1000:
+        return 2 + (_number_words(n % 100) if n % 100 else 0)
+    for size, _name in ((10**9, "billion"), (10**6, "million"), (1000, "thousand")):
+        if n >= size:
+            rest = n % size
+            return _number_words(n // size) + 1 + (_number_words(rest) if rest else 0)
+    return 1
+
+
+def spoken_words(text: str) -> int:
+    """Words as the voice says them: digits, money, percents, and years expanded."""
+    total = 0
+    for tok in text.split():
+        core = tok.strip(".,!?;:()\"'")
+        nums = re.findall(r"\d[\d,]*(?:\.\d+)?", core)
+        if not nums:
+            total += 1
+            continue
+        for num in nums:
+            whole, _, frac = num.replace(",", "").partition(".")
+            n = int(whole or 0)
+            if 1100 <= n <= 2099 and len(whole) == 4 and "," not in num and not frac:
+                total += 2                                   # years: "twenty fourteen"
+            else:
+                total += _number_words(n) + (1 + len(frac) if frac else 0)
+        total += core.count("$") + core.count("%")           # "dollars", "percent"
+        if re.search(r"[A-Za-z]", re.sub(r"\d", "", core)):
+            total += 1                                       # "50-plus", "10-year"
+    return total
+
+
+def spoken_word_count(script: dict) -> int:
+    return spoken_words(narration(script))
+
+
 def normalize(script: dict) -> dict:
     beats = []
     for b in script.get("beats", []):
@@ -29,6 +70,13 @@ def normalize(script: dict) -> dict:
                       "visual": str(b.get("visual", "")).strip()})
     if beats:
         beats[0]["callout"] = ""  # the hook headline owns the top of the frame in beat 1
+    # keep at most 7 callouts, numbers first: too many on-screen phrases dilutes every one of them
+    with_callout = [i for i, b in enumerate(beats) if b["callout"]]
+    if len(with_callout) > 7:
+        keep = sorted(with_callout, key=lambda i: (not re.search(r"\d", beats[i]["callout"]), i))[:7]
+        for i in with_callout:
+            if i not in keep:
+                beats[i]["callout"] = ""
     tags = script.get("hashtags") or re.findall(r"#\w+", script.get("caption", ""))
     tags = [t if t.startswith("#") else f"#{t}" for t in tags][:6]
     return {

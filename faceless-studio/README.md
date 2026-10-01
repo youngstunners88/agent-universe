@@ -36,6 +36,7 @@ Add these repository secrets (Settings → Secrets and variables → Actions):
 | `UPLOAD_POST_API_KEY`, `UPLOAD_POST_USER` | for auto-posting | upload-post.com → API key + profile name with TikTok/YouTube/IG connected |
 | `ELEVENLABS_API_KEY` | optional | premium voice |
 | `TYPESAFE_API_KEY` | optional | Jev decision layer (starts in dry-run) |
+| `COMPOSIO_API_KEY` | recommended | dashboard.composio.dev → Platform → project key (`ak_...`): YouTube/TikTok/Drive connections, see `.claude/skills/faceless-composio` |
 
 Without Upload-Post secrets the workflow still builds every pack: download the artifact and post from your phone.
 
