@@ -1,17 +1,17 @@
 {
   "job": "2026-10-01-s3-myth-myth-renting-is-throwing-money-a",
-  "score": 89,
+  "score": 96,
   "passed": false,
   "hard_failures": [
-    "duration"
+    "word_count"
   ],
   "gates": [
     {
       "name": "word_count",
       "passed": false,
       "weight": 8,
-      "hard": false,
-      "detail": "125 words; need 175-200. Add about 62 words.",
+      "hard": true,
+      "detail": "149 words; need 175-200. Add about 38 words.",
       "fix": "script"
     },
     {
@@ -19,7 +19,7 @@
       "passed": true,
       "weight": 6,
       "hard": true,
-      "detail": "11 beats; need 10-14.",
+      "detail": "12 beats; need 10-14.",
       "fix": "script"
     },
     {
@@ -27,7 +27,7 @@
       "passed": true,
       "weight": 6,
       "hard": false,
-      "detail": "hook is 9 words; keep under 18.",
+      "detail": "hook is 13 words; keep under 18.",
       "fix": "script"
     },
     {
@@ -43,7 +43,7 @@
       "passed": true,
       "weight": 4,
       "hard": false,
-      "detail": "on-screen hook 'RENTING IS NOT THROWING MONEY AWAY' should be 2-7 words.",
+      "detail": "on-screen hook 'YOUR RENT IS NOT THROWING MONEY AWAY' should be 2-7 words.",
       "fix": "script"
     },
     {
@@ -64,10 +64,10 @@
     },
     {
       "name": "callouts",
-      "passed": true,
+      "passed": false,
       "weight": 3,
       "hard": false,
-      "detail": "7 callouts; use 4-7 on-screen numbers/phrases.",
+      "detail": "10 callouts; use 4-7 on-screen numbers/phrases.",
       "fix": "script"
     },
     {
@@ -127,19 +127,27 @@
       "fix": "script"
     },
     {
+      "name": "pillar_structure",
+      "passed": true,
+      "weight": 4,
+      "hard": false,
+      "detail": "a 'Money Myths' video must name the belief and flip it within the first 3 beats.",
+      "fix": "script"
+    },
+    {
       "name": "readability",
       "passed": true,
       "weight": 3,
       "hard": false,
-      "detail": "average sentence is 10.4 words; aim for 8-14.",
+      "detail": "average sentence is 9.9 words; aim for 8-14.",
       "fix": "script"
     },
     {
       "name": "judge_hook",
-      "passed": false,
+      "passed": true,
       "weight": 8,
       "hard": false,
-      "detail": "hook scored 6/10. Rewrite Line 11 to fix the typo and perfect the loop: 'Stop letting outdated financial myths make you feel bad about renting, because... [loops to Hook: Renting is not throwing money away]'; Rewrite Line 5 to add compliance safety: 'Take $200 a month invested at a historical 8% stock market return for 30 years.'; Rewrite Line 1 to increase hook tension: 'Renting is not throwing money away. In fact, buying a home too early is the fastest way to go broke.'",
+      "detail": "hook scored 7/10. Change line 8 to state the assumption clearly, e.g., 'Assuming an average 8% return, that routine could grow to nearly $700,000.'; Strengthen the loop ending by making line 12 flow directly into the hook without stuttering ('...because your rent is / YOUR RENT IS NOT THROWING MONEY AWAY').; Add a brief mention of historical market averages in line 7 to further lower factual risk.",
       "fix": "script"
     },
     {
@@ -147,7 +155,7 @@
       "passed": true,
       "weight": 6,
       "hard": false,
-      "detail": "retention scored 7/10. Rewrite Line 11 to fix the typo and perfect the loop: 'Stop letting outdated financial myths make you feel bad about renting, because... [loops to Hook: Renting is not throwing money away]'; Rewrite Line 5 to add compliance safety: 'Take $200 a month invested at a historical 8% stock market return for 30 years.'; Rewrite Line 1 to increase hook tension: 'Renting is not throwing money away. In fact, buying a home too early is the fastest way to go broke.'",
+      "detail": "retention scored 6/10. Change line 8 to state the assumption clearly, e.g., 'Assuming an average 8% return, that routine could grow to nearly $700,000.'; Strengthen the loop ending by making line 12 flow directly into the hook without stuttering ('...because your rent is / YOUR RENT IS NOT THROWING MONEY AWAY').; Add a brief mention of historical market averages in line 7 to further lower factual risk.",
       "fix": "script"
     },
     {
@@ -155,7 +163,7 @@
       "passed": true,
       "weight": 5,
       "hard": false,
-      "detail": "value scored 8/10. Rewrite Line 11 to fix the typo and perfect the loop: 'Stop letting outdated financial myths make you feel bad about renting, because... [loops to Hook: Renting is not throwing money away]'; Rewrite Line 5 to add compliance safety: 'Take $200 a month invested at a historical 8% stock market return for 30 years.'; Rewrite Line 1 to increase hook tension: 'Renting is not throwing money away. In fact, buying a home too early is the fastest way to go broke.'",
+      "detail": "value scored 7/10. Change line 8 to state the assumption clearly, e.g., 'Assuming an average 8% return, that routine could grow to nearly $700,000.'; Strengthen the loop ending by making line 12 flow directly into the hook without stuttering ('...because your rent is / YOUR RENT IS NOT THROWING MONEY AWAY').; Add a brief mention of historical market averages in line 7 to further lower factual risk.",
       "fix": "script"
     },
     {
@@ -163,7 +171,7 @@
       "passed": true,
       "weight": 10,
       "hard": true,
-      "detail": "factual risk 2/10: The phrase 'landlords of old myths' in line 11 is grammatically confusing and likely a typo.; The 8% return is mathematically correct for the calculation, but lacks the context of being a historical stock market average rather than a guaranteed rate.",
+      "detail": "factual risk 2/10: Over 40 years, that routine turns into $698,202 sitting in your account.",
       "fix": "script"
     },
     {
@@ -176,10 +184,10 @@
     },
     {
       "name": "duration",
-      "passed": false,
+      "passed": true,
       "weight": 10,
       "hard": true,
-      "detail": "53.3s; need 61-72s (TikTok rewards need >60s).",
+      "detail": "62.8s; need 61-72s (TikTok rewards need >60s).",
       "fix": "script"
     },
     {
@@ -203,7 +211,7 @@
       "passed": true,
       "weight": 10,
       "hard": true,
-      "detail": "10 images for 10 beats",
+      "detail": "12 images for 12 beats",
       "fix": "visuals"
     },
     {
@@ -243,7 +251,7 @@
       "passed": true,
       "weight": 8,
       "hard": true,
-      "detail": "video 53.30s vs voice 53.29s",
+      "detail": "video 62.80s vs voice 62.80s",
       "fix": "render"
     },
     {
@@ -259,7 +267,7 @@
       "passed": true,
       "weight": 4,
       "hard": true,
-      "detail": "13.8 MB",
+      "detail": "17.9 MB",
       "fix": "render"
     },
     {
@@ -275,7 +283,7 @@
       "passed": true,
       "weight": 5,
       "hard": false,
-      "detail": "avg shot 2.66s; target <= 3.2s",
+      "detail": "avg shot 2.62s; target <= 3.2s",
       "fix": "render"
     },
     {
@@ -283,7 +291,7 @@
       "passed": true,
       "weight": 8,
       "hard": true,
-      "detail": "123/123 words captioned",
+      "detail": "147/147 words captioned",
       "fix": "render"
     },
     {
@@ -312,21 +320,20 @@
     }
   ],
   "judge": {
-    "hook": 6,
-    "retention": 7,
-    "value": 8,
-    "clarity": 7,
-    "loop_ending": 8,
+    "hook": 7,
+    "retention": 6,
+    "value": 7,
+    "clarity": 8,
+    "loop_ending": 6,
     "factual_risk": 2,
     "compliance_risk": 2,
     "suspect_claims": [
-      "The phrase 'landlords of old myths' in line 11 is grammatically confusing and likely a typo.",
-      "The 8% return is mathematically correct for the calculation, but lacks the context of being a historical stock market average rather than a guaranteed rate."
+      "Over 40 years, that routine turns into $698,202 sitting in your account."
     ],
     "fixes": [
-      "Rewrite Line 11 to fix the typo and perfect the loop: 'Stop letting outdated financial myths make you feel bad about renting, because... [loops to Hook: Renting is not throwing money away]'",
-      "Rewrite Line 5 to add compliance safety: 'Take $200 a month invested at a historical 8% stock market return for 30 years.'",
-      "Rewrite Line 1 to increase hook tension: 'Renting is not throwing money away. In fact, buying a home too early is the fastest way to go broke.'"
+      "Change line 8 to state the assumption clearly, e.g., 'Assuming an average 8% return, that routine could grow to nearly $700,000.'",
+      "Strengthen the loop ending by making line 12 flow directly into the hook without stuttering ('...because your rent is / YOUR RENT IS NOT THROWING MONEY AWAY').",
+      "Add a brief mention of historical market averages in line 7 to further lower factual risk."
     ]
   }
 }

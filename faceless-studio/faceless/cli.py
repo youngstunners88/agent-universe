@@ -120,6 +120,30 @@ def cmd_publish(args) -> int:
     return 0
 
 
+def cmd_composio(args) -> int:
+    from faceless.providers import composio_tools as ct
+    if args.action == "status":
+        conns = ct.connected_toolkits()
+        print(f"Composio user: {ct.user_id()}")
+        print("Connected:", ", ".join(f"{k} ({v})" for k, v in conns.items()) or "nothing yet")
+        return 0
+    if args.action == "connect":
+        if args.target in ct.connected_toolkits():
+            print(f"{args.target} is already connected for {ct.user_id()}.")
+            return 0
+        req = ct.connect(args.target)
+        print(f"Open this link to connect {args.target}:\n{req.redirect_url}")
+        if args.wait:
+            acct = req.wait_for_connection()
+            print(f"Connected: {getattr(acct, 'id', acct)} (status {getattr(acct, 'status', '?')})")
+        return 0
+    if args.action == "call":
+        res = ct.execute(args.target, json.loads(args.args or "{}"))
+        print(json.dumps(res, indent=2, default=str)[: args.max_chars])
+        return 0
+    return 1
+
+
 def main(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(prog="faceless", description="Faceless Studio engine")
     sub = p.add_subparsers(dest="cmd", required=True)
@@ -150,6 +174,13 @@ def main(argv: list[str] | None = None) -> int:
     pb = sub.add_parser("publish", help="(re)publish a packaged job")
     pb.add_argument("job")
     pb.set_defaults(fn=cmd_publish)
+    cp = sub.add_parser("composio", help="connected apps via Composio: status | connect <toolkit> | call <TOOL_SLUG>")
+    cp.add_argument("action", choices=["status", "connect", "call"])
+    cp.add_argument("target", nargs="?", help="toolkit slug (connect) or tool slug (call)")
+    cp.add_argument("--args", help="JSON arguments for call")
+    cp.add_argument("--wait", action="store_true", help="block until the connect link is completed")
+    cp.add_argument("--max-chars", type=int, default=4000)
+    cp.set_defaults(fn=cmd_composio)
     args = p.parse_args(argv)
     return args.fn(args)
 

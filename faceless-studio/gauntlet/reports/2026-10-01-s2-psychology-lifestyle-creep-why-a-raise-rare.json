@@ -1,10 +1,8 @@
 {
   "job": "2026-10-01-s2-psychology-lifestyle-creep-why-a-raise-rare",
-  "score": 91,
-  "passed": false,
-  "hard_failures": [
-    "judge_compliance"
-  ],
+  "score": 95,
+  "passed": true,
+  "hard_failures": [],
   "gates": [
     {
       "name": "word_count",
@@ -139,7 +137,7 @@
       "passed": true,
       "weight": 8,
       "hard": false,
-      "detail": "hook scored 7/10. Remove the specific dollar amount return claim to lower compliance risk.; Tighten lines 6 and 7 to pivot faster from lifestyle creep back to the core solution.; Strengthen the loop-to-hook transition in line 11 to make it seamless.",
+      "detail": "hook scored 8/10. Change line 7 to state the math assumption clearly: 'Take five dollars a day--invested at an average 8 percent return over thirty years, that's over two hundred thousand dollars.'; Tighten lines 1 and 2 to accelerate the pacing and reduce filler words.; Ensure line 11 loops smoothly into the hook text without dead air.",
       "fix": "script"
     },
     {
@@ -147,7 +145,7 @@
       "passed": true,
       "weight": 6,
       "hard": false,
-      "detail": "retention scored 6/10. Remove the specific dollar amount return claim to lower compliance risk.; Tighten lines 6 and 7 to pivot faster from lifestyle creep back to the core solution.; Strengthen the loop-to-hook transition in line 11 to make it seamless.",
+      "detail": "retention scored 7/10. Change line 7 to state the math assumption clearly: 'Take five dollars a day--invested at an average 8 percent return over thirty years, that's over two hundred thousand dollars.'; Tighten lines 1 and 2 to accelerate the pacing and reduce filler words.; Ensure line 11 loops smoothly into the hook text without dead air.",
       "fix": "script"
     },
     {
@@ -155,7 +153,7 @@
       "passed": true,
       "weight": 5,
       "hard": false,
-      "detail": "value scored 7/10. Remove the specific dollar amount return claim to lower compliance risk.; Tighten lines 6 and 7 to pivot faster from lifestyle creep back to the core solution.; Strengthen the loop-to-hook transition in line 11 to make it seamless.",
+      "detail": "value scored 8/10. Change line 7 to state the math assumption clearly: 'Take five dollars a day--invested at an average 8 percent return over thirty years, that's over two hundred thousand dollars.'; Tighten lines 1 and 2 to accelerate the pacing and reduce filler words.; Ensure line 11 loops smoothly into the hook text without dead air.",
       "fix": "script"
     },
     {
@@ -163,15 +161,15 @@
       "passed": true,
       "weight": 10,
       "hard": true,
-      "detail": "factual risk 2/10: Invested monthly at eight percent for thirty years, it becomes two hundred twenty six thousand dollars.",
+      "detail": "factual risk 1/10: Take a five dollar daily habit. Invested monthly at eight percent for thirty years, it becomes two hundred twenty six thousand dollars.",
       "fix": "script"
     },
     {
       "name": "judge_compliance",
-      "passed": false,
+      "passed": true,
       "weight": 10,
       "hard": true,
-      "detail": "compliance risk 4/10",
+      "detail": "compliance risk 2/10",
       "fix": "script"
     },
     {
@@ -259,7 +257,7 @@
       "passed": true,
       "weight": 4,
       "hard": true,
-      "detail": "14.1 MB",
+      "detail": "13.1 MB",
       "fix": "render"
     },
     {
@@ -312,20 +310,20 @@
     }
   ],
   "judge": {
-    "hook": 7,
-    "retention": 6,
-    "value": 7,
-    "clarity": 8,
+    "hook": 8,
+    "retention": 7,
+    "value": 8,
+    "clarity": 9,
     "loop_ending": 8,
-    "factual_risk": 2,
-    "compliance_risk": 4,
+    "factual_risk": 1,
+    "compliance_risk": 2,
     "suspect_claims": [
-      "Invested monthly at eight percent for thirty years, it becomes two hundred twenty six thousand dollars."
+      "Take a five dollar daily habit. Invested monthly at eight percent for thirty years, it becomes two hundred twenty six thousand dollars."
     ],
     "fixes": [
-      "Remove the specific dollar amount return claim to lower compliance risk.",
-      "Tighten lines 6 and 7 to pivot faster from lifestyle creep back to the core solution.",
-      "Strengthen the loop-to-hook transition in line 11 to make it seamless."
+      "Change line 7 to state the math assumption clearly: 'Take five dollars a day--invested at an average 8 percent return over thirty years, that's over two hundred thousand dollars.'",
+      "Tighten lines 1 and 2 to accelerate the pacing and reduce filler words.",
+      "Ensure line 11 loops smoothly into the hook text without dead air."
     ]
   }
 }

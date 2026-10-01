@@ -1,5 +1,5 @@
 # Gauntlet: 2026-10-01-s2-psychology-lifestyle-creep-why-a-raise-rare
-Score **91/100**, FAIL
+Score **95/100**, PASS
 
 | gate | result | weight | detail |
 |---|---|---|---|
@@ -23,7 +23,7 @@ Score **91/100**, FAIL
 | judge_retention | pass | 6 |  |
 | judge_value | pass | 5 |  |
 | judge_facts (hard) | pass | 10 |  |
-| judge_compliance (hard) | FAIL | 10 | compliance risk 4/10 |
+| judge_compliance (hard) | pass | 10 |  |
 | duration (hard) | pass | 10 |  |
 | word_timings (hard) | pass | 8 |  |
 | voice_provider | pass | 2 |  |

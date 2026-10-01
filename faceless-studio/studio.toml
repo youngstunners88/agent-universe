@@ -75,6 +75,11 @@ platforms = ["tiktok", "youtube", "instagram"]
 timezone = "America/New_York"
 slots = ["07:30", "11:30", "15:00", "18:30", "21:00"]
 
+[composio]
+# One stable identity for the studio's connected apps (single-tenant). Changing it orphans existing connections.
+user_id = "quiet-money-studio"
+toolkits = ["youtube"]                       # connected so far; add tiktok, instagram, googledrive as you link them
+
 # Five pillars = five different formats, looks, and music keys.
 # Rotating them daily is what keeps the channel clear of "mass-produced" signals.
 [[pillars]]

@@ -9,41 +9,41 @@
     {
       "from": "planned",
       "to": "scripted",
-      "ts": "2026-10-01T14:24:18Z",
-      "words": 125
+      "ts": "2026-10-01T15:37:02Z",
+      "words": 149
     },
     {
       "from": "scripted",
       "to": "voiced",
-      "ts": "2026-10-01T14:25:34Z",
-      "seconds": 53.29,
+      "ts": "2026-10-01T15:38:25Z",
+      "seconds": 62.799,
       "provider": "edge"
     },
     {
       "from": "voiced",
       "to": "visualized",
-      "ts": "2026-10-01T14:26:51Z"
+      "ts": "2026-10-01T15:38:38Z"
     },
     {
       "from": "visualized",
       "to": "rendered",
-      "ts": "2026-10-01T14:27:50Z"
+      "ts": "2026-10-01T15:39:57Z"
     },
     {
       "from": "rendered",
       "to": "gated",
-      "ts": "2026-10-01T14:27:50Z",
-      "score": 89
+      "ts": "2026-10-01T15:39:57Z",
+      "score": 96
     },
     {
       "from": "gated",
       "to": "packaged",
-      "ts": "2026-10-01T14:27:50Z"
+      "ts": "2026-10-01T15:39:57Z"
     },
     {
       "from": "packaged",
       "to": "held",
-      "ts": "2026-10-01T14:27:50Z"
+      "ts": "2026-10-01T15:39:57Z"
     }
   ],
   "artifacts": {
@@ -52,13 +52,13 @@
     "cover": "/home/user/agent-universe/faceless-studio/production/output/2026-10-01/2026-10-01-s3-myth-myth-renting-is-throwing-money-a/cover.jpg"
   },
   "scores": {
-    "gauntlet": 89,
+    "gauntlet": 96,
     "passed": false
   },
   "cost": {
-    "tts:edge:chars": 1412
+    "tts:edge:chars": 891
   },
   "notes": [
-    "held for review: duration"
+    "held for review: word_count"
   ]
 }
