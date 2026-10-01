@@ -27,14 +27,10 @@ def _load(job: Job, name: str):
     return json.loads(p.read_text(encoding="utf-8")) if p.exists() else None
 
 
-def produce(job: Job, *, judge: bool = True, prefer_voice: str | None = None, do_publish: bool = True) -> dict:
+def script_loop(job: Job, history: list[str], judge: bool, feedback: list[str] | None = None):
+    """Draft -> gate -> judge -> rewrite until it passes. Every script that ships goes through here."""
     cfg = config.load()
     rounds = cfg["gauntlet"]["max_fix_rounds"]
-    history = [h for h in ideate.history_texts() if h != job.topic]
-    all_gates: list[gauntlet.Gate] = []
-
-    # 1. script (+ judge) with rewrite loop
-    feedback: list[str] | None = None
     judged: dict = {}
     for rnd in range(rounds + 1):
         scr = script_stage.write(job, feedback=feedback)
@@ -49,21 +45,40 @@ def produce(job: Job, *, judge: bool = True, prefer_voice: str | None = None, do
             break
         if scr.get("source") == "human" or rnd == rounds:
             break  # never overwrite a human-written script; its failures go to the report instead
-        feedback = [g.detail for g in bad]
+        feedback = (feedback or [])[:1] + [g.detail for g in bad]  # keep the original brief (e.g. length)
     script_stage.finalize(job, scr)
     job.artifacts["title"] = scr["title"]
-    all_gates += gates
+    return scr, gates, judged
+
+
+def length_brief(seconds: float, words: int) -> str:
+    prod = config.load()["production"]
+    lo, hi = prod["target_seconds"]
+    # the configured word range is calibrated to the base voice pace; the measured pace may already be refit
+    target_w = sum(prod["words_range"]) // 2
+    verb = "too short" if seconds < lo else "too long"
+    return (f"The narration ran {seconds:.1f}s, {verb}; it must run {lo:.0f}-{hi:.0f}s. Rewrite to about "
+            f"{target_w} words in total across all 'say' fields (currently {words}). Count them before answering.")
+
+
+def produce(job: Job, *, judge: bool = True, prefer_voice: str | None = None, do_publish: bool = True) -> dict:
+    history = [h for h in ideate.history_texts() if h != job.topic]
+    all_gates: list[gauntlet.Gate] = []
+
+    # 1. script (+ judge) with rewrite loop
+    scr, gates, judged = script_loop(job, history, judge)
     job.advance("scripted", words=script_stage.word_count(scr))
 
-    # 2. voice (a duration miss sends one rewrite back to the script stage)
+    # 2. voice. A duration miss sends the script back through the full gated loop with a word target.
     vo = voice_stage.run(job, scr, prefer=prefer_voice)
     vg = gauntlet.check_voice(vo)
     if not vg[0].passed and scr.get("source") != "human":
-        scr = script_stage.write(job, feedback=[vg[0].detail])
-        script_stage.finalize(job, scr)
+        brief = length_brief(vo["duration"], script_stage.word_count(scr))
+        events.emit("LENGTH_REWRITE", job=job.id, brief=brief)
+        scr, gates, judged = script_loop(job, history, judge, feedback=[brief])
         vo = voice_stage.run(job, scr, prefer=prefer_voice)
         vg = gauntlet.check_voice(vo)
-    all_gates += vg
+    all_gates += gates + vg          # gates of the script that actually ships
     job.advance("voiced", seconds=vo["duration"], provider=vo["provider"])
 
     # 3. visuals

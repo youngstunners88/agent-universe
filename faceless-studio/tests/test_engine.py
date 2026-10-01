@@ -140,6 +140,21 @@ def test_judge_compliance_ignores_factual_score(monkeypatch):
     assert not gates["judge_facts"].passed
 
 
+def test_word_count_hard_only_when_far_out_of_range():
+    scr = seed_script()
+    gate = lambda s: next(g for g in check_script(s, history=[]) if g.name == "word_count")  # noqa: E731
+    near = dict(scr, beats=scr["beats"][:-1])            # a few words short: soft
+    far = dict(scr, beats=scr["beats"][:8])              # ~60 words short: hard, rewrite in the script loop
+    assert not gate(near).hard or gate(near).passed
+    assert gate(far).hard and not gate(far).passed
+
+
+def test_length_brief_gives_a_word_target():
+    from faceless.orchestrator import length_brief
+    brief = length_brief(53.3, 124)
+    assert "too short" in brief and "about 187 words" in brief
+
+
 def test_normalize_strips_hook_punctuation():
     assert normalize({"title": "t", "hook_text": "21 YEARS.", "beats": []})["hook_text"] == "21 YEARS"
 

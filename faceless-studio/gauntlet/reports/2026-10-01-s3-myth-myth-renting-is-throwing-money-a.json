@@ -1,0 +1,332 @@
+{
+  "job": "2026-10-01-s3-myth-myth-renting-is-throwing-money-a",
+  "score": 89,
+  "passed": false,
+  "hard_failures": [
+    "duration"
+  ],
+  "gates": [
+    {
+      "name": "word_count",
+      "passed": false,
+      "weight": 8,
+      "hard": false,
+      "detail": "125 words; need 175-200. Add about 62 words.",
+      "fix": "script"
+    },
+    {
+      "name": "beat_count",
+      "passed": true,
+      "weight": 6,
+      "hard": true,
+      "detail": "11 beats; need 10-14.",
+      "fix": "script"
+    },
+    {
+      "name": "hook_length",
+      "passed": true,
+      "weight": 6,
+      "hard": false,
+      "detail": "hook is 9 words; keep under 18.",
+      "fix": "script"
+    },
+    {
+      "name": "hook_trigger",
+      "passed": true,
+      "weight": 6,
+      "hard": false,
+      "detail": "hook needs a number, a 'you', or a contradiction in the first line.",
+      "fix": "script"
+    },
+    {
+      "name": "hook_text",
+      "passed": true,
+      "weight": 4,
+      "hard": false,
+      "detail": "on-screen hook 'RENTING IS NOT THROWING MONEY AWAY' should be 2-7 words.",
+      "fix": "script"
+    },
+    {
+      "name": "beat_length",
+      "passed": true,
+      "weight": 4,
+      "hard": false,
+      "detail": "beats too long for the ear: []",
+      "fix": "script"
+    },
+    {
+      "name": "visual_prompts",
+      "passed": true,
+      "weight": 8,
+      "hard": true,
+      "detail": "beats missing a concrete visual prompt: []",
+      "fix": "script"
+    },
+    {
+      "name": "callouts",
+      "passed": true,
+      "weight": 3,
+      "hard": false,
+      "detail": "7 callouts; use 4-7 on-screen numbers/phrases.",
+      "fix": "script"
+    },
+    {
+      "name": "banned_phrases",
+      "passed": true,
+      "weight": 5,
+      "hard": false,
+      "detail": "remove filler phrases: []",
+      "fix": "script"
+    },
+    {
+      "name": "compliance_phrases",
+      "passed": true,
+      "weight": 10,
+      "hard": true,
+      "detail": "remove advice/promise language: []",
+      "fix": "script"
+    },
+    {
+      "name": "no_ticker_picks",
+      "passed": true,
+      "weight": 8,
+      "hard": true,
+      "detail": "no ticker callouts: []",
+      "fix": "script"
+    },
+    {
+      "name": "loop_ending",
+      "passed": true,
+      "weight": 4,
+      "hard": false,
+      "detail": "end the last line mid-thought so it loops back into the hook.",
+      "fix": "script"
+    },
+    {
+      "name": "title",
+      "passed": true,
+      "weight": 3,
+      "hard": false,
+      "detail": "title is 37 chars; 25-60 works best.",
+      "fix": "script"
+    },
+    {
+      "name": "hashtags",
+      "passed": true,
+      "weight": 2,
+      "hard": false,
+      "detail": "5 hashtags; use 4-5.",
+      "fix": "script"
+    },
+    {
+      "name": "originality",
+      "passed": true,
+      "weight": 8,
+      "hard": true,
+      "detail": "too close to an earlier video (similarity 0.14); change the angle and hook.",
+      "fix": "script"
+    },
+    {
+      "name": "readability",
+      "passed": true,
+      "weight": 3,
+      "hard": false,
+      "detail": "average sentence is 10.4 words; aim for 8-14.",
+      "fix": "script"
+    },
+    {
+      "name": "judge_hook",
+      "passed": false,
+      "weight": 8,
+      "hard": false,
+      "detail": "hook scored 6/10. Rewrite Line 11 to fix the typo and perfect the loop: 'Stop letting outdated financial myths make you feel bad about renting, because... [loops to Hook: Renting is not throwing money away]'; Rewrite Line 5 to add compliance safety: 'Take $200 a month invested at a historical 8% stock market return for 30 years.'; Rewrite Line 1 to increase hook tension: 'Renting is not throwing money away. In fact, buying a home too early is the fastest way to go broke.'",
+      "fix": "script"
+    },
+    {
+      "name": "judge_retention",
+      "passed": true,
+      "weight": 6,
+      "hard": false,
+      "detail": "retention scored 7/10. Rewrite Line 11 to fix the typo and perfect the loop: 'Stop letting outdated financial myths make you feel bad about renting, because... [loops to Hook: Renting is not throwing money away]'; Rewrite Line 5 to add compliance safety: 'Take $200 a month invested at a historical 8% stock market return for 30 years.'; Rewrite Line 1 to increase hook tension: 'Renting is not throwing money away. In fact, buying a home too early is the fastest way to go broke.'",
+      "fix": "script"
+    },
+    {
+      "name": "judge_value",
+      "passed": true,
+      "weight": 5,
+      "hard": false,
+      "detail": "value scored 8/10. Rewrite Line 11 to fix the typo and perfect the loop: 'Stop letting outdated financial myths make you feel bad about renting, because... [loops to Hook: Renting is not throwing money away]'; Rewrite Line 5 to add compliance safety: 'Take $200 a month invested at a historical 8% stock market return for 30 years.'; Rewrite Line 1 to increase hook tension: 'Renting is not throwing money away. In fact, buying a home too early is the fastest way to go broke.'",
+      "fix": "script"
+    },
+    {
+      "name": "judge_facts",
+      "passed": true,
+      "weight": 10,
+      "hard": true,
+      "detail": "factual risk 2/10: The phrase 'landlords of old myths' in line 11 is grammatically confusing and likely a typo.; The 8% return is mathematically correct for the calculation, but lacks the context of being a historical stock market average rather than a guaranteed rate.",
+      "fix": "script"
+    },
+    {
+      "name": "judge_compliance",
+      "passed": true,
+      "weight": 10,
+      "hard": true,
+      "detail": "compliance risk 2/10",
+      "fix": "script"
+    },
+    {
+      "name": "duration",
+      "passed": false,
+      "weight": 10,
+      "hard": true,
+      "detail": "53.3s; need 61-72s (TikTok rewards need >60s).",
+      "fix": "script"
+    },
+    {
+      "name": "word_timings",
+      "passed": true,
+      "weight": 8,
+      "hard": true,
+      "detail": "missing word timings for captions",
+      "fix": "voice"
+    },
+    {
+      "name": "voice_provider",
+      "passed": true,
+      "weight": 2,
+      "hard": false,
+      "detail": "voice came from fallback edge (estimated caption timing)",
+      "fix": "voice"
+    },
+    {
+      "name": "image_count",
+      "passed": true,
+      "weight": 10,
+      "hard": true,
+      "detail": "10 images for 10 beats",
+      "fix": "visuals"
+    },
+    {
+      "name": "no_placeholder_art",
+      "passed": true,
+      "weight": 6,
+      "hard": false,
+      "detail": "beats using abstract fallback art: []",
+      "fix": "visuals"
+    },
+    {
+      "name": "image_quality",
+      "passed": true,
+      "weight": 3,
+      "hard": false,
+      "detail": "beats using low-res fallback images: []",
+      "fix": "visuals"
+    },
+    {
+      "name": "resolution",
+      "passed": true,
+      "weight": 10,
+      "hard": true,
+      "detail": "1080x1920",
+      "fix": "render"
+    },
+    {
+      "name": "fps",
+      "passed": true,
+      "weight": 4,
+      "hard": true,
+      "detail": "30.0 fps",
+      "fix": "render"
+    },
+    {
+      "name": "av_sync_length",
+      "passed": true,
+      "weight": 8,
+      "hard": true,
+      "detail": "video 53.30s vs voice 53.29s",
+      "fix": "render"
+    },
+    {
+      "name": "audio_present",
+      "passed": true,
+      "weight": 10,
+      "hard": true,
+      "detail": "no audio stream",
+      "fix": "render"
+    },
+    {
+      "name": "file_size",
+      "passed": true,
+      "weight": 4,
+      "hard": true,
+      "detail": "13.8 MB",
+      "fix": "render"
+    },
+    {
+      "name": "first_frame_visible",
+      "passed": true,
+      "weight": 6,
+      "hard": true,
+      "detail": "first frame is nearly black (kills the hook)",
+      "fix": "visuals"
+    },
+    {
+      "name": "cut_cadence",
+      "passed": true,
+      "weight": 5,
+      "hard": false,
+      "detail": "avg shot 2.66s; target <= 3.2s",
+      "fix": "render"
+    },
+    {
+      "name": "caption_coverage",
+      "passed": true,
+      "weight": 8,
+      "hard": true,
+      "detail": "123/123 words captioned",
+      "fix": "render"
+    },
+    {
+      "name": "disclosure",
+      "passed": true,
+      "weight": 10,
+      "hard": true,
+      "detail": "missing disclaimers",
+      "fix": "package"
+    },
+    {
+      "name": "affiliate_disclosure",
+      "passed": true,
+      "weight": 8,
+      "hard": true,
+      "detail": "links without affiliate disclosure",
+      "fix": "package"
+    },
+    {
+      "name": "caption_tags",
+      "passed": true,
+      "weight": 2,
+      "hard": false,
+      "detail": "caption has no hashtags",
+      "fix": "package"
+    }
+  ],
+  "judge": {
+    "hook": 6,
+    "retention": 7,
+    "value": 8,
+    "clarity": 7,
+    "loop_ending": 8,
+    "factual_risk": 2,
+    "compliance_risk": 2,
+    "suspect_claims": [
+      "The phrase 'landlords of old myths' in line 11 is grammatically confusing and likely a typo.",
+      "The 8% return is mathematically correct for the calculation, but lacks the context of being a historical stock market average rather than a guaranteed rate."
+    ],
+    "fixes": [
+      "Rewrite Line 11 to fix the typo and perfect the loop: 'Stop letting outdated financial myths make you feel bad about renting, because... [loops to Hook: Renting is not throwing money away]'",
+      "Rewrite Line 5 to add compliance safety: 'Take $200 a month invested at a historical 8% stock market return for 30 years.'",
+      "Rewrite Line 1 to increase hook tension: 'Renting is not throwing money away. In fact, buying a home too early is the fastest way to go broke.'"
+    ]
+  }
+}

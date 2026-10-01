@@ -5,6 +5,8 @@ from __future__ import annotations
 import json
 import re
 
+import requests
+
 from faceless import config, ledger
 from faceless.providers import ProviderError, ProviderUnavailable, http, run_chain
 
@@ -46,7 +48,11 @@ def gemini(prompt: str, *, system: str | None, want_json: bool, temperature: flo
     errs = []
     s = http()
     for model in cfg["gemini_models"]:
-        r = s.post(GEMINI_URL.format(model=model), params={"key": key}, json=body, timeout=180)
+        try:
+            r = s.post(GEMINI_URL.format(model=model), params={"key": key}, json=body, timeout=75)
+        except requests.RequestException as e:   # a hung model shouldn't cost the whole chain 3 minutes
+            errs.append(f"{model}:{type(e).__name__}")
+            continue
         if r.status_code != 200:
             errs.append(f"{model}:{r.status_code}")
             continue

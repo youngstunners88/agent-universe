@@ -50,7 +50,9 @@ def script_prompt(pillar, topic: str, angle: str = "", feedback: list[str] | Non
         moneymath.fact_sheet() if pillar.id in ("math", "playbook", "myth", "psychology") else "",
         "",
         "# CONSTRAINTS",
-        f"- Spoken words across all beats: {lo}-{hi} words total (the video must run 61-72 seconds).",
+        f"- LENGTH IS CRITICAL: {lo}-{hi} words in total across all 'say' fields (aim for {(lo + hi) // 2}); the "
+        "video must run 61-72 seconds and shorter scripts are rejected. Count the words before answering and "
+        "report the count in 'word_count'.",
         "- 11 to 14 beats. Each 'say' is 1-2 sentences, max 20 words. Write for the ear: ALWAYS use contractions "
         "(it's, here's, you're, don't, that's), plain words, 8th-grade reading level.",
         "- Write money and percentages as digits: $226,000, $5, 8%, 30 years (the voice reads them correctly and "
@@ -79,7 +81,7 @@ def script_prompt(pillar, topic: str, angle: str = "", feedback: list[str] | Non
         "",
         "# OUTPUT FORMAT",
         "Return ONLY valid JSON with this exact shape:",
-        '{"title": str, "hook_text": str, "beats": [{"say": str, "callout": str, "visual": str}], '
+        '{"title": str, "hook_text": str, "word_count": int, "beats": [{"say": str, "callout": str, "visual": str}], '
         '"caption": str, "description": str, "hashtags": [str], "first_comment": str, '
         '"facts": [{"claim": str, "basis": str}]}',
     ]
