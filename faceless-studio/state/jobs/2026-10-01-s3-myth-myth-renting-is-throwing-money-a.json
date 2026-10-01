@@ -4,19 +4,28 @@
   "topic": "Myth: renting is throwing money away",
   "day": "2026-10-01",
   "slot": 3,
-  "status": "scripted",
+  "status": "voiced",
   "history": [
     {
       "from": "planned",
       "to": "scripted",
       "ts": "2026-10-01T14:24:18Z",
       "words": 125
+    },
+    {
+      "from": "scripted",
+      "to": "voiced",
+      "ts": "2026-10-01T14:25:34Z",
+      "seconds": 53.29,
+      "provider": "edge"
     }
   ],
   "artifacts": {
     "title": "Why Renting Isn't Throwing Money Away"
   },
   "scores": {},
-  "cost": {},
+  "cost": {
+    "tts:edge:chars": 1412
+  },
   "notes": []
 }

@@ -144,3 +144,8 @@
 {"ts": "2026-10-01T14:25:02Z", "t": 1790864702.93, "actor": "engine", "type": "PROVIDER_OK", "capability": "llm", "provider": "gemini", "job": "2026-10-01-s3-myth-myth-renting-is-throwing-money-a", "ms": 16735}
 {"ts": "2026-10-01T14:25:02Z", "t": 1790864702.931, "actor": "engine", "type": "SCRIPT_DRAFTED", "job": "2026-10-01-s3-myth-myth-renting-is-throwing-money-a", "words": 124, "beats": 10, "round": 1}
 {"ts": "2026-10-01T14:25:21Z", "t": 1790864721.75, "actor": "engine", "type": "PROVIDER_OK", "capability": "tts", "provider": "edge", "job": "2026-10-01-s3-myth-myth-renting-is-throwing-money-a", "ms": 18818}
+{"ts": "2026-10-01T14:25:34Z", "t": 1790864734.862, "actor": "engine", "type": "PROVIDER_OK", "capability": "tts", "provider": "edge", "job": "2026-10-01-s3-myth-myth-renting-is-throwing-money-a", "ms": 13056}
+{"ts": "2026-10-01T14:25:34Z", "t": 1790864734.92, "actor": "engine", "type": "VOICE_REFIT", "job": "2026-10-01-s3-myth-myth-renting-is-throwing-money-a", "speed": 0.88, "seconds": 52.94}
+{"ts": "2026-10-01T14:25:34Z", "t": 1790864734.922, "actor": "engine", "type": "JOB_TRANSITION", "job": "2026-10-01-s3-myth-myth-renting-is-throwing-money-a", "to": "voiced", "seconds": 53.29, "provider": "edge"}
+{"ts": "2026-10-01T14:25:48Z", "t": 1790864748.765, "actor": "engine", "type": "PROVIDER_OK", "capability": "image", "provider": "cloudflare", "job": "2026-10-01-s3-myth-myth-renting-is-throwing-money-a", "ms": 13840}
+{"ts": "2026-10-01T14:25:57Z", "t": 1790864757.533, "actor": "engine", "type": "PROVIDER_OK", "capability": "image", "provider": "cloudflare", "job": "2026-10-01-s3-myth-myth-renting-is-throwing-money-a", "ms": 22604}

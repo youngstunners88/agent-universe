@@ -62,3 +62,6 @@
 {"day": "2026-10-01", "provider": "edge", "unit": "chars", "amount": 726, "usd": 0.0, "job": null}
 {"day": "2026-10-01", "provider": "gemini", "unit": "tokens", "amount": 2924, "usd": 0.0, "job": null}
 {"day": "2026-10-01", "provider": "edge", "unit": "chars", "amount": 686, "usd": 0.0, "job": null}
+{"day": "2026-10-01", "provider": "edge", "unit": "chars", "amount": 686, "usd": 0.0, "job": null}
+{"day": "2026-10-01", "provider": "cloudflare", "unit": "neurons", "amount": 156.3, "usd": 0.0, "job": null}
+{"day": "2026-10-01", "provider": "cloudflare", "unit": "neurons", "amount": 156.3, "usd": 0.0, "job": null}
