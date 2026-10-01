@@ -43,3 +43,11 @@ until a clean pass. Log each round below so the next session starts where this o
   encodes; word_count demoted to soft (duration is the hard truth).
 - **R4 (autonomous batch):** Gemini scripts landed ~169 words → slowed voice to 0.94x. Raised base voice rate
   to +14%, word range to 175-200, refit now aims at the nearest window edge.
+- **R5:** math 99/100 published. Psychology **held** on judge_compliance (compliance 4, factual 2): the judge
+  read hypothetical math with a stated assumption as a return promise, and the gate double-counted factual
+  risk. Added explicit 0-10 calibration anchors to the judge, decoupled compliance from factual risk
+  (<= 4 passes). Visual review: Gemini spelled numbers out ("two hundred fifty-two months") making weak
+  captions → digits required; no contractions → required; FLUX drew gibberish text on cards/screens →
+  visual rule steers to writing-free objects; hook_text trailing period stripped. Cloudflare's safety filter
+  flagged 2/26 images → retry once with a new seed before the paid fallback. Images moved to 864x1536
+  (same 156 neurons per image as 768x1344, less upscaling). Weak-word caption pass now loops (test caught it).

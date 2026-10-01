@@ -127,6 +127,23 @@ def test_originality_gate_blocks_duplicates():
     assert "originality" in hard
 
 
+def test_judge_compliance_ignores_factual_score(monkeypatch):
+    """Compliance risk 4 with stated assumptions passes; factual risk is judged by its own gate."""
+    from faceless import gauntlet
+    monkeypatch.setattr(gauntlet.llm, "complete", lambda *a, **k: {
+        "hook": 8, "retention": 7, "value": 7, "factual_risk": 6, "compliance_risk": 4,
+        "suspect_claims": ["x"], "fixes": []})
+    monkeypatch.setattr("faceless.decide.RECORDS", Path("/dev/null"))
+    monkeypatch.setattr("faceless.events.JOURNAL", Path("/dev/null"))
+    gates = {g.name: g for g in gauntlet.judge_script(seed_script())[0]}
+    assert gates["judge_compliance"].passed
+    assert not gates["judge_facts"].passed
+
+
+def test_normalize_strips_hook_punctuation():
+    assert normalize({"title": "t", "hook_text": "21 YEARS.", "beats": []})["hook_text"] == "21 YEARS"
+
+
 def test_normalize_clears_callout_on_hook_beat():
     scr = normalize({"title": "t", "beats": [{"say": "a b", "callout": "X", "visual": "v"}]})
     assert scr["beats"][0]["callout"] == ""
