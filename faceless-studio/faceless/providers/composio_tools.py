@@ -7,6 +7,7 @@ Connections are made once with a Connect Link and persist for every later run, i
 
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 from functools import lru_cache
@@ -36,7 +37,9 @@ def session():
     except ImportError as e:
         raise ProviderUnavailable("composio not installed (pip install composio)") from e
     s = Composio().create(user_id=user_id())
-    events.emit("COMPOSIO_SESSION", user=user_id(), session=getattr(s, "session_id", None))
+    sid = str(getattr(s, "session_id", "") or "")
+    # log a short fingerprint, never the session id itself (the journal is committed, possibly publicly)
+    events.emit("COMPOSIO_SESSION", user=user_id(), session_hash=hashlib.sha1(sid.encode()).hexdigest()[:8])
     return s
 
 

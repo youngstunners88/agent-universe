@@ -259,8 +259,8 @@
 {"ts": "2026-10-01T15:38:38Z", "t": 1790869118.253, "actor": "engine", "type": "PROVIDER_OK", "capability": "image", "provider": "openrouter", "job": "2026-10-01-s3-myth-myth-renting-is-throwing-money-a", "ms": 5599}
 {"ts": "2026-10-01T15:38:38Z", "t": 1790869118.255, "actor": "engine", "type": "VISUALS_DONE", "job": "2026-10-01-s3-myth-myth-renting-is-throwing-money-a", "providers": {"openrouter": 12}}
 {"ts": "2026-10-01T15:38:38Z", "t": 1790869118.256, "actor": "engine", "type": "JOB_TRANSITION", "job": "2026-10-01-s3-myth-myth-renting-is-throwing-money-a", "to": "visualized"}
-{"ts": "2026-10-01T15:39:40Z", "t": 1790869180.789, "actor": "engine", "type": "COMPOSIO_SESSION", "user": "quiet-money-studio", "session": "trs_c3sdPSsSoGBP"}
-{"ts": "2026-10-01T15:39:54Z", "t": 1790869194.122, "actor": "engine", "type": "COMPOSIO_SESSION", "user": "quiet-money-studio", "session": "trs_dPbDgwV2FJIz"}
+{"ts": "2026-10-01T15:39:40Z", "t": 1790869180.789, "actor": "engine", "type": "COMPOSIO_SESSION", "user": "quiet-money-studio", "session": "redacted"}
+{"ts": "2026-10-01T15:39:54Z", "t": 1790869194.122, "actor": "engine", "type": "COMPOSIO_SESSION", "user": "quiet-money-studio", "session": "redacted"}
 {"ts": "2026-10-01T15:39:54Z", "t": 1790869194.759, "actor": "engine", "type": "COMPOSIO_CONNECT_LINK", "toolkit": "youtube"}
 {"ts": "2026-10-01T15:39:56Z", "t": 1790869196.855, "actor": "engine", "type": "RENDERED", "job": "2026-10-01-s3-myth-myth-renting-is-throwing-money-a", "video": "/home/user/agent-universe/faceless-studio/production/output/2026-10-01/2026-10-01-s3-myth-myth-renting-is-throwing-money-a/final.mp4", "cover": "/home/user/agent-universe/faceless-studio/production/output/2026-10-01/2026-10-01-s3-myth-myth-renting-is-throwing-money-a/cover.jpg", "shots": 24, "captioned_words": 147, "avg_shot": 2.62}
 {"ts": "2026-10-01T15:39:57Z", "t": 1790869197.068, "actor": "engine", "type": "JOB_TRANSITION", "job": "2026-10-01-s3-myth-myth-renting-is-throwing-money-a", "to": "rendered"}
@@ -268,10 +268,40 @@
 {"ts": "2026-10-01T15:39:57Z", "t": 1790869197.071, "actor": "engine", "type": "JOB_TRANSITION", "job": "2026-10-01-s3-myth-myth-renting-is-throwing-money-a", "to": "gated", "score": 96}
 {"ts": "2026-10-01T15:39:57Z", "t": 1790869197.072, "actor": "engine", "type": "JOB_TRANSITION", "job": "2026-10-01-s3-myth-myth-renting-is-throwing-money-a", "to": "packaged"}
 {"ts": "2026-10-01T15:39:57Z", "t": 1790869197.073, "actor": "engine", "type": "JOB_TRANSITION", "job": "2026-10-01-s3-myth-myth-renting-is-throwing-money-a", "to": "held"}
-{"ts": "2026-10-01T15:40:09Z", "t": 1790869209.525, "actor": "engine", "type": "COMPOSIO_SESSION", "user": "quiet-money-studio", "session": "trs_hOvMX6TMYKN7"}
+{"ts": "2026-10-01T15:40:09Z", "t": 1790869209.525, "actor": "engine", "type": "COMPOSIO_SESSION", "user": "quiet-money-studio", "session": "redacted"}
 {"ts": "2026-10-01T15:41:39Z", "t": 1790869299.023, "actor": "engine", "type": "GAUNTLET", "job": "2026-10-01-s3-myth-myth-renting-is-throwing-money-a", "score": 95, "passed": true, "hard": []}
 {"ts": "2026-10-01T15:41:48Z", "t": 1790869308.661, "actor": "engine", "type": "JOB_TRANSITION", "job": "2026-10-01-s3-myth-myth-renting-is-throwing-money-a", "to": "published", "manual": true}
 {"ts": "2026-10-01T15:44:12Z", "t": 1790869452.966, "actor": "engine", "type": "COMPOSIO_EXECUTE", "tool": "YOUTUBE_LIST_CHANNELS", "ok": true, "log_id": "log_42sKMruCUhnh", "job": null}
-{"ts": "2026-10-01T15:44:44Z", "t": 1790869484.766, "actor": "engine", "type": "COMPOSIO_SESSION", "user": "quiet-money-studio", "session": "trs_ndeKuCgCAvtE"}
-{"ts": "2026-10-01T15:44:50Z", "t": 1790869490.383, "actor": "engine", "type": "COMPOSIO_SESSION", "user": "quiet-money-studio", "session": "trs_fUPi1pQNRY8Y"}
+{"ts": "2026-10-01T15:44:44Z", "t": 1790869484.766, "actor": "engine", "type": "COMPOSIO_SESSION", "user": "quiet-money-studio", "session": "redacted"}
+{"ts": "2026-10-01T15:44:50Z", "t": 1790869490.383, "actor": "engine", "type": "COMPOSIO_SESSION", "user": "quiet-money-studio", "session": "redacted"}
 {"ts": "2026-10-01T15:44:53Z", "t": 1790869493.63, "actor": "engine", "type": "COMPOSIO_EXECUTE", "tool": "YOUTUBE_LIST_CHANNEL_VIDEOS", "ok": true, "log_id": "log_m9vTxvoAMqfV", "job": null}
+{"ts": "2026-10-01T15:56:11Z", "t": 1790870171.772, "actor": "engine", "type": "COMPOSIO_SESSION", "user": "quiet-money-studio", "session": "redacted"}
+{"ts": "2026-10-01T15:56:12Z", "t": 1790870172.382, "actor": "engine", "type": "COMPOSIO_EXECUTE", "tool": "YOUTUBE_GET_CHANNEL_ID_BY_HANDLE", "ok": true, "log_id": "log_E8n0OPBQlBhX", "job": null}
+{"ts": "2026-10-01T15:56:13Z", "t": 1790870173.04, "actor": "engine", "type": "COMPOSIO_EXECUTE", "tool": "YOUTUBE_GET_CHANNEL_ID_BY_HANDLE", "ok": true, "log_id": "log_25yybyVmVNqV", "job": null}
+{"ts": "2026-10-01T15:56:13Z", "t": 1790870173.589, "actor": "engine", "type": "COMPOSIO_EXECUTE", "tool": "YOUTUBE_GET_CHANNEL_ID_BY_HANDLE", "ok": true, "log_id": "log_6-4s0a5AFkIZ", "job": null}
+{"ts": "2026-10-01T15:56:14Z", "t": 1790870174.203, "actor": "engine", "type": "COMPOSIO_EXECUTE", "tool": "YOUTUBE_GET_CHANNEL_ID_BY_HANDLE", "ok": true, "log_id": "log_y9h8k8any1TR", "job": null}
+{"ts": "2026-10-01T15:56:14Z", "t": 1790870174.711, "actor": "engine", "type": "COMPOSIO_EXECUTE", "tool": "YOUTUBE_GET_CHANNEL_ID_BY_HANDLE", "ok": true, "log_id": "log_RhypryE-iN1J", "job": null}
+{"ts": "2026-10-01T15:56:15Z", "t": 1790870175.902, "actor": "engine", "type": "COMPOSIO_EXECUTE", "tool": "YOUTUBE_GET_CHANNEL_ID_BY_HANDLE", "ok": true, "log_id": "log_MOf6RzkWXlFk", "job": null}
+{"ts": "2026-10-01T15:56:27Z", "t": 1790870187.878, "actor": "engine", "type": "COMPOSIO_SESSION", "user": "quiet-money-studio", "session": "redacted"}
+{"ts": "2026-10-01T15:56:28Z", "t": 1790870188.366, "actor": "engine", "type": "COMPOSIO_EXECUTE", "tool": "YOUTUBE_GET_CHANNEL_ID_BY_HANDLE", "ok": true, "log_id": "log_NOS1MAmeFnxd", "job": null}
+{"ts": "2026-10-01T15:56:28Z", "t": 1790870188.943, "actor": "engine", "type": "COMPOSIO_EXECUTE", "tool": "YOUTUBE_GET_CHANNEL_ID_BY_HANDLE", "ok": true, "log_id": "log_Km5nLzQnoPLS", "job": null}
+{"ts": "2026-10-01T15:56:29Z", "t": 1790870189.381, "actor": "engine", "type": "COMPOSIO_EXECUTE", "tool": "YOUTUBE_GET_CHANNEL_ID_BY_HANDLE", "ok": true, "log_id": "log_KJmdiEItl7Ou", "job": null}
+{"ts": "2026-10-01T15:56:29Z", "t": 1790870189.872, "actor": "engine", "type": "COMPOSIO_EXECUTE", "tool": "YOUTUBE_GET_CHANNEL_ID_BY_HANDLE", "ok": true, "log_id": "log_tZ-hgEXqpyMc", "job": null}
+{"ts": "2026-10-01T15:56:30Z", "t": 1790870190.394, "actor": "engine", "type": "COMPOSIO_EXECUTE", "tool": "YOUTUBE_GET_CHANNEL_ID_BY_HANDLE", "ok": true, "log_id": "log_lXaBhooo3KdO", "job": null}
+{"ts": "2026-10-01T15:56:31Z", "t": 1790870191.133, "actor": "engine", "type": "COMPOSIO_EXECUTE", "tool": "YOUTUBE_GET_CHANNEL_ID_BY_HANDLE", "ok": true, "log_id": "log_Gn-oAHKENdnl", "job": null}
+{"ts": "2026-10-01T15:56:31Z", "t": 1790870191.874, "actor": "engine", "type": "COMPOSIO_EXECUTE", "tool": "YOUTUBE_GET_CHANNEL_ID_BY_HANDLE", "ok": true, "log_id": "log_iiGcdaynBRIn", "job": null}
+{"ts": "2026-10-01T15:56:32Z", "t": 1790870192.343, "actor": "engine", "type": "COMPOSIO_EXECUTE", "tool": "YOUTUBE_GET_CHANNEL_ID_BY_HANDLE", "ok": true, "log_id": "log_Iwnta_P54K5f", "job": null}
+{"ts": "2026-10-01T15:56:33Z", "t": 1790870193.078, "actor": "engine", "type": "COMPOSIO_EXECUTE", "tool": "YOUTUBE_GET_CHANNEL_ID_BY_HANDLE", "ok": true, "log_id": "log_O_P1CeU9vmjv", "job": null}
+{"ts": "2026-10-01T15:56:33Z", "t": 1790870193.579, "actor": "engine", "type": "COMPOSIO_EXECUTE", "tool": "YOUTUBE_GET_CHANNEL_ID_BY_HANDLE", "ok": true, "log_id": "log_p9HrjUiGkATx", "job": null}
+{"ts": "2026-10-01T15:56:33Z", "t": 1790870194.0, "actor": "engine", "type": "COMPOSIO_EXECUTE", "tool": "YOUTUBE_GET_CHANNEL_ID_BY_HANDLE", "ok": true, "log_id": "log_jsPi1IU-Nt7o", "job": null}
+{"ts": "2026-10-01T15:56:35Z", "t": 1790870195.097, "actor": "engine", "type": "COMPOSIO_EXECUTE", "tool": "YOUTUBE_GET_CHANNEL_ID_BY_HANDLE", "ok": true, "log_id": "log_p1hCJZL19a1R", "job": null}
+{"ts": "2026-10-01T15:56:48Z", "t": 1790870208.9, "actor": "engine", "type": "COMPOSIO_SESSION", "user": "quiet-money-studio", "session": "redacted"}
+{"ts": "2026-10-01T15:56:49Z", "t": 1790870209.388, "actor": "engine", "type": "COMPOSIO_EXECUTE", "tool": "YOUTUBE_GET_CHANNEL_ID_BY_HANDLE", "ok": true, "log_id": "log_Gv56CWE9YNA8", "job": null}
+{"ts": "2026-10-01T15:56:49Z", "t": 1790870209.807, "actor": "engine", "type": "COMPOSIO_EXECUTE", "tool": "YOUTUBE_GET_CHANNEL_ID_BY_HANDLE", "ok": true, "log_id": "log_7xmtHyEWiUbH", "job": null}
+{"ts": "2026-10-01T15:56:50Z", "t": 1790870210.32, "actor": "engine", "type": "COMPOSIO_EXECUTE", "tool": "YOUTUBE_GET_CHANNEL_ID_BY_HANDLE", "ok": true, "log_id": "log_mZsffc7sOobv", "job": null}
+{"ts": "2026-10-01T15:56:51Z", "t": 1790870211.158, "actor": "engine", "type": "COMPOSIO_EXECUTE", "tool": "YOUTUBE_GET_CHANNEL_ID_BY_HANDLE", "ok": true, "log_id": "log_L8Zv7dMx556W", "job": null}
+{"ts": "2026-10-01T15:56:51Z", "t": 1790870211.663, "actor": "engine", "type": "COMPOSIO_EXECUTE", "tool": "YOUTUBE_GET_CHANNEL_ID_BY_HANDLE", "ok": true, "log_id": "log_DkDxLaBnBDVt", "job": null}
+{"ts": "2026-10-01T15:56:52Z", "t": 1790870212.217, "actor": "engine", "type": "COMPOSIO_EXECUTE", "tool": "YOUTUBE_GET_CHANNEL_ID_BY_HANDLE", "ok": true, "log_id": "log_gg4QQ68D-aOl", "job": null}
+{"ts": "2026-10-01T15:56:52Z", "t": 1790870212.692, "actor": "engine", "type": "COMPOSIO_EXECUTE", "tool": "YOUTUBE_GET_CHANNEL_ID_BY_HANDLE", "ok": true, "log_id": "log_p0ZADR8n-D91", "job": null}
+{"ts": "2026-10-01T15:56:53Z", "t": 1790870213.19, "actor": "engine", "type": "COMPOSIO_EXECUTE", "tool": "YOUTUBE_LIST_CHANNELS", "ok": true, "log_id": "log_hwbeg7xz5cJj", "job": null}
+{"ts": "2026-10-01T16:05:18Z", "t": 1790870718.055, "actor": "engine", "type": "AEO_TRACK", "probes": 4, "ok": 4, "mentioned": 0}

@@ -266,3 +266,20 @@ def test_composio_execute_raises_with_log_id(monkeypatch):
     monkeypatch.setattr("faceless.ledger.LEDGER", Path("/dev/null"))
     with pytest.raises(ProviderError, match="log_bad"):
         ct.execute("YOUTUBE_LIST_CHANNELS", {})
+
+
+def test_voice_classifier_separates_slop_from_our_voice():
+    from faceless import quality
+    slop = ("In today's fast-paced world, managing money can feel overwhelming. Let's dive into simple yet "
+            "powerful tips that will transform your financial journey and unlock the life you deserve.")
+    ours = ("A $6,000 card at 24% takes about 21 years on minimum payments. You'd pay $10,887 in interest. "
+            "Pay $300 a month and it's gone in 26 months. Same debt. Two different lives.")
+    assert quality.classify(slop)[0] == "slop"
+    assert quality.classify(ours)[0] == "quality"
+
+
+def test_aeo_name_parsing_and_self_match():
+    from faceless import aeo
+    assert aeo._names('["Graham Stephan", "Quiet Money", "The Financial Diet"]')[1] == "Quiet Money"
+    assert aeo._names("1. Ali Abdaal\n2. QuietMoneyRules") == ["Ali Abdaal", "QuietMoneyRules"]
+    assert aeo._is_us("QuietMoneyRules") and not aeo._is_us("Money Guy Show")

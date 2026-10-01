@@ -79,6 +79,11 @@ def check_script(script: dict, history: list[str]) -> list[Gate]:
     g.append(Gate("originality", top < cfg["gauntlet"]["similarity_max"], 8, True,
                   f"too close to an earlier video (similarity {top:.2f}); change the angle and hook."))
     g += check_structure(script, low)
+    from faceless import quality
+    label, margin, _ = quality.classify(text)
+    g.append(Gate("voice_quality", label != "slop", 5, False,
+                  "reads like generic AI copy (compression classifier): swap filler for concrete numbers, names, "
+                  "and short spoken sentences; cut phrases like 'financial journey' and 'unlock'"))
     sentences = [s for s in re.split(r"[.!?]+", text) if s.strip()]
     avg = sum(len(s.split()) for s in sentences) / max(1, len(sentences))
     g.append(Gate("readability", avg <= 16, 3, False, f"average sentence is {avg:.1f} words; aim for 8-14."))
@@ -197,7 +202,8 @@ def check_package(meta: dict) -> list[Gate]:
     d = meta["description"].lower()
     return [
         Gate("disclosure", "not financial advice" in d and "ai-assisted" in d, 10, True, "missing disclaimers", "package"),
-        Gate("affiliate_disclosure", ("http" not in d) or ("affiliate" in d), 8, True, "links without affiliate disclosure", "package"),
+        Gate("affiliate_disclosure", not config.load()["channel"].get("has_affiliate_links") or "affiliate" in d, 8, True,
+             "affiliate links are on but the description has no affiliate disclosure", "package"),
         Gate("caption_tags", "#" in meta["caption"], 2, False, "caption has no hashtags", "package"),
     ]
 

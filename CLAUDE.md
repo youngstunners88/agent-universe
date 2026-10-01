@@ -1,5 +1,8 @@
 # Agent Universe
 
+**Canonical home of the studio: https://github.com/youngstunners88/quiet-money (public).** Develop there;
+this copy is the incubation history.
+
 This repo holds two things:
 
 1. **`faceless-studio/`**: the live business. An autonomous faceless short-video channel

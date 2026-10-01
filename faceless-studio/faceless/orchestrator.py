@@ -106,6 +106,9 @@ def produce(job: Job, *, judge: bool = True, prefer_voice: str | None = None, do
                  "hold": "A hard gate failed, the score is low, or a claim needs a human check."})},
         state={"score": rep["score"], "hard_failures": rep["hard_failures"], "title": meta["title"]}, job=job.id)
     job.advance("packaged")
+    if rep["score"] >= 95:   # teach the voice classifier what our best writing looks like
+        from faceless import quality
+        quality.remember("quality", job.id, script_stage.narration(scr))
     if do_publish and verdict["next_step"].value == "publish":
         res = publisher.publish(job, meta)
         job.artifacts["publish"] = res

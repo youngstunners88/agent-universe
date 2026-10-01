@@ -149,6 +149,29 @@ def cmd_composio(args) -> int:
     return 1
 
 
+def cmd_site(args) -> int:
+    from faceless import site
+    if args.action == "build":
+        print(json.dumps(site.build(), indent=2))
+    else:
+        print(json.dumps(site.indexnow(), indent=2))
+    return 0
+
+
+def cmd_aeo(args) -> int:
+    from faceless import aeo
+    rows = aeo.track(engines=args.engines.split(",") if args.engines else None)
+    print(json.dumps(aeo.summary(rows), indent=2, ensure_ascii=False))
+    return 0
+
+
+def cmd_brand(_args) -> int:
+    from faceless import brand
+    bg = brand.generate_background()
+    print(json.dumps(brand.build(bg), indent=2))
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(prog="faceless", description="Faceless Studio engine")
     sub = p.add_subparsers(dest="cmd", required=True)
@@ -186,6 +209,13 @@ def main(argv: list[str] | None = None) -> int:
     cp.add_argument("--wait", action="store_true", help="block until the connect link is completed")
     cp.add_argument("--max-chars", type=int, default=4000)
     cp.set_defaults(fn=cmd_composio)
+    sub.add_parser("brand", help="(re)generate the brand kit in channel/brand-kit").set_defaults(fn=cmd_brand)
+    ae = sub.add_parser("aeo", help="probe AI answer engines: are we recommended/cited? (writes analytics/aeo.jsonl)")
+    ae.add_argument("--engines", help="comma list from gpt,claude,gemini,perplexity")
+    ae.set_defaults(fn=cmd_aeo)
+    st = sub.add_parser("site", help="Money Rules Library website: build | indexnow")
+    st.add_argument("action", choices=["build", "indexnow"])
+    st.set_defaults(fn=cmd_site)
     args = p.parse_args(argv)
     return args.fn(args)
 

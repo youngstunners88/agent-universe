@@ -15,8 +15,9 @@ def run(job, script: dict) -> dict:
     link = ch.get("link_in_bio", "")
     desc = [script.get("description", "")]
     if link:
-        desc += ["", f"Free money-reset checklist + tools I use: {link}",
-                 "Some links are affiliate links: I may earn a commission at no cost to you."]
+        desc += ["", f"Free 7-day Money Reset checklist + calculators: {link}"]
+    if ch.get("has_affiliate_links"):
+        desc += ["Some links are affiliate links: I may earn a commission at no cost to you."]
     desc += ["", DISCLAIMER, "", " ".join(tags + ["#shorts"])]
     caption = script.get("caption") or script["title"]
     for t in tags:
