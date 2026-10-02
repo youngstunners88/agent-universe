@@ -185,7 +185,7 @@ def test_similarity_is_symmetric_and_bounded():
 
 def test_allocate_balanced_by_default():
     weights = {p.id: 1.0 for p in config.load()["pillars"]}
-    plan = analytics.allocate(5, weights, day_index=3)
+    plan = analytics.allocate(len(weights), weights, day_index=3)
     assert sorted(plan) == sorted(weights)
 
 
@@ -283,3 +283,90 @@ def test_aeo_name_parsing_and_self_match():
     assert aeo._names('["Graham Stephan", "Quiet Money", "The Financial Diet"]')[1] == "Quiet Money"
     assert aeo._names("1. Ali Abdaal\n2. QuietMoneyRules") == ["Ali Abdaal", "QuietMoneyRules"]
     assert aeo._is_us("QuietMoneyRules") and not aeo._is_us("Money Guy Show")
+
+
+# ---- scheduling: resume + bank-ahead ----------------------------------------------------------
+
+def test_extra_slots_roll_into_later_days():
+    from faceless.providers.publish import nominal_slot
+    assert nominal_slot("2026-10-02", 0) == ("2026-10-02", 0)
+    assert nominal_slot("2026-10-02", 6) == ("2026-10-03", 1)
+    assert nominal_slot("2026-10-02", 12) == ("2026-10-04", 2)
+
+
+def test_open_slots_resume_and_bank_ahead(monkeypatch):
+    from datetime import datetime, timedelta, timezone
+
+    from faceless import orchestrator
+    today = datetime.now(timezone.utc).date()
+    done = [Job(id=f"j{s}", pillar="math", topic="t", day=today.isoformat(), slot=s, status=st)
+            for s, st in [(0, "published"), (1, "packaged"), (2, "held"), (5, "published")]]
+    monkeypatch.setattr(orchestrator, "all_jobs", lambda: done)
+    d0, d1 = today.isoformat(), (today + timedelta(days=1)).isoformat()
+    assert orchestrator.open_slots(5) == [(d0, 2), (d0, 3), (d0, 4)]        # held slot is retried
+    assert orchestrator.open_slots(5, extra=5) == [(d0, 2), (d0, 3), (d0, 4), (d1, 1), (d1, 2)]
+
+
+def test_dotenv_loads_without_overriding(tmp_path, monkeypatch):
+    f = tmp_path / ".env"
+    f.write_text('# comment\nQM_TEST_A="from-file"\nexport QM_TEST_B=b\nQM_TEST_EMPTY=\n')
+    monkeypatch.setenv("QM_TEST_B", "from-env")
+    monkeypatch.delenv("QM_TEST_A", raising=False)
+    assert config.load_dotenv(f) == 1
+    import os
+    assert os.environ["QM_TEST_A"] == "from-file" and os.environ["QM_TEST_B"] == "from-env"
+    monkeypatch.delenv("QM_TEST_A")
+
+
+def test_paid_image_fallback_is_capped(tmp_path, monkeypatch):
+    from faceless import ledger
+    from faceless.providers import ProviderUnavailable, images
+    monkeypatch.setenv("OPENROUTER_API_KEY", "test")
+    monkeypatch.setattr(ledger, "used", lambda provider, unit, day=None: 60 if provider == "openrouter" else 0)
+    with pytest.raises(ProviderUnavailable):
+        images.openrouter("a quiet kitchen table", 864, 1536, 1, tmp_path / "x.jpg")
+
+
+def test_allocate_rotates_the_skipped_pillar():
+    w = {"story": 1.0, "math": 1.0, "psychology": 1.0, "myth": 1.0, "playbook": 1.0, "escape": 1.5}
+    plans = [analytics.allocate(5, w, d) for d in range(6)]
+    assert all("escape" in p and len(set(p)) == 5 for p in plans)
+    skipped = {next(k for k in w if k not in p) for p in plans}
+    assert skipped == {"story", "math", "psychology", "myth", "playbook"}
+
+
+def test_passive_income_math():
+    assert moneymath.capital_for_income(3000) == 900000
+    assert moneymath.months_to_target(1000, 0.0, 12000) == 12
+
+
+def test_escape_series_needs_the_catch_and_a_move():
+    from faceless.gauntlet import check_structure
+    beats = lambda *says: {"pillar": "escape", "beats": [{"say": s} for s in says]}  # noqa: E731
+    ok = beats("Two people sell the same skill.", "One charges ten times more.", "Here's the value equation.",
+               "The catch: it takes years of reps.", "This week, rewrite your offer around the outcome.")
+    assert check_structure(ok, "")[0].passed
+    assert not check_structure(beats("Two people.", "Same skill.", "Different price.", "Do it."), "")[0].passed
+
+
+def test_research_brief_drops_sources_and_unknown_ids():
+    from faceless import research
+    assert "## Sources" not in research.brief("kiyosaki") and "Rich Dad Poor Dad" in research.brief("kiyosaki")
+    assert research.brief("nobody") == "" and research.brief(None) == ""
+
+
+def test_measured_duration_overrides_hard_word_count():
+    from faceless.gauntlet import Gate, reconcile
+    gates = [Gate("word_count", False, 8, True), Gate("duration", True, 10, True)]
+    assert not reconcile(gates)[0].hard
+    assert reconcile([Gate("word_count", False, 8, True), Gate("duration", False, 10, True)])[0].hard
+
+
+def test_blocked_provider_is_skipped_for_the_day(tmp_path, monkeypatch):
+    from faceless import ledger
+    from faceless.providers import ProviderUnavailable, images
+    monkeypatch.setenv("CLOUDFLARE_API_KEY", "t")
+    monkeypatch.setenv("CLOUDFLARE_ACCOUNT_ID", "a")
+    monkeypatch.setattr(ledger, "used", lambda provider, unit, day=None: 1 if unit == "blocked" else 0)
+    with pytest.raises(ProviderUnavailable):
+        images.cloudflare("a desk", 864, 1536, 1, tmp_path / "x.jpg")

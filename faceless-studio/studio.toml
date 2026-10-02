@@ -45,6 +45,7 @@ cloudflare_model = "@cf/black-forest-labs/flux-2-klein-4b"
 cloudflare_hero_model = "@cf/black-forest-labs/flux-2-klein-4b"   # 9b is sharper but costs ~9x the neurons
 cloudflare_daily_neurons = 9500              # free tier is 10,000 neurons/day; keep a margin
 openrouter_model = "google/gemini-3.1-flash-lite-image"
+openrouter_daily_images = 60                 # paid fallback cap: ~$0.04 each, so at most ~$2.40/day
 width = 864                                  # 2x3 Cloudflare tiles: same 156 neurons as 768x1344, exact 9:16
 height = 1536
 concurrency = 4
@@ -99,7 +100,7 @@ entities = ["short videos that explain money psychology",
 user_id = "quiet-money-studio"
 toolkits = ["youtube"]                       # connected so far; add tiktok, instagram, googledrive as you link them
 
-# Five pillars = five different formats, looks, and music keys.
+# Six pillars = six different formats, looks, and music keys (five slots a day).
 # Rotating them daily is what keeps the channel clear of "mass-produced" signals.
 [[pillars]]
 id = "story"
@@ -145,3 +146,12 @@ format = "A concrete 3-step action the viewer can do today in under 15 minutes (
 style = "clean modern lifestyle photography, bright soft daylight, minimal tidy desk scenes, fresh green and white palette"
 grade = "clean"
 music_key = "G"
+
+[[pillars]]
+id = "escape"
+name = "Escape the Rat Race"
+weight = 1.5                                 # a slot every day: the series the owner asked to lead with
+format = "One proven income-building framework (the value equation, the rule of 100, the four ways to get customers, asset vs liability, the four ways to earn, using other people's money, your circle sets your ceiling) or the math of replacing a paycheck with passive income. Teach the framework in our own words: what it is, one real number from the fact sheet, one concrete move the viewer can make this week, and the honest catch (effort, risk, or debt). No quotes, and no claims about real people; the video is about the method, not the person. Bold and direct, never hype: no promised income."
+style = "ambitious cinematic night photography, city skyline seen from a high window, hands sketching plans on paper, keys and a signed contract on a desk, deep navy and electric orange palette, strong rim light, sense of momentum"
+grade = "night"
+music_key = "F"

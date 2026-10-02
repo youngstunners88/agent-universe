@@ -1,6 +1,6 @@
 """Configuration and filesystem layout.
 
-Everything the engine touches is resolved from STUDIO (the faceless-studio folder),
+Everything the engine touches is resolved from STUDIO (the repo root),
 so the same code runs locally, in CI, and from a scheduled agent session.
 """
 
@@ -29,6 +29,7 @@ class Paths:
     reports = STUDIO / "gauntlet" / "reports"
     state = STUDIO / "state"
     jobs = STUDIO / "state" / "jobs"
+    research = STUDIO / "channel" / "research"
 
     @classmethod
     def ensure(cls) -> None:
@@ -61,6 +62,25 @@ def pillar(pillar_id: str) -> Pillar:
         if p.id == pillar_id:
             return p
     raise KeyError(f"unknown pillar {pillar_id!r}")
+
+
+def load_dotenv(path: Path | None = None) -> int:
+    """Read KEY=VALUE lines from the studio's .env (gitignored) for runs on your own machine, so keys stay
+    on that machine. Real environment variables win. Returns how many keys were loaded."""
+    path = path or STUDIO / ".env"
+    if not path.exists():
+        return 0
+    n = 0
+    for line in path.read_text(encoding="utf-8").splitlines():
+        line = line.strip()
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+        k, v = line.removeprefix("export ").split("=", 1)
+        k, v = k.strip(), v.strip().strip('"').strip("'")
+        if k and v and not os.environ.get(k):
+            os.environ[k] = v
+            n += 1
+    return n
 
 
 def env(*names: str) -> str | None:

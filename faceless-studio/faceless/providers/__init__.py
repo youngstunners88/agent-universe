@@ -30,7 +30,7 @@ def http() -> requests.Session:
     bundle = ca_bundle()
     if bundle:
         s.verify = bundle
-    s.headers["User-Agent"] = "faceless-studio/0.1"
+    s.headers["User-Agent"] = "0.1"
     return s
 
 
