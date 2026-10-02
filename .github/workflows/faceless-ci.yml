@@ -26,5 +26,5 @@ jobs:
         run: python -c "import faceless.cli, faceless.orchestrator, faceless.pipeline.render, faceless.providers.publish"
       - name: Validate config and seed script
         run: |
-          python -c "from faceless import config; c=config.load(); assert len(c['pillars'])==5; print('pillars ok')"
+          python -c "from faceless import config; from faceless.pipeline.render import GRADES; ps=config.load()['pillars']; ids=[p.id for p in ps]; assert len(ids)==len(set(ids))>=5 and all(p.grade in GRADES for p in ps); print('pillars ok')"
           python -c "import json,glob; [json.load(open(p)) for p in glob.glob('script-lab/final/*.json')]; print('scripts ok')"
