@@ -1,0 +1,15 @@
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+.env
+
+# Faceless studio: media is rebuilt or shipped as CI artifacts; state, scripts, and reports are committed
+faceless-studio/production/output/
+faceless-studio/production/cache/
+faceless-studio/distribution/queue/**/*.mp4
+faceless-studio/distribution/queue/**/*.jpg
+faceless-studio/distribution/queue/**/*.wav
+
+# built website (deployed by CI)
+faceless-studio/site/
